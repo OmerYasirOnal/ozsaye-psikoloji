@@ -2,7 +2,7 @@
 
 # Proje: Özsaye Psikoloji
 
-Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<html lang="tr">`). Uzmanlar: Psk. Dan. Melek Yıldız, Kl. Psk. Sacide Şahin. Ana sayfa (`/`) bölümleri hash-anchor ile bağlı (`#hakkimizda`, `#randevu`, `#surec`, `#sss` vb.). Ayrıca gerçek alt route'lar: `/kvkk-aydinlatma-metni`, `/gizlilik-politikasi`, `/randevu/tesekkurler` (+ `not-found`). SEO dosya-konvansiyonları: `robots.ts`, `sitemap.ts`, `manifest.ts`, `opengraph-image.tsx`, `icon.tsx`.
+Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<html lang="tr">`). Uzmanlar: Psk. Dan. Melek Yıldız, Kl. Psk. Sacide Şahin. Ana sayfa (`/`) bölümleri hash-anchor ile bağlı (`#hakkimizda`, `#randevu`, `#surec`, `#sss` vb.). Ayrıca gerçek alt route'lar: `/hizmetler` + `/hizmetler/[slug]` (8, SSG), `/ekip` + `/ekip/[slug]` (2, SSG), `/kvkk-aydinlatma-metni`, `/gizlilik-politikasi`, `/randevu/tesekkurler` (+ `not-found`). SEO dosya-konvansiyonları: `robots.ts`, `sitemap.ts`, `manifest.ts`, `opengraph-image.tsx`, `icon.tsx`.
 
 ## Stack & konvansiyonlar
 - Next.js 16 App Router + React 19 + Tailwind v4 + TypeScript.
@@ -17,5 +17,5 @@ Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<htm
 - `npm run dev` · `npm run build` · `npm run lint`. Test framework kurulu değil.
 
 ## Notlar
-- SEO/AIO/tasarım/erişilebilirlik incelemesi ve 4 fazlı uygulama yol haritası: `docs/seo-aio-inceleme-yol-haritasi.md`. **Durum:** Faz 1–3 (veri gerektirmeyen kod) uygulandı; Faz 4 (içerik mimarisi — `/hizmetler/[slug]`, `/ekip/[slug]`, MDX blog) bekliyor.
+- SEO/AIO/tasarım/erişilebilirlik incelemesi ve 4 fazlı uygulama yol haritası: `docs/seo-aio-inceleme-yol-haritasi.md`. **Durum:** Faz 1–4 uygulandı (SEO/AIO altyapısı, çalışan form, a11y, sade redesign, hizmet/ekip detay sayfaları). Hizmet içerikleri `src/lib/services.ts` ("yanıt biçimli" TASLAK; uzman onayına açık). **Kalan:** MDX blog (`/yazilar`), Cal.com, ve gerçek veri girişi.
 - Yayın öncesi klinikten doldurulması gereken gerçek veriler (örnekli checklist): `docs/klinikten-gereken-veriler.md`.
