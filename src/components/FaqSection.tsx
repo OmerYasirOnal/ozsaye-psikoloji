@@ -34,6 +34,10 @@ interface Faq {
  * SSS maddesi hem görünümden hem de FAQPage JSON-LD'sinden çıkarılır.
  */
 const pricingReady = isReady(site.pricing.sessionFee);
+// Seans süresi placeholder iken genel/standart bir ifadeye düşülür (sızıntı önlenir).
+const seansSuresi = isReady(site.pricing.duration)
+  ? site.pricing.duration
+  : "yaklaşık 45-50 dakika";
 
 const faqs: Faq[] = [
   {
@@ -106,7 +110,7 @@ const faqs: Faq[] = [
     answer: (
       <>
         Bir bireysel seans genellikle{" "}
-        <span className="font-semibold text-forest">{site.pricing.duration}</span>{" "}
+        <span className="font-semibold text-forest">{seansSuresi}</span>{" "}
         sürer. Görüşmeler çoğunlukla haftada bir yapılır; sürecin başında daha
         düzenli görüşmek, ilerledikçe sıklığı seyrekleştirmek yaygın bir
         yaklaşımdır. Ancak görüşme sıklığı sabit bir kural değildir: ihtiyacınıza,
@@ -114,7 +118,7 @@ const faqs: Faq[] = [
         belirlenir.
       </>
     ),
-    answerText: `Bir bireysel seans genellikle ${site.pricing.duration} sürer. Görüşmeler çoğunlukla haftada bir yapılır; sürecin başında daha düzenli görüşmek, ilerledikçe sıklığı seyrekleştirmek yaygın bir yaklaşımdır. Ancak görüşme sıklığı sabit bir kural değildir: ihtiyacınıza, hedeflerinize ve uzmanınızın değerlendirmesine göre size özel olarak belirlenir.`,
+    answerText: `Bir bireysel seans genellikle ${seansSuresi} sürer. Görüşmeler çoğunlukla haftada bir yapılır; sürecin başında daha düzenli görüşmek, ilerledikçe sıklığı seyrekleştirmek yaygın bir yaklaşımdır. Ancak görüşme sıklığı sabit bir kural değildir: ihtiyacınıza, hedeflerinize ve uzmanınızın değerlendirmesine göre size özel olarak belirlenir.`,
   },
   // Ücret SSS maddesi yalnızca site.pricing.sessionFee gerçek veriyken eklenir;
   // placeholder iken hem görünümden hem JSON-LD'den çıkar (yukarıdaki filtre).
@@ -128,12 +132,12 @@ const faqs: Faq[] = [
               <span className="font-semibold text-forest">
                 {site.pricing.sessionFee}
               </span>{" "}
-              olup, bir seans yaklaşık {site.pricing.duration} sürer.{" "}
+              olup, bir seans yaklaşık {seansSuresi} sürer.{" "}
               {site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı
               görüşme türleri için bizimle iletişime geçebilirsiniz.
             </>
           ),
-          answerText: `Bireysel seans ücreti ${site.pricing.sessionFee} olup, bir seans yaklaşık ${site.pricing.duration} sürer. ${site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı görüşme türleri için bizimle iletişime geçebilirsiniz.`,
+          answerText: `Bireysel seans ücreti ${site.pricing.sessionFee} olup, bir seans yaklaşık ${seansSuresi} sürer. ${site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı görüşme türleri için bizimle iletişime geçebilirsiniz.`,
         },
       ]
     : []),
