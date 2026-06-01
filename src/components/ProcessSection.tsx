@@ -1,5 +1,5 @@
 import ScrollReveal from "./ScrollReveal";
-import { site } from "@/lib/site";
+import { site, isReady } from "@/lib/site";
 
 const steps = [
   {
@@ -25,6 +25,13 @@ const steps = [
 ];
 
 export default function ProcessSection() {
+  // Ücret alanları placeholder ("[DOLDUR]") iken ham metin sızmasın diye
+  // ücret bloğunu tümüyle gizle. Gerçek veri girilince otomatik görünür.
+  const pricingReady =
+    isReady(site.pricing.sessionFee) &&
+    isReady(site.pricing.duration) &&
+    isReady(site.pricing.note);
+
   return (
     <section id="surec" className="bg-cream py-28 lg:py-36">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
@@ -74,6 +81,7 @@ export default function ProcessSection() {
         </ol>
 
         {/* Ücret & Şeffaflık */}
+        {pricingReady && (
         <ScrollReveal delay={2}>
           <div className="mt-20 rounded-2xl border border-sage/15 bg-forest p-8 lg:p-12">
             <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
@@ -111,6 +119,7 @@ export default function ProcessSection() {
             </div>
           </div>
         </ScrollReveal>
+        )}
       </div>
     </section>
   );

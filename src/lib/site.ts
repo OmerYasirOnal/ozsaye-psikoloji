@@ -294,3 +294,18 @@ export function absoluteUrl(path: string): string {
   const suffix = path.startsWith("/") ? path : `/${path}`;
   return `${base}${suffix}`;
 }
+
+/**
+ * Bir alanın gerçek (doldurulmuş) veri olup olmadığını söyler. "[DOLDUR] "
+ * ön-ekli veya boş değerler placeholder kabul edilir; bu durumda arayüzde
+ * gösterilmez / yapısal veriye (JSON-LD) eklenmez. Gerçek veri girilince
+ * koşullu render otomatik olarak içeriği gösterir. Sahte NAP/künye sızıntısını
+ * (özellikle YMYL için) önlemenin tek noktadan kontrolü budur.
+ */
+export function isReady(value?: string | null): boolean {
+  return (
+    typeof value === "string" &&
+    value.trim().length > 0 &&
+    !value.startsWith("[DOLDUR]")
+  );
+}

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { site } from "@/lib/site";
+import { isReady, site } from "@/lib/site";
+
+const HENUZ_DOLDURULMADI = "[Yayından önce doldurulacak]";
 
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni",
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function KvkkAydinlatmaMetniPage() {
   return (
-    <main className="relative min-h-screen bg-cream py-24 lg:py-32">
+    <main id="icerik" className="relative min-h-screen bg-cream py-24 lg:py-32">
       <article className="mx-auto max-w-3xl px-6 lg:px-8">
         {/* Anasayfaya dönüş */}
         <Link
@@ -69,9 +71,9 @@ export default function KvkkAydinlatmaMetniPage() {
 
         {/* Başlık */}
         <header className="mt-12">
-          <span className="inline-block rounded-full bg-sage/15 px-4 py-1.5 text-xs font-semibold tracking-widest text-forest uppercase">
+          <p className="font-body text-xs tracking-[0.2em] text-forest-muted uppercase">
             Kişisel Verilerin Korunması
-          </span>
+          </p>
           <h1 className="mt-6 font-display text-4xl leading-tight font-light text-forest lg:text-5xl">
             KVKK <span className="font-medium italic">Aydınlatma Metni</span>
           </h1>
@@ -103,14 +105,18 @@ export default function KvkkAydinlatmaMetniPage() {
                 <dt className="shrink-0 text-sm font-semibold text-forest sm:w-40">
                   Unvan
                 </dt>
-                <dd className="text-sm text-forest-muted">{site.legalName}</dd>
+                <dd className="text-sm text-forest-muted">
+                  {isReady(site.legalName) ? site.legalName : HENUZ_DOLDURULMADI}
+                </dd>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:gap-3">
                 <dt className="shrink-0 text-sm font-semibold text-forest sm:w-40">
                   Adres
                 </dt>
                 <dd className="text-sm text-forest-muted">
-                  {site.address.full}
+                  {isReady(site.address.full)
+                    ? site.address.full
+                    : HENUZ_DOLDURULMADI}
                 </dd>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:gap-3">
@@ -118,7 +124,9 @@ export default function KvkkAydinlatmaMetniPage() {
                   Telefon
                 </dt>
                 <dd className="text-sm text-forest-muted">
-                  {site.phone.display}
+                  {isReady(site.phone.display)
+                    ? site.phone.display
+                    : HENUZ_DOLDURULMADI}
                 </dd>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:gap-3">
@@ -126,7 +134,9 @@ export default function KvkkAydinlatmaMetniPage() {
                   E-posta
                 </dt>
                 <dd className="text-sm text-forest-muted">
-                  {site.email.address}
+                  {isReady(site.email.address)
+                    ? site.email.address
+                    : HENUZ_DOLDURULMADI}
                 </dd>
               </div>
             </dl>
@@ -403,12 +413,18 @@ export default function KvkkAydinlatmaMetniPage() {
             <div className="mt-5 rounded-xl border border-cream-dark bg-warm-white px-6 py-5">
               <p className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:gap-3">
                 <span className="font-semibold text-forest">E-posta</span>
-                <a
-                  href={site.email.href}
-                  className="font-medium text-forest underline decoration-sage decoration-2 underline-offset-4 transition-colors hover:text-forest-light"
-                >
-                  {site.email.address}
-                </a>
+                {isReady(site.email.address) ? (
+                  <a
+                    href={site.email.href}
+                    className="font-medium text-forest underline decoration-sage decoration-2 underline-offset-4 transition-colors hover:text-forest-light"
+                  >
+                    {site.email.address}
+                  </a>
+                ) : (
+                  <span className="font-medium text-forest-muted">
+                    {HENUZ_DOLDURULMADI}
+                  </span>
+                )}
               </p>
               <p className="mt-3 text-xs leading-relaxed text-forest-muted">
                 Başvurunuzda adınız, soyadınız ve talebinizin konusunu açıkça

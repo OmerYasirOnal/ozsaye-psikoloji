@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { site } from "@/lib/site";
+import { isReady, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Gizlilik Politikası",
@@ -17,20 +17,20 @@ export const metadata: Metadata = {
 const lastUpdated = "[DOLDUR] Yürürlük tarihi";
 
 /** E-posta gerçek veri mi (placeholder değil mi) — gösterimi buna göre uyarla. */
-const emailReady = !site.email.address.startsWith("[DOLDUR]");
+const emailReady = isReady(site.email.address);
 
 export default function GizlilikPolitikasiPage() {
   return (
     <main id="icerik" className="relative bg-cream">
-      {/* Üst dekoratif sage gradient ayraç */}
-      <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-sage/30 to-transparent" />
+      {/* Üst ince sage ayraç */}
+      <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-sage/40" />
 
       <div className="mx-auto max-w-3xl px-6 py-24 lg:px-8 lg:py-32">
         {/* Başlık bloğu */}
         <header className="text-center">
-          <span className="inline-block rounded-full bg-sage/15 px-4 py-1.5 text-xs font-semibold tracking-widest text-forest uppercase">
+          <p className="text-xs font-semibold tracking-widest text-forest uppercase">
             Yasal
-          </span>
+          </p>
           <h1 className="mt-6 font-display text-4xl leading-tight font-light text-forest lg:text-5xl">
             Gizlilik <span className="font-medium italic">Politikası</span>
           </h1>
@@ -278,7 +278,7 @@ function Section({
       >
         {title}
       </h2>
-      <div className="mt-3 h-px w-12 bg-gradient-to-r from-sage/60 to-transparent" />
+      <div className="mt-3 h-px w-12 bg-sage/40" />
       <div className="mt-5 space-y-4 text-base leading-relaxed [&_p]:text-forest-muted">
         {children}
       </div>

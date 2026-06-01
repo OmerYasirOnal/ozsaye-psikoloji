@@ -36,7 +36,9 @@ export default function Services() {
                 href={`/hizmetler/${s.slug}`}
                 className="group flex h-full flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(43,82,51,0.15)] motion-reduce:transition-none lg:p-10"
               >
-                <ServiceIcon name={s.iconKey} />
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage/10">
+                  <ServiceIcon name={s.iconKey} className="h-6 w-6 text-sage" />
+                </span>
                 <h3 className="mt-6 font-display text-xl font-medium text-forest">
                   {s.title}
                 </h3>

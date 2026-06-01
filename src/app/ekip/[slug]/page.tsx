@@ -2,16 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { site } from "@/lib/site";
+import { isReady, site } from "@/lib/site";
 
 // Uzman detay sayfası. Kaynak: site.experts (slug ile bulunur).
 // robots: kök layout dataReady durumuna göre noindex/index yönetir; burada
 // ayarlanmaz (miras alınır).
-
-/** Bir değerin gerçek veri mi (placeholder [DOLDUR] değil mi) olduğunu döndürür. */
-function isReady(value: string): boolean {
-  return value.trim().length > 0 && !value.trim().startsWith("[DOLDUR]");
-}
+// isReady (placeholder filtresi) @/lib/site tek kaynağından gelir.
 
 export function generateStaticParams() {
   return site.experts.map((expert) => ({ slug: expert.slug }));
@@ -48,10 +44,31 @@ export default async function ExpertDetailPage({
     notFound();
   }
 
+  // Monogram: ad kelimelerinin baş harfleri (en fazla 2, büyük harf). Foto
+  // yer tutucusu için. Ör. "Melek Yıldız" -> "MY", "Sacide Şahin" -> "SŞ".
+  const monogram = expert.name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toLocaleUpperCase("tr-TR"))
+    .join("");
+
+  // Placeholder uzman alanları yalnızca gerçek veri girildiğinde gösterilir;
+  // [DOLDUR] iken hiç render edilmez (sahte künye/beyan görünmesin).
+  const bio = isReady(expert.bio) ? expert.bio : null;
+  const university = isReady(expert.university) ? expert.university : null;
+  const membership = isReady(expert.membership) ? expert.membership : null;
+  const credentialsLine = isReady(expert.credentialsLine)
+    ? expert.credentialsLine
+    : null;
+  const degrees = expert.degrees.filter(isReady);
+  const certifications = expert.certifications.filter(isReady);
+  const areas = expert.areas.filter(isReady);
+
   // JSON-LD yalnızca gerçek veri hazır olduğunda (dataReady) üretilir; künye
   // placeholder olduğu sürece yapısal veri yayılmaz.
   const sameAs = expert.sameAs.filter(isReady);
-  const knowsAbout = expert.areas.filter(isReady);
+  const knowsAbout = areas;
 
   const personJsonLd = site.dataReady
     ? {
@@ -64,9 +81,7 @@ export default async function ExpertDetailPage({
           name: site.shortName,
           url: site.url,
         },
-        ...(isReady(expert.university)
-          ? { alumniOf: expert.university }
-          : {}),
+        ...(university ? { alumniOf: university } : {}),
         ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
         ...(sameAs.length > 0 ? { sameAs } : {}),
       }
@@ -117,10 +132,11 @@ export default async function ExpertDetailPage({
           {/* Foto yuvası */}
           <div className="lg:sticky lg:top-28 lg:self-start">
             {/*
-              FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki SVG geçici
-              yer tutucudur. Görsel hazır olduğunda (public yolu
-              expert.image, ör. "/uzmanlar/melek-yildiz.jpg") bu yuvayı
-              next/image ile değiştirin. Örnek:
+              FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki monogram
+              (uzmanın ad baş harfleri) geçici yer tutucudur. Görsel hazır
+              olduğunda (public yolu expert.image, ör.
+              "/uzmanlar/melek-yildiz.jpg") bu yuvayı next/image ile değiştirin.
+              Örnek:
 
                 import Image from "next/image";
 
@@ -136,18 +152,9 @@ export default async function ExpertDetailPage({
               aria-hidden="true"
               className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-sage/15 bg-sage/10"
             >
-              <svg
-                className="h-16 w-16 text-sage"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                viewBox="0 0 24 24"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+              <span className="font-display text-6xl font-light tracking-wide text-sage lg:text-7xl">
+                {monogram}
+              </span>
             </div>
           </div>
 
@@ -164,31 +171,33 @@ export default async function ExpertDetailPage({
             <p className="mt-6 font-body text-base text-forest-muted lg:text-lg">
               {expert.title}
             </p>
-            {isReady(expert.credentialsLine) && (
+            {credentialsLine && (
               <p className="mt-2 font-body text-base leading-relaxed text-forest-muted">
-                {expert.credentialsLine}
+                {credentialsLine}
               </p>
             )}
 
             {/* Biyografi */}
-            <p className="mt-8 max-w-3xl font-body text-base leading-relaxed text-forest-muted lg:text-lg">
-              {expert.bio}
-            </p>
+            {bio && (
+              <p className="mt-8 max-w-3xl font-body text-base leading-relaxed text-forest-muted lg:text-lg">
+                {bio}
+              </p>
+            )}
 
             {/* E-E-A-T künye bloğu */}
             <dl className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-              {isReady(expert.university) && (
+              {university && (
                 <CredentialBlock label="Eğitim kurumu">
                   <p className="font-body text-base leading-relaxed text-forest-muted">
-                    {expert.university}
+                    {university}
                   </p>
                 </CredentialBlock>
               )}
 
-              {expert.degrees.length > 0 && (
+              {degrees.length > 0 && (
                 <CredentialBlock label="Dereceler">
                   <ul className="space-y-2">
-                    {expert.degrees.map((degree) => (
+                    {degrees.map((degree) => (
                       <li
                         key={degree}
                         className="font-body text-base leading-relaxed text-forest-muted"
@@ -200,10 +209,10 @@ export default async function ExpertDetailPage({
                 </CredentialBlock>
               )}
 
-              {expert.certifications.length > 0 && (
+              {certifications.length > 0 && (
                 <CredentialBlock label="Sertifikalar">
                   <ul className="space-y-2">
-                    {expert.certifications.map((cert) => (
+                    {certifications.map((cert) => (
                       <li
                         key={cert}
                         className="font-body text-base leading-relaxed text-forest-muted"
@@ -215,17 +224,17 @@ export default async function ExpertDetailPage({
                 </CredentialBlock>
               )}
 
-              {isReady(expert.membership) && (
+              {membership && (
                 <CredentialBlock label="Üyelik">
                   <p className="font-body text-base leading-relaxed text-forest-muted">
-                    {expert.membership}
+                    {membership}
                   </p>
                 </CredentialBlock>
               )}
             </dl>
 
             {/* Çalışma alanları */}
-            {expert.areas.length > 0 && (
+            {areas.length > 0 && (
               <section aria-labelledby="calisma-alanlari" className="mt-12">
                 <h2
                   id="calisma-alanlari"
@@ -235,7 +244,7 @@ export default async function ExpertDetailPage({
                 </h2>
                 <div aria-hidden="true" className="mt-4 h-px w-12 bg-sage/40" />
                 <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {expert.areas.map((area) => (
+                  {areas.map((area) => (
                     <li key={area} className="flex items-start gap-3">
                       <span
                         aria-hidden="true"

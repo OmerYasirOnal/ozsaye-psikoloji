@@ -1,7 +1,21 @@
 import Link from "next/link";
 
 import ScrollReveal from "./ScrollReveal";
-import { site } from "@/lib/site";
+import { site, isReady } from "@/lib/site";
+
+/**
+ * Uzman adının kelimelerinin baş harflerinden (en fazla 2) büyük harf monogram
+ * üretir. Ör. "Melek Yıldız" -> "MY", "Sacide Şahin" -> "SŞ".
+ */
+function monogram(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toLocaleUpperCase("tr"))
+    .join("");
+}
 
 export default function Team() {
   return (
@@ -45,23 +59,14 @@ export default function Team() {
                       className="mx-auto mb-6 h-28 w-28 rounded-2xl object-cover"
                     />
                 */}
-                {/* Foto placeholder (dekoratif — aria-hidden) */}
+                {/* Foto placeholder (dekoratif — aria-hidden): uzman monogramı */}
                 <div
                   aria-hidden="true"
                   className="mx-auto mb-7 flex h-28 w-28 items-center justify-center rounded-2xl bg-sage/10"
                 >
-                  <svg
-                    className="h-12 w-12 text-sage"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+                  <span className="font-display text-3xl font-light text-sage">
+                    {monogram(expert.name)}
+                  </span>
                 </div>
 
                 {/* Info */}
@@ -72,66 +77,92 @@ export default function Team() {
                   <p className="mt-2 font-body text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
                     {expert.title}
                   </p>
-                  <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">
-                    {expert.bio}
-                  </p>
+                  {isReady(expert.bio) && (
+                    <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">
+                      {expert.bio}
+                    </p>
+                  )}
 
-                  {/* E-E-A-T kimlik sinyalleri (uzmanlık/güven) */}
-                  <dl className="mt-7 space-y-3 text-left font-body text-sm text-forest-muted">
-                    {expert.credentialsLine && (
-                      <div>
-                        <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
-                          Künye
-                        </dt>
-                        <dd className="mt-1 text-forest-muted">
-                          {expert.credentialsLine}
-                        </dd>
-                      </div>
-                    )}
-                    {expert.degrees.length > 0 && (
-                      <div>
-                        <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
-                          Eğitim
-                        </dt>
-                        <dd className="mt-1 text-forest-muted">
-                          {expert.degrees.join(" · ")}
-                          {expert.university ? `, ${expert.university}` : ""}
-                        </dd>
-                      </div>
-                    )}
-                    {expert.certifications.length > 0 && (
-                      <div>
-                        <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
-                          Sertifikalar
-                        </dt>
-                        <dd className="mt-1 text-forest-muted">
-                          {expert.certifications.join(" · ")}
-                        </dd>
-                      </div>
-                    )}
-                    {expert.membership && (
-                      <div>
-                        <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
-                          Üyelik
-                        </dt>
-                        <dd className="mt-1 text-forest-muted">
-                          {expert.membership}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
+                  {/* E-E-A-T kimlik sinyalleri (uzmanlık/güven) — yalnızca gerçek veri */}
+                  {(() => {
+                    const readyDegrees = expert.degrees.filter(isReady);
+                    const readyCertifications =
+                      expert.certifications.filter(isReady);
+                    const hasCredentials =
+                      isReady(expert.credentialsLine) ||
+                      readyDegrees.length > 0 ||
+                      readyCertifications.length > 0 ||
+                      isReady(expert.membership);
 
-                  {/* Areas */}
-                  <div className="mt-7 flex flex-wrap justify-center gap-2">
-                    {expert.areas.map((area) => (
-                      <span
-                        key={area}
-                        className="rounded-full border border-sage/20 px-3 py-1 font-body text-xs text-forest-muted"
-                      >
-                        {area}
-                      </span>
-                    ))}
-                  </div>
+                    if (!hasCredentials) return null;
+
+                    return (
+                      <dl className="mt-7 space-y-3 text-left font-body text-sm text-forest-muted">
+                        {isReady(expert.credentialsLine) && (
+                          <div>
+                            <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
+                              Künye
+                            </dt>
+                            <dd className="mt-1 text-forest-muted">
+                              {expert.credentialsLine}
+                            </dd>
+                          </div>
+                        )}
+                        {readyDegrees.length > 0 && (
+                          <div>
+                            <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
+                              Eğitim
+                            </dt>
+                            <dd className="mt-1 text-forest-muted">
+                              {readyDegrees.join(" · ")}
+                              {isReady(expert.university)
+                                ? `, ${expert.university}`
+                                : ""}
+                            </dd>
+                          </div>
+                        )}
+                        {readyCertifications.length > 0 && (
+                          <div>
+                            <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
+                              Sertifikalar
+                            </dt>
+                            <dd className="mt-1 text-forest-muted">
+                              {readyCertifications.join(" · ")}
+                            </dd>
+                          </div>
+                        )}
+                        {isReady(expert.membership) && (
+                          <div>
+                            <dt className="text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
+                              Üyelik
+                            </dt>
+                            <dd className="mt-1 text-forest-muted">
+                              {expert.membership}
+                            </dd>
+                          </div>
+                        )}
+                      </dl>
+                    );
+                  })()}
+
+                  {/* Areas — yalnızca gerçek (placeholder olmayan) alanlar */}
+                  {(() => {
+                    const readyAreas = expert.areas.filter(isReady);
+                    if (readyAreas.length === 0) return null;
+
+                    return (
+                      <div className="mt-7 flex flex-wrap justify-center gap-2">
+                        {readyAreas.map((area) => (
+                          <span
+                            key={area}
+                            className="rounded-full border border-sage/20 px-3 py-1 font-body text-xs text-forest-muted"
+                          >
+                            {area}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
 
                   {/* Profil bağlantısı */}
                   <Link

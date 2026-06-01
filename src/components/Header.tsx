@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 const navLinks = [
-  { href: "#anasayfa", label: "Anasayfa" },
-  { href: "#hakkimizda", label: "Hakkımızda" },
-  { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
-  { href: "#biz-kimiz", label: "Biz Kimiz" },
-  { href: "#iletisim", label: "İletişim" },
+  { href: "/#anasayfa", label: "Anasayfa" },
+  { href: "/#hakkimizda", label: "Hakkımızda" },
+  { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
+  { href: "/#biz-kimiz", label: "Biz Kimiz" },
+  { href: "/#iletisim", label: "İletişim" },
 ];
 
 export default function Header() {
@@ -92,7 +93,7 @@ export default function Header() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <a href="#anasayfa" className="group flex items-center gap-3">
+        <Link href="/#anasayfa" className="group flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-forest transition-colors group-hover:bg-forest group-hover:text-cream">
             <svg
               width="20"
@@ -118,28 +119,28 @@ export default function Header() {
               Psikoloji
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="relative px-3 py-2 text-sm font-medium text-forest-muted transition-colors hover:text-forest after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-sage after:transition-all after:duration-300 hover:after:w-2/3"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         {/* CTA Button */}
-        <a
-          href="#randevu"
+        <Link
+          href="/#randevu"
           className="hidden rounded-full bg-forest px-6 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/20 lg:block"
         >
           Online Randevu
-        </a>
+        </Link>
 
         {/* Mobile menu button */}
         <button
@@ -172,6 +173,9 @@ export default function Header() {
       {/* Mobile menu overlay */}
       <div
         id="mobil-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menü"
         inert={!mobileOpen}
         className={`fixed inset-0 z-40 bg-cream transition-all duration-500 lg:hidden ${
           mobileOpen
@@ -184,22 +188,22 @@ export default function Header() {
           className="flex h-full flex-col items-center justify-center gap-6"
         >
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
               className="font-display text-3xl font-medium text-forest transition-colors hover:text-forest-light"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <a
-            href="#randevu"
+          <Link
+            href="/#randevu"
             onClick={() => setMobileOpen(false)}
             className="mt-4 rounded-full bg-forest px-8 py-3 text-lg font-semibold text-cream transition-all hover:bg-forest-dark"
           >
             Online Randevu
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

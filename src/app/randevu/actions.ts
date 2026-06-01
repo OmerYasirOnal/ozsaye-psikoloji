@@ -55,7 +55,36 @@ const appointmentSchema = z.object({
   uzman: z.enum(["melek-yildiz", "sacide-sahin", "farketmez"], {
     message: "Lütfen bir uzman seçin.",
   }),
-  tarih: z.string().trim().optional(),
+  tarih: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (v) => {
+        // Boş/verilmemişse opsiyonel: geçerli kabul et.
+        if (!v) return true;
+        // Dolu ise katı "YYYY-MM-DD" biçimi ve gerçek bir takvim tarihi olmalı.
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+        const [year, month, day] = v.split("-").map(Number);
+        const parsedDate = new Date(year!, month! - 1, day!);
+        // Round-trip: ör. "2026-02-30" gibi taşan/geçersiz günleri ele.
+        if (
+          parsedDate.getFullYear() !== year ||
+          parsedDate.getMonth() !== month! - 1 ||
+          parsedDate.getDate() !== day
+        ) {
+          return false;
+        }
+        // Bugünün tarihini ISO "YYYY-MM-DD" olarak (yerel) hesapla ve karşılaştır.
+        const today = new Date();
+        const todayIso = `${today.getFullYear()}-${String(
+          today.getMonth() + 1,
+        ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        // Bugün veya sonrası olmalı (geçmiş tarihi reddet).
+        return v >= todayIso;
+      },
+      { message: "Lütfen bugün veya sonrası için geçerli bir tarih seçin." },
+    ),
   mesaj: z
     .string()
     .trim()
@@ -119,11 +148,12 @@ export async function submitAppointment(
   prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  // 1) Honeypot: gizli "website" alanı bot tarafından doldurulduysa, sessizce
-  // başarılı gibi davran ama hiçbir şey gönderme.
+  // 1) Honeypot: gizli "website" alanı bot tarafından doldurulduysa, gerçek
+  // kullanıcı akışıyla AYNI sonucu göster (aynı teşekkür sayfasına yönlendir) ki
+  // bot başarılı/başarısız ayrımı yapamasın — ama HİÇBİR e-posta gönderme.
   const honeypot = formData.get("website");
   if (typeof honeypot === "string" && honeypot.trim() !== "") {
-    return { status: "success" };
+    redirect("/randevu/tesekkurler");
   }
 
   // 2) Rate-limit kontrolü.
@@ -219,7 +249,8 @@ export async function submitAppointment(
   // onayı şu an yalnızca yukarıdaki e-posta gövdesinde tutuluyor.
 
   // 6) Başarı: teşekkür sayfasına yönlendir.
-  // Not: redirect() bir NEXT_REDIRECT exception fırlatır; bu yüzden try/catch
-  // bloğunun DIŞINDA, fonksiyonun en sonunda çağrılır.
+  // Not: redirect() bir NEXT_REDIRECT exception fırlatır; bu exception'ın
+  // Next.js tarafından yakalanabilmesi için onu kendi try/catch'imizle
+  // sarmıyoruz — bu yüzden redirect fonksiyonun en sonunda çağrılır.
   redirect("/randevu/tesekkurler");
 }

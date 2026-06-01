@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { ServiceIcon } from "@/components/ServiceIcon";
 import { services } from "@/lib/services";
 
@@ -17,9 +15,7 @@ export const metadata: Metadata = {
 
 export default function HizmetlerPage() {
   return (
-    <>
-      <Header />
-      <main id="icerik" className="bg-cream">
+    <main id="icerik" className="bg-cream">
         <section className="py-28 lg:py-36">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
             {/* Sayfa başlığı */}
@@ -51,7 +47,9 @@ export default function HizmetlerPage() {
                   href={`/hizmetler/${service.slug}`}
                   className="group flex h-full flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(43,82,51,0.15)] motion-reduce:transition-none lg:p-10"
                 >
-                  <ServiceIcon name={service.iconKey} className="h-7 w-7 text-sage" />
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage/10">
+                    <ServiceIcon name={service.iconKey} className="h-6 w-6 text-sage" />
+                  </span>
                   <h2 className="mt-6 font-display text-xl font-medium text-forest">
                     {service.title}
                   </h2>
@@ -72,8 +70,6 @@ export default function HizmetlerPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </>
+    </main>
   );
 }

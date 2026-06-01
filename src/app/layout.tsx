@@ -4,6 +4,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import StickyCta from "@/components/StickyCta";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -68,7 +71,10 @@ export default function RootLayout({
         <a href="#icerik" className="skip-link">
           İçeriğe geç
         </a>
+        <Header />
         {children}
+        <Footer />
+        <StickyCta />
         <JsonLd />
         <SpeedInsights />
         <Analytics />

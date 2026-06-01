@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { services } from "@/lib/services";
-import { site } from "@/lib/site";
+import { site, isReady } from "@/lib/site";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -72,11 +72,11 @@ export default function Footer() {
             <span aria-hidden="true" className="mt-4 block h-px w-12 bg-cream/20" />
             <ul className="mt-5 space-y-3">
               {[
-                { href: "#anasayfa", label: "Anasayfa" },
-                { href: "#hakkimizda", label: "Hakkımızda" },
-                { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
-                { href: "#biz-kimiz", label: "Biz Kimiz" },
-                { href: "#iletisim", label: "İletişim" },
+                { href: "/#anasayfa", label: "Anasayfa" },
+                { href: "/#hakkimizda", label: "Hakkımızda" },
+                { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
+                { href: "/#biz-kimiz", label: "Biz Kimiz" },
+                { href: "/#iletisim", label: "İletişim" },
               ].map((link) => (
                 <li key={link.href}>
                   <a
@@ -136,7 +136,9 @@ export default function Footer() {
                   <circle cx="12" cy="10" r="3" />
                 </svg>
                 <span className="font-body text-sm text-sage-light">
-                  {site.address.full}
+                  {isReady(site.address.streetAddress)
+                    ? site.address.full
+                    : "Adres bilgisi yakında"}
                 </span>
               </li>
               <li className="flex items-start gap-3">
@@ -150,12 +152,18 @@ export default function Footer() {
                 >
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                <a
-                  href={site.phone.href}
-                  className="font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
-                >
-                  {site.phone.display}
-                </a>
+                {isReady(site.phone.e164) ? (
+                  <a
+                    href={site.phone.href}
+                    className="font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
+                  >
+                    {site.phone.display}
+                  </a>
+                ) : (
+                  <span className="font-body text-sm text-sage-light">
+                    Telefon yakında
+                  </span>
+                )}
               </li>
               <li className="flex items-start gap-3">
                 <svg
@@ -169,12 +177,18 @@ export default function Footer() {
                   <rect x="2" y="4" width="20" height="16" rx="2" />
                   <path d="M22 4l-10 8L2 4" />
                 </svg>
-                <a
-                  href={site.email.href}
-                  className="font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
-                >
-                  {site.email.address}
-                </a>
+                {isReady(site.email.address) ? (
+                  <a
+                    href={site.email.href}
+                    className="font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
+                  >
+                    {site.email.address}
+                  </a>
+                ) : (
+                  <span className="font-body text-sm text-sage-light">
+                    E-posta yakında
+                  </span>
+                )}
               </li>
             </ul>
 

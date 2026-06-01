@@ -13,6 +13,9 @@ export default function AppointmentForm() {
 
   const errors = state.errors ?? {};
 
+  // Bugünün yerel tarihi "YYYY-MM-DD" — geçmiş tarih seçimini engeller.
+  const minTarih = new Date().toISOString().slice(0, 10);
+
   return (
     <section id="randevu" className="relative bg-forest py-28 lg:py-36">
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
@@ -238,6 +241,7 @@ export default function AppointmentForm() {
                     type="date"
                     id="tarih"
                     name="tarih"
+                    min={minTarih}
                     aria-invalid={errors.tarih ? true : undefined}
                     aria-describedby={errors.tarih ? "tarih-error" : undefined}
                     className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all aria-[invalid=true]:border-red-400"

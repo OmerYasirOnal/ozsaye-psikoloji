@@ -69,6 +69,7 @@ export default async function HizmetDetayPage({
     serviceType: service.title,
     provider: {
       "@type": "MedicalClinic",
+      "@id": site.url + "#klinik",
       name: site.shortName,
       url: site.url,
     },

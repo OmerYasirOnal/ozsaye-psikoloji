@@ -1,5 +1,5 @@
 import ScrollReveal from "./ScrollReveal";
-import { site } from "@/lib/site";
+import { site, isReady } from "@/lib/site";
 
 /**
  * Sıkça Sorulan Sorular bölümü.
@@ -13,9 +13,12 @@ import { site } from "@/lib/site";
  * Yanıtlar "yanıt biçimli" ve net yazıldı; AI/yanıt motorlarının doğrudan
  * alıntılaması kolay olsun diye her cevap kendi başına tam bir bilgi taşır.
  *
- * FAQPage JSON-LD her zaman yayınlanır: içerik gerçek ve doğrudur, NAP/kimlik
- * gibi doğrulanması gereken veriye dayanmaz; bu nedenle site.dataReady'den
- * bağımsızdır.
+ * FAQPage JSON-LD yayınlanır: içerik gerçek ve doğrudur, NAP/kimlik gibi
+ * doğrulanması gereken veriye dayanmaz; bu nedenle site.dataReady'den
+ * bağımsızdır. Tek istisna, seans ücretine atıf yapan SSS maddesidir:
+ * site.pricing.sessionFee placeholder ([DOLDUR]) iken o soru-cevap hem
+ * görünümden hem de JSON-LD mainEntity dizisinden çıkarılır (sahte ücret
+ * beyanının yapısal veriye sızmaması için).
  */
 
 interface Faq {
@@ -25,6 +28,12 @@ interface Faq {
   /** JSON-LD acceptedAnswer.text için düz metin (alıntılanabilir, tek paragraf). */
   answerText: string;
 }
+
+/**
+ * Seans ücreti bilgisi gerçek mi? Placeholder ([DOLDUR]) iken ücrete atıf yapan
+ * SSS maddesi hem görünümden hem de FAQPage JSON-LD'sinden çıkarılır.
+ */
+const pricingReady = isReady(site.pricing.sessionFee);
 
 const faqs: Faq[] = [
   {
@@ -107,21 +116,27 @@ const faqs: Faq[] = [
     ),
     answerText: `Bir bireysel seans genellikle ${site.pricing.duration} sürer. Görüşmeler çoğunlukla haftada bir yapılır; sürecin başında daha düzenli görüşmek, ilerledikçe sıklığı seyrekleştirmek yaygın bir yaklaşımdır. Ancak görüşme sıklığı sabit bir kural değildir: ihtiyacınıza, hedeflerinize ve uzmanınızın değerlendirmesine göre size özel olarak belirlenir.`,
   },
-  {
-    question: "Seans ücreti ne kadardır?",
-    answer: (
-      <>
-        Bireysel seans ücreti{" "}
-        <span className="font-semibold text-forest">
-          {site.pricing.sessionFee}
-        </span>{" "}
-        olup, bir seans yaklaşık {site.pricing.duration} sürer.{" "}
-        {site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı görüşme
-        türleri için bizimle iletişime geçebilirsiniz.
-      </>
-    ),
-    answerText: `Bireysel seans ücreti ${site.pricing.sessionFee} olup, bir seans yaklaşık ${site.pricing.duration} sürer. ${site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı görüşme türleri için bizimle iletişime geçebilirsiniz.`,
-  },
+  // Ücret SSS maddesi yalnızca site.pricing.sessionFee gerçek veriyken eklenir;
+  // placeholder iken hem görünümden hem JSON-LD'den çıkar (yukarıdaki filtre).
+  ...(pricingReady
+    ? [
+        {
+          question: "Seans ücreti ne kadardır?",
+          answer: (
+            <>
+              Bireysel seans ücreti{" "}
+              <span className="font-semibold text-forest">
+                {site.pricing.sessionFee}
+              </span>{" "}
+              olup, bir seans yaklaşık {site.pricing.duration} sürer.{" "}
+              {site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı
+              görüşme türleri için bizimle iletişime geçebilirsiniz.
+            </>
+          ),
+          answerText: `Bireysel seans ücreti ${site.pricing.sessionFee} olup, bir seans yaklaşık ${site.pricing.duration} sürer. ${site.pricing.note} Güncel ücret bilgisi ve çift/aile gibi farklı görüşme türleri için bizimle iletişime geçebilirsiniz.`,
+        },
+      ]
+    : []),
   {
     question: "Randevuyu nasıl alabilirim?",
     answer: (

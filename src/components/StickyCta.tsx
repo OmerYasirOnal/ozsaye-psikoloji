@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 /**
  * Mobil cihazlarda (lg altinda) ekranin altina sabitlenen randevu CTA cubugu.
@@ -41,13 +42,13 @@ export default function StickyCta() {
               Güvenli ve gizli bir görüşme
             </p>
           </div>
-          <a
-            href="#randevu"
+          <Link
+            href="/#randevu"
             aria-label="Online randevu al"
             className="flex min-h-[44px] shrink-0 items-center rounded-full bg-cream px-5 text-sm font-semibold text-forest transition-colors duration-300 hover:bg-cream-light motion-reduce:transition-none"
           >
             Online Randevu Al
-          </a>
+          </Link>
         </div>
       </div>
     </div>

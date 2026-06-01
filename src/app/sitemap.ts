@@ -5,7 +5,8 @@ import { absoluteUrl, site } from "@/lib/site";
 
 /**
  * Sitemap — indekslenmesi istenen genel sayfalar.
- * /randevu/tesekkurler dahil edilmez (noindex teşekkür sayfası).
+ * noindex sayfalar dahil edilmez: /randevu/tesekkurler (teşekkür sayfası),
+ * /kvkk-aydinlatma-metni ve /gizlilik-politikasi (robots index:false).
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -41,17 +42,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
-    {
-      url: absoluteUrl("/kvkk-aydinlatma-metni"),
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: absoluteUrl("/gizlilik-politikasi"),
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
   ];
 }

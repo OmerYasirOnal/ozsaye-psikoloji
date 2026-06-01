@@ -177,3 +177,16 @@ Yukarıdaki **tüm** veriler girilip [9. Doğrulama Kontrolü](#9-doğrulama-kon
 - [ ] `src/lib/site.ts` içinde `site.dataReady` değerini `false` → **`true`** yapın.
 
 Ancak o zaman `src/components/JsonLd.tsx` `MedicalClinic` + iki `Person` yapısal verisini (JSON-LD) yayınlar. Eksik/placeholder veriyle `dataReady = true` yapmayın — Google'a yanlış yapısal veri göndermek SEO açısından zararlıdır.
+
+---
+
+## 11. Yayın Öncesi Teknik Bloker'lar (kod tarafı — geliştirici işi)
+
+Aşağıdakiler veri değil, **kod/altyapı** gerektirir; canlıya çıkmadan ele alınmalı:
+
+- [ ] **KVKK açık rıza kaydı kalıcı saklansın.** Şu an rıza yalnızca bildirim e-postasının gövdesinde zaman damgasıyla tutuluyor (kalıcı kayıt yok). KVKK m.6 açık rızanın ispatını veri sorumlusuna yükler; e-posta silinirse kayıt kaybolur. Bir veritabanı/append-only log (Vercel Marketplace — Neon Postgres/Upstash) ekleyip rıza + zaman damgası + IP yazılmalı.
+- [ ] **Dağıtık rate-limit.** `src/app/randevu/actions.ts` içindeki bellek-içi rate-limit sunucusuz/çok-instance ortamda paylaşılmaz (gerçek koruma sağlamaz). Üretimde Upstash Redis / Vercel KV tabanlı limit ya da Vercel WAF rate-limit kuralı kullanılmalı (honeypot yerinde kalır).
+- [ ] **Resend uçtan uca test.** Gerçek `RESEND_API_KEY` + doğrulanmış gönderen domain ile test başvurusu yapılıp e-postanın `APPOINTMENT_TO_EMAIL` kutusuna ulaştığı doğrulanmalı (şu an key yoksa yalnızca `console.info` log fallback çalışır).
+- [ ] **Gerçek görseller + `next/image`.** Uzman portreleri/ofis görselleri eklenip `next/image` ile (statik import, CLS=0) bağlanmalı; şu an monogram/placeholder yuvalar var.
+- [ ] **`dataReady=true` sonrası JSON-LD doğrulaması.** Gerçek veri girilip `dataReady=true` yapılınca `validator.schema.org` / Google Rich Results Test ile MedicalClinic / Person / Service / FAQPage doğrulanmalı.
+- [ ] **(Opsiyonel) Maskable PWA ikonları** (192×192 ve 512×512 PNG) `manifest.ts`'e eklenebilir.

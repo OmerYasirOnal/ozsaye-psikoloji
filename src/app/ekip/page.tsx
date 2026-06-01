@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { site } from "@/lib/site";
+import { isReady, site } from "@/lib/site";
+
+/** Adın ilk en fazla 2 kelimesinin baş harflerinden büyük harfli monogram üretir. */
+function monogram(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join("")
+    .toLocaleUpperCase("tr-TR");
+}
 
 export const metadata: Metadata = {
   title: "Ekibimiz",
@@ -44,27 +55,18 @@ export default function EkipPage() {
               className="group flex flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(43,82,51,0.15)] lg:p-10"
             >
               {/*
-                FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki SVG geçici
-                yer tutucudur. Görsel hazır olduğunda (public yolu
-                site.experts[].image, ör. "/uzmanlar/melek-yildiz.jpg") bu SVG
-                bloğunu next/image ile değiştirin.
+                FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki monogram
+                geçici yer tutucudur. Görsel hazır olduğunda (public yolu
+                site.experts[].image, ör. "/uzmanlar/melek-yildiz.jpg") bu
+                bloğu next/image ile değiştirin.
               */}
               <div
                 aria-hidden="true"
                 className="mb-7 flex h-24 w-24 items-center justify-center rounded-2xl bg-sage/10"
               >
-                <svg
-                  className="h-11 w-11 text-sage"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+                <span className="font-display text-3xl font-light text-sage">
+                  {monogram(expert.name)}
+                </span>
               </div>
 
               <h2 className="font-display text-2xl font-light text-forest">
@@ -73,9 +75,11 @@ export default function EkipPage() {
               <p className="mt-2 font-body text-base leading-relaxed text-forest-muted">
                 {expert.title}
               </p>
-              <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">
-                {expert.bio}
-              </p>
+              {isReady(expert.bio) && (
+                <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">
+                  {expert.bio}
+                </p>
+              )}
 
               <span className="mt-7 inline-flex items-center gap-1.5 font-body text-sm font-medium text-forest">
                 Profili görüntüle
