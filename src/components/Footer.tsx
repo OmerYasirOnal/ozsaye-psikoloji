@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { services } from "@/lib/services";
 import { site } from "@/lib/site";
 
 export default function Footer() {
@@ -96,15 +97,20 @@ export default function Footer() {
             </h4>
             <span aria-hidden="true" className="mt-4 block h-px w-12 bg-cream/20" />
             <ul className="mt-5 space-y-3">
-              {[
-                "Bireysel Psikoterapi",
-                "Çift Terapisi",
-                "Aile Danışmanlığı",
-                "Çocuk & Ergen Terapisi",
-                "Travma Terapisi",
-              ].map((item) => (
-                <li key={item} className="font-body text-sm text-sage-light">
-                  {item}
+              {services.slice(0, 6).map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/hizmetler/${s.slug}`}
+                    className="group inline-flex items-center gap-1.5 font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
+                  >
+                    {s.title}
+                    <span
+                      aria-hidden="true"
+                      className="text-sage transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                    >
+                      &rarr;
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>

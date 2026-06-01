@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import ScrollReveal from "./ScrollReveal";
 import { site } from "@/lib/site";
 
@@ -26,7 +28,7 @@ export default function Team() {
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           {site.experts.map((expert, idx) => (
             <ScrollReveal key={expert.slug} delay={idx + 2}>
-              <div className="rounded-2xl border border-sage/15 bg-warm-white p-8 transition-colors duration-300 hover:border-sage/30 lg:p-10">
+              <div className="group rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(43,82,51,0.15)] motion-reduce:transition-none lg:p-10">
                 {/*
                   FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki SVG geçici
                   yer tutucudur. Görsel hazır olduğunda (public yolu
@@ -130,6 +132,20 @@ export default function Team() {
                       </span>
                     ))}
                   </div>
+
+                  {/* Profil bağlantısı */}
+                  <Link
+                    href={`/ekip/${expert.slug}`}
+                    className="mt-8 inline-flex items-center gap-1.5 font-body text-sm font-medium text-forest underline decoration-sage/50 underline-offset-[5px] transition-colors duration-300 hover:decoration-forest motion-reduce:transition-none"
+                  >
+                    {expert.name} profilini görüntüle
+                    <span
+                      aria-hidden="true"
+                      className="no-underline transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                    >
+                      →
+                    </span>
+                  </Link>
                 </div>
               </div>
             </ScrollReveal>
