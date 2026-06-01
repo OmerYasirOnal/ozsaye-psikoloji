@@ -18,16 +18,9 @@ import { z } from "zod";
 
 import { site } from "@/lib/site";
 import { saveConsentRecord } from "@/lib/db";
-
-/** useActionState ile uyumlu form durumu. */
-export type ActionState = {
-  status: "idle" | "error" | "success";
-  message?: string;
-  errors?: Record<string, string>;
-};
-
-/** Form ilk render edildiğindeki başlangıç durumu. */
-export const initialState: ActionState = { status: "idle" };
+// ActionState/initialState ayrı (use server olmayan) dosyada — bu dosya yalnızca
+// async fonksiyon export edebilir.
+import type { ActionState } from "./types";
 
 /**
  * Türk cep telefonu formatına toleranslı regex.

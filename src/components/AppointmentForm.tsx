@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import Link from "next/link";
 
-import { submitAppointment, initialState } from "@/app/randevu/actions";
+import { submitAppointment } from "@/app/randevu/actions";
+import { initialState } from "@/app/randevu/types";
 
 export default function AppointmentForm() {
   const [state, formAction, isPending] = useActionState(
