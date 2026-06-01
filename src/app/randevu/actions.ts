@@ -5,12 +5,11 @@
  *
  * Akış: useActionState ile kullanılır (ilk parametre prevState). Zod ile sunucu
  * tarafı doğrulama yapılır, honeypot + basit token-bucket rate-limit uygulanır.
- * RESEND_API_KEY varsa e-posta gönderilir; yoksa dev fallback olarak console.info
- * ile loglanır. Başarıda /randevu/tesekkurler'e redirect edilir.
- *
- * NOT: Kalıcı bir veritabanı yok; KVKK rızası şu an yalnızca e-posta gövdesine
- * zaman damgasıyla yazılır.
- * TODO: rızayı kalıcı sakla (DB).
+ * KVKK açık rızası + başvuru, DATABASE_URL yapılandırılmışsa kalıcı olarak
+ * veritabanına yazılır (src/lib/db.ts) — KVKK m.6 ispat yükümlülüğü için birincil
+ * kayıt budur. Ayrıca RESEND_API_KEY varsa bildirim e-postası gönderilir (yoksa
+ * dev fallback olarak console.info ile loglanır). Başarıda
+ * /randevu/tesekkurler'e redirect edilir.
  */
 
 import { headers } from "next/headers";
@@ -18,6 +17,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { site } from "@/lib/site";
+import { saveConsentRecord } from "@/lib/db";
 
 /** useActionState ile uyumlu form durumu. */
 export type ActionState = {
@@ -129,15 +129,16 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-/** İstek başlıklarından istemci IP'sini çıkarır. */
-async function getClientIp(): Promise<string> {
+/** İstek başlıklarından istemci IP'si ve user-agent'ı çıkarır. */
+async function getRequestMeta(): Promise<{ ip: string; userAgent: string }> {
   const headersList = await headers();
   const forwardedFor = headersList.get("x-forwarded-for");
-  if (forwardedFor) {
-    // İlk değer gerçek istemci IP'sidir (proxy zinciri).
-    return forwardedFor.split(",")[0]!.trim();
-  }
-  return headersList.get("x-real-ip")?.trim() || "unknown";
+  const ip = forwardedFor
+    ? // İlk değer gerçek istemci IP'sidir (proxy zinciri).
+      forwardedFor.split(",")[0]!.trim()
+    : headersList.get("x-real-ip")?.trim() || "unknown";
+  const userAgent = headersList.get("user-agent")?.slice(0, 500) || "unknown";
+  return { ip, userAgent };
 }
 
 /**
@@ -157,7 +158,7 @@ export async function submitAppointment(
   }
 
   // 2) Rate-limit kontrolü.
-  const ip = await getClientIp();
+  const { ip, userAgent } = await getRequestMeta();
   if (!checkRateLimit(ip)) {
     return {
       status: "error",
@@ -195,7 +196,23 @@ export async function submitAppointment(
   const data = parsed.data;
   const consentTimestamp = new Date().toISOString();
 
-  // 4) E-posta gövdesini oluştur.
+  // 4) KVKK açık rızası + başvuruyu kalıcı sakla (DATABASE_URL yapılandırılmışsa).
+  //    İspat yükümlülüğü için birincil kayıt budur; e-posta ikincil kayıttır.
+  //    DB yoksa/yazım başarısızsa kullanıcı akışı bloklanmaz.
+  const consentSaved = await saveConsentRecord({
+    ad: data.ad,
+    telefon: data.telefon,
+    email: data.email,
+    uzman: data.uzman,
+    tarih: data.tarih,
+    mesaj: data.mesaj,
+    kvkkConsent: true,
+    consentAt: consentTimestamp,
+    ip,
+    userAgent,
+  });
+
+  // 5) E-posta gövdesini oluştur.
   const subject = `Yeni Randevu Başvurusu — ${data.ad}`;
   const bodyLines = [
     "Yeni randevu başvurusu alındı.",
@@ -212,10 +229,13 @@ export async function submitAppointment(
     "—",
     `KVKK aydınlatma metni onayı: evet (${consentTimestamp})`,
     `Başvuru IP: ${ip}`,
+    consentSaved
+      ? "Kalıcı kayıt: veritabanına yazıldı."
+      : "Kalıcı kayıt: veritabanı yapılandırılmadı — bu e-posta ikincil kayıttır.",
   ];
   const textBody = bodyLines.join("\n");
 
-  // 5) Gönderim: RESEND_API_KEY varsa Resend ile e-posta, yoksa dev fallback log.
+  // 6) Gönderim: RESEND_API_KEY varsa Resend ile e-posta, yoksa dev fallback log.
   if (process.env.RESEND_API_KEY) {
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -245,10 +265,7 @@ export async function submitAppointment(
     console.info("[Randevu başvurusu — dev fallback]\n" + textBody);
   }
 
-  // TODO: rızayı kalıcı sakla (DB). Kalıcı bir veritabanı olmadığından KVKK
-  // onayı şu an yalnızca yukarıdaki e-posta gövdesinde tutuluyor.
-
-  // 6) Başarı: teşekkür sayfasına yönlendir.
+  // 7) Başarı: teşekkür sayfasına yönlendir.
   // Not: redirect() bir NEXT_REDIRECT exception fırlatır; bu exception'ın
   // Next.js tarafından yakalanabilmesi için onu kendi try/catch'imizle
   // sarmıyoruz — bu yüzden redirect fonksiyonun en sonunda çağrılır.

@@ -116,8 +116,11 @@ Bu değerler kodda **değil**, ortam değişkeni olarak tutulur. Yerelde `.env.l
   - Örn: `"Özsaye Psikoloji <randevu@ozsayepsikoloji.com>"`
 - [ ] **APPOINTMENT_TO_EMAIL** — randevu başvurularının düşeceği e-posta kutusu.
   - Örn: `iletisim@ozsayepsikoloji.com`
+- [ ] **DATABASE_URL** — KVKK rıza + başvuru kaydının yazılacağı Postgres bağlantısı.
+  - **Vercel Marketplace → Postgres (Neon)** entegrasyonu eklenince otomatik gelir; elle de girilebilir.
+  - Yoksa kayıt veritabanına yazılmaz (yalnızca e-posta/log); gelince otomatik aktifleşir.
 
-> Not: Randevu formu Server Action'ı (`src/app/randevu/actions.ts`) bu üç Resend/e-posta değişkenini kullanır. Eksikse form gönderimi başarısız olur.
+> Not: Randevu Server Action'ı (`src/app/randevu/actions.ts`) e-posta için `RESEND_*`/`APPOINTMENT_TO_EMAIL`'i, kalıcı KVKK rıza kaydı için `DATABASE_URL`'i kullanır. Hiçbiri yoksa başvuru `console.info` ile loglanır — **form yine de çalışır, başarısız olmaz.**
 
 ---
 
@@ -184,7 +187,11 @@ Ancak o zaman `src/components/JsonLd.tsx` `MedicalClinic` + iki `Person` yapısa
 
 Aşağıdakiler veri değil, **kod/altyapı** gerektirir; canlıya çıkmadan ele alınmalı:
 
-- [ ] **KVKK açık rıza kaydı kalıcı saklansın.** Şu an rıza yalnızca bildirim e-postasının gövdesinde zaman damgasıyla tutuluyor (kalıcı kayıt yok). KVKK m.6 açık rızanın ispatını veri sorumlusuna yükler; e-posta silinirse kayıt kaybolur. Bir veritabanı/append-only log (Vercel Marketplace — Neon Postgres/Upstash) ekleyip rıza + zaman damgası + IP yazılmalı.
+- [x] **KVKK açık rıza kaydı kalıcı saklama — KOD HAZIR.** Rıza + başvuru (zaman damgası + IP + user-agent ile) `appointment_submissions` tablosuna yazılır (`src/lib/db.ts`, Neon/Postgres serverless sürücü). **Aktifleştirmek için tek kalan: provisioning.**
+  - Vercel projesinde **Marketplace → bir Postgres (Neon) entegrasyonu** ekleyin → `DATABASE_URL` ortam değişkeni otomatik gelir.
+  - Tablo ilk yazımda otomatik (`CREATE TABLE IF NOT EXISTS`) oluşur; istenirse elle: `db/migrations/0001_appointment_submissions.sql`.
+  - `DATABASE_URL` gelene kadar uygulama e-posta/`console.info` fallback'i kullanır (form çalışmaya devam eder).
+  - Not: Tabloda kişisel veri (PII) saklanır; klinik KVKK saklama/silme sürelerini yönetmelidir.
 - [ ] **Dağıtık rate-limit.** `src/app/randevu/actions.ts` içindeki bellek-içi rate-limit sunucusuz/çok-instance ortamda paylaşılmaz (gerçek koruma sağlamaz). Üretimde Upstash Redis / Vercel KV tabanlı limit ya da Vercel WAF rate-limit kuralı kullanılmalı (honeypot yerinde kalır).
 - [ ] **Resend uçtan uca test.** Gerçek `RESEND_API_KEY` + doğrulanmış gönderen domain ile test başvurusu yapılıp e-postanın `APPOINTMENT_TO_EMAIL` kutusuna ulaştığı doğrulanmalı (şu an key yoksa yalnızca `console.info` log fallback çalışır).
 - [ ] **Gerçek görseller + `next/image`.** Uzman portreleri/ofis görselleri eklenip `next/image` ile (statik import, CLS=0) bağlanmalı; şu an monogram/placeholder yuvalar var.
