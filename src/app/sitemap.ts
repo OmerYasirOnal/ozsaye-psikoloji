@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getServiceSlugs } from "@/lib/services";
+import { getPostSlugs } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
 /**
@@ -41,6 +42,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+    })),
+    {
+      url: absoluteUrl("/yazilar"),
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    ...getPostSlugs().map((slug) => ({
+      url: absoluteUrl(`/yazilar/${slug}`),
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
     })),
   ];
 }

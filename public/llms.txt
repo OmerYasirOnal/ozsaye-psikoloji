@@ -18,11 +18,17 @@
 - Melek Yıldız — Psikolojik Danışman (/ekip/melek-yildiz)
 - Sacide Şahin — Klinik Psikolog (/ekip/sacide-sahin)
 
+## Yazılar
+
+- [Terapiye Başlamak: İlk Adımı Atmak Neden Zor ve Nasıl Kolaylaşır?](/yazilar/terapiye-baslamak): Terapiye başlamayı düşünmek neden zor gelebilir ve ilk adımı atmayı kolaylaştıran somut düşünceler.
+- [Kaygıyla Baş Etmek: Günlük Yaşamda İşe Yarayan Yaklaşımlar](/yazilar/kaygiyla-bas-etmek): Kaygının ne olduğu, belirtileri ve günlük yaşamda işe yarayan baş etme yöntemleri.
+
 ## Önemli sayfalar
 
 - Ana sayfa (/)
 - Hizmetler (/hizmetler)
 - Ekip (/ekip)
+- Yazılar (/yazilar)
 - KVKK Aydınlatma Metni (/kvkk-aydinlatma-metni)
 - Gizlilik Politikası (/gizlilik-politikasi)
 

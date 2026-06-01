@@ -76,15 +76,16 @@ export default function Footer() {
                 { href: "/#hakkimizda", label: "Hakkımızda" },
                 { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
                 { href: "/#biz-kimiz", label: "Biz Kimiz" },
+                { href: "/yazilar", label: "Yazılar" },
                 { href: "/#iletisim", label: "İletişim" },
               ].map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="font-body text-sm text-sage-light transition-colors duration-300 hover:text-cream"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
