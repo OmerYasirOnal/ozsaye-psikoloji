@@ -1,42 +1,31 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useActionState } from "react";
+import Link from "next/link";
+
+import { submitAppointment, initialState } from "@/app/randevu/actions";
 
 export default function AppointmentForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [state, formAction, isPending] = useActionState(
+    submitAppointment,
+    initialState,
+  );
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
-  };
+  const errors = state.errors ?? {};
 
   return (
-    <section id="randevu" className="relative overflow-hidden bg-forest py-24 lg:py-32">
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-32 -top-32 h-[400px] w-[400px] rounded-full bg-forest-light/20" />
-        <div className="absolute -bottom-16 -left-16 h-[300px] w-[300px] rounded-full bg-sage/5" />
-        <svg
-          className="absolute right-[10%] top-[15%] h-20 w-20 text-sage/10"
-          viewBox="0 0 100 140"
-          fill="currentColor"
-        >
-          <path d="M50 0 C20 30 5 70 15 110 C25 130 40 140 50 140 C60 140 75 130 85 110 C95 70 80 30 50 0Z" />
-        </svg>
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="randevu" className="relative bg-forest py-28 lg:py-36">
+      <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left: Info */}
           <div className="text-cream">
-            <span className="inline-block rounded-full border border-sage/30 px-4 py-1.5 text-xs font-semibold tracking-widest text-sage uppercase">
+            <p className="font-body text-xs font-medium tracking-[0.25em] text-sage-light uppercase">
               Online Randevu
-            </span>
+            </p>
             <h2 className="mt-6 font-display text-4xl leading-tight font-light lg:text-5xl">
               Başvuru Formu
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-cream/70">
+            <p className="mt-4 text-base leading-relaxed text-sage-light">
               Aşağıdaki formu doldurarak online randevu talebinde
               bulunabilirsiniz. En kısa sürede sizinle iletişime geçeceğiz.
             </p>
@@ -72,11 +61,12 @@ export default function AppointmentForm() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       {item.icon}
                     </svg>
                   </div>
-                  <span className="text-sm text-cream/80">{item.text}</span>
+                  <span className="text-sm text-sage-light">{item.text}</span>
                 </div>
               ))}
             </div>
@@ -84,117 +74,273 @@ export default function AppointmentForm() {
 
           {/* Right: Form */}
           <div className="rounded-2xl bg-cream/95 p-8 shadow-2xl backdrop-blur-sm lg:p-10">
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sage/20">
-                  <svg
-                    className="h-8 w-8 text-forest"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
+            <form action={formAction} className="space-y-5" noValidate>
+              {/* Üst seviye durum mesajı (validasyon özeti / sunucu hatası) */}
+              {state.status === "error" && state.message ? (
+                <div
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
+                >
+                  {state.message}
                 </div>
-                <h3 className="mt-4 font-display text-2xl font-semibold text-forest">
-                  Başvurunuz Alındı
-                </h3>
-                <p className="mt-2 text-sm text-forest/60">
-                  En kısa sürede sizinle iletişime geçeceğiz.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                      Ad Soyad
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Adınız Soyadınız"
-                      className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest/30 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                      Telefon
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="05XX XXX XX XX"
-                      className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest/30 transition-all"
-                    />
-                  </div>
+              ) : (
+                <div aria-live="polite" role="status" className="sr-only">
+                  {state.message ?? ""}
                 </div>
+              )}
 
+              {/* Honeypot: görsel + ekran okuyuculardan gizli; botlar doldurur */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+              >
+                <label htmlFor="website">Web sitesi (boş bırakın)</label>
+                <input
+                  type="text"
+                  id="website"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                    E-posta
+                  <label
+                    htmlFor="ad"
+                    className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
+                  >
+                    Ad Soyad
                   </label>
                   <input
-                    type="email"
+                    type="text"
+                    id="ad"
+                    name="ad"
+                    autoComplete="name"
                     required
-                    placeholder="ornek@email.com"
-                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest/30 transition-all"
+                    placeholder="Adınız Soyadınız"
+                    aria-invalid={errors.ad ? true : undefined}
+                    aria-describedby={errors.ad ? "ad-error" : undefined}
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
                   />
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                      Uzman Tercihi
-                    </label>
-                    <select
-                      required
-                      className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all"
-                      defaultValue=""
+                  {errors.ad ? (
+                    <p
+                      id="ad-error"
+                      role="alert"
+                      className="mt-1.5 text-xs text-red-700"
                     >
-                      <option value="" disabled>
-                        Seçiniz
-                      </option>
-                      <option value="melek">Psk. Dan. Melek Yıldız</option>
-                      <option value="sacide">Kl. Psk. Sacide Şahin</option>
-                      <option value="farketmez">Farketmez</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                      Tercih Edilen Tarih
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all"
-                    />
-                  </div>
+                      {errors.ad}
+                    </p>
+                  ) : null}
                 </div>
-
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold tracking-wider text-forest/70 uppercase">
-                    Mesajınız
+                  <label
+                    htmlFor="telefon"
+                    className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
+                  >
+                    Telefon
                   </label>
-                  <textarea
-                    rows={4}
-                    placeholder="Başvurunuzla ilgili eklemek istediğiniz bilgiler..."
-                    className="w-full resize-none rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest/30 transition-all"
+                  <input
+                    type="tel"
+                    id="telefon"
+                    name="telefon"
+                    autoComplete="tel"
+                    required
+                    placeholder="05XX XXX XX XX"
+                    aria-invalid={errors.telefon ? true : undefined}
+                    aria-describedby={errors.telefon ? "telefon-error" : undefined}
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
                   />
+                  {errors.telefon ? (
+                    <p
+                      id="telefon-error"
+                      role="alert"
+                      className="mt-1.5 text-xs text-red-700"
+                    >
+                      {errors.telefon}
+                    </p>
+                  ) : null}
                 </div>
+              </div>
 
-                <button
-                  type="submit"
-                  className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30"
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
                 >
-                  Randevu Talebini Gönder
-                </button>
+                  E-posta
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  placeholder="ornek@email.com"
+                  aria-invalid={errors.email ? true : undefined}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                  className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                />
+                {errors.email ? (
+                  <p
+                    id="email-error"
+                    role="alert"
+                    className="mt-1.5 text-xs text-red-700"
+                  >
+                    {errors.email}
+                  </p>
+                ) : null}
+              </div>
 
-                <p className="text-center text-xs text-forest/40">
-                  Bilgileriniz gizlilik ilkemiz gereği korunmaktadır.
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="uzman"
+                    className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
+                  >
+                    Uzman Tercihi
+                  </label>
+                  <select
+                    id="uzman"
+                    name="uzman"
+                    required
+                    defaultValue=""
+                    aria-invalid={errors.uzman ? true : undefined}
+                    aria-describedby={errors.uzman ? "uzman-error" : undefined}
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all aria-[invalid=true]:border-red-400"
+                  >
+                    <option value="" disabled>
+                      Seçiniz
+                    </option>
+                    <option value="melek-yildiz">Psk. Dan. Melek Yıldız</option>
+                    <option value="sacide-sahin">Kl. Psk. Sacide Şahin</option>
+                    <option value="farketmez">Farketmez</option>
+                  </select>
+                  {errors.uzman ? (
+                    <p
+                      id="uzman-error"
+                      role="alert"
+                      className="mt-1.5 text-xs text-red-700"
+                    >
+                      {errors.uzman}
+                    </p>
+                  ) : null}
+                </div>
+                <div>
+                  <label
+                    htmlFor="tarih"
+                    className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
+                  >
+                    Tercih Edilen Tarih
+                  </label>
+                  <input
+                    type="date"
+                    id="tarih"
+                    name="tarih"
+                    aria-invalid={errors.tarih ? true : undefined}
+                    aria-describedby={errors.tarih ? "tarih-error" : undefined}
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all aria-[invalid=true]:border-red-400"
+                  />
+                  {errors.tarih ? (
+                    <p
+                      id="tarih-error"
+                      role="alert"
+                      className="mt-1.5 text-xs text-red-700"
+                    >
+                      {errors.tarih}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="mesaj"
+                  className="mb-1.5 block text-xs font-semibold tracking-wider text-forest-muted uppercase"
+                >
+                  Mesajınız
+                </label>
+                <textarea
+                  id="mesaj"
+                  name="mesaj"
+                  rows={4}
+                  placeholder="Başvurunuzla ilgili eklemek istediğiniz bilgiler..."
+                  aria-invalid={errors.mesaj ? true : undefined}
+                  aria-describedby={errors.mesaj ? "mesaj-error" : undefined}
+                  className="w-full resize-none rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                />
+                {errors.mesaj ? (
+                  <p
+                    id="mesaj-error"
+                    role="alert"
+                    className="mt-1.5 text-xs text-red-700"
+                  >
+                    {errors.mesaj}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* KVKK açık rıza */}
+              <div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="kvkk"
+                    name="kvkk"
+                    required
+                    aria-invalid={errors.kvkk ? true : undefined}
+                    aria-describedby={
+                      errors.kvkk ? "kvkk-error kvkk-note" : "kvkk-note"
+                    }
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-sage/40 text-forest accent-forest"
+                  />
+                  <label htmlFor="kvkk" className="text-xs leading-relaxed text-forest-muted">
+                    <Link
+                      href="/kvkk-aydinlatma-metni"
+                      className="font-semibold text-forest underline underline-offset-2 hover:text-forest-dark"
+                    >
+                      KVKK Aydınlatma Metni
+                    </Link>{" "}
+                    ve{" "}
+                    <Link
+                      href="/gizlilik-politikasi"
+                      className="font-semibold text-forest underline underline-offset-2 hover:text-forest-dark"
+                    >
+                      Gizlilik Politikası
+                    </Link>
+                    &apos;nı okudum; kişisel verilerimin başvurumun
+                    değerlendirilmesi amacıyla işlenmesine açık rıza veriyorum.
+                  </label>
+                </div>
+                <p id="kvkk-note" className="mt-2 text-xs text-forest-muted">
+                  Lütfen bu formda sağlık durumunuza ilişkin özel nitelikli
+                  (hassas) bilgileri paylaşmayın; bu tür ayrıntıları
+                  görüşmemizde ele alacağız.
                 </p>
-              </form>
-            )}
+                {errors.kvkk ? (
+                  <p
+                    id="kvkk-error"
+                    role="alert"
+                    className="mt-1.5 text-xs text-red-700"
+                  >
+                    {errors.kvkk}
+                  </p>
+                ) : null}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isPending}
+                className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isPending ? "Gönderiliyor..." : "Randevu Talebini Gönder"}
+              </button>
+
+              <p className="text-center text-xs text-forest-muted">
+                Bilgileriniz gizlilik ilkemiz gereği korunmaktadır.
+              </p>
+            </form>
           </div>
         </div>
       </div>

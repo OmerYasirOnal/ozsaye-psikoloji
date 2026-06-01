@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const navLinks = [
   { href: "#anasayfa", label: "Anasayfa" },
   { href: "#hakkimizda", label: "Hakkımızda" },
   { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
   { href: "#biz-kimiz", label: "Biz Kimiz" },
-  { href: "#yazilar", label: "Yazılar" },
   { href: "#iletisim", label: "İletişim" },
 ];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  // Menü en az bir kez açıldı mı? İlk mount'ta odağı butona kaçırmamak için.
+  const hasOpenedRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -30,6 +33,53 @@ export default function Header() {
     return () => {
       document.body.style.overflow = "";
     };
+  }, [mobileOpen]);
+
+  // Açılınca ilk menü linkine odaklan; kapanınca odağı menü butonuna geri ver.
+  // İlk mount'ta (menü hiç açılmadan) odağı butona taşıma.
+  useEffect(() => {
+    if (mobileOpen) {
+      hasOpenedRef.current = true;
+      const first = mobileMenuRef.current?.querySelector<HTMLElement>("a[href]");
+      first?.focus();
+    } else if (hasOpenedRef.current) {
+      menuButtonRef.current?.focus();
+    }
+  }, [mobileOpen]);
+
+  // ESC ile kapat + basit focus-trap (Tab overlay içinde dönsün).
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const menu = mobileMenuRef.current;
+      if (!menu) return;
+      const focusable = menu.querySelectorAll<HTMLElement>("a[href]");
+      if (focusable.length === 0) return;
+      const firstEl = focusable[0];
+      const lastEl = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [mobileOpen]);
 
   return (
@@ -53,6 +103,7 @@ export default function Header() {
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <path d="M12 22c-4-3-8-7.5-8-12a8 8 0 0 1 16 0c0 4.5-4 9-8 12z" />
               <path d="M12 6v8" />
@@ -63,7 +114,7 @@ export default function Header() {
             <span className="font-display text-xl font-semibold tracking-wide text-forest">
               Özsaye
             </span>
-            <span className="font-body text-[10px] font-light tracking-[0.2em] text-sage-dark uppercase">
+            <span className="font-body text-[10px] font-light tracking-[0.2em] text-forest-muted uppercase">
               Psikoloji
             </span>
           </div>
@@ -75,7 +126,7 @@ export default function Header() {
             <a
               key={link.href}
               href={link.href}
-              className="relative px-3 py-2 text-sm font-medium text-forest/70 transition-colors hover:text-forest after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-sage after:transition-all after:duration-300 hover:after:w-2/3"
+              className="relative px-3 py-2 text-sm font-medium text-forest-muted transition-colors hover:text-forest after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-sage after:transition-all after:duration-300 hover:after:w-2/3"
             >
               {link.label}
             </a>
@@ -92,9 +143,13 @@ export default function Header() {
 
         {/* Mobile menu button */}
         <button
+          ref={menuButtonRef}
+          type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
           className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
-          aria-label="Menü"
+          aria-expanded={mobileOpen}
+          aria-controls="mobil-menu"
+          aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
         >
           <span
             className={`h-[2px] w-6 bg-forest transition-all duration-300 ${
@@ -116,19 +171,24 @@ export default function Header() {
 
       {/* Mobile menu overlay */}
       <div
+        id="mobil-menu"
+        inert={!mobileOpen}
         className={`fixed inset-0 z-40 bg-cream transition-all duration-500 lg:hidden ${
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
       >
-        <nav className="flex h-full flex-col items-center justify-center gap-6">
+        <nav
+          ref={mobileMenuRef}
+          className="flex h-full flex-col items-center justify-center gap-6"
+        >
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="font-display text-3xl font-medium text-forest transition-colors hover:text-sage-dark"
+              className="font-display text-3xl font-medium text-forest transition-colors hover:text-forest-light"
             >
               {link.label}
             </a>

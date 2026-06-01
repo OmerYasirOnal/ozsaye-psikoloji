@@ -7,6 +7,13 @@
   --color-forest: #2B5233;
   --color-forest-dark: #1E3A24;
   --color-forest-light: #3A6B45;
+  /* Yumuşak/soluk koyu yeşil — govde metni icin WCAG AA (>= 4.5:1) uyumlu.
+     Kontrast oranlari (hesaplanmistir):
+       cream      (#F1EAD9) zemine karsi: 5.83:1  AA ✓
+       cream-dark (#E5D9C3) zemine karsi: 5.01:1  AA ✓ (en zorlu zemin, >= 4.5:1)
+       warm-white (#FDFBF7) zemine karsi: 6.76:1  AA ✓
+     Markanin forest tonunda kalan, hafif desature edilmis bir yesildir. */
+  --color-forest-muted: #42604A;
   --color-sage: #92B594;
   --color-sage-light: #AFC6B0;
   --color-sage-dark: #7A9E7C;
@@ -72,58 +79,70 @@ body {
 .hero-animate-delay-2 { animation-delay: 400ms; opacity: 0; }
 .hero-animate-delay-3 { animation-delay: 600ms; opacity: 0; }
 
-/* Floating leaf animation */
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(3deg); }
+/* Global erisilebilir odak halkasi.
+   forest (#2B5233) odak halkasi: cream zemine karsi 7.43:1, cream-dark'a karsi 6.38:1,
+   warm-white'a karsi 8.62:1 — hepsi WCAG odak gostergesi esigi (>= 3:1) uzerinde. */
+:focus-visible {
+  outline: 2px solid #2B5233;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-.leaf-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.leaf-float-slow {
-  animation: float 8s ease-in-out infinite;
-  animation-delay: -2s;
-}
-
-/* Subtle grain overlay */
-.grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Organic section divider */
-.section-divider {
-  position: relative;
-}
-
-.section-divider::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #92B594, transparent);
-  margin: 0 auto;
-}
-
-/* Form focus styles */
+/* Form focus styles — forest tabanli, kontrasti yeterli odak gostergesi.
+   Onceki sage (#92B594) golgesi cream zemine karsi yetersiz kontrasttaydi;
+   forest (#2B5233) box-shadow + kenarlik ile erisilebilir hale getirildi. */
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #92B594;
-  border-color: #92B594;
+  box-shadow: 0 0 0 2px #2B5233;
+  border-color: #2B5233;
 }
 
-/* Reduced motion: show everything immediately */
+/* "Icerige gec" baglantisi (skip-link).
+   Normalde gorsel olarak gizli (clip ile ekran disina alinmaz, klavye/odak erisimini korur);
+   odaklaninca sol-ust kosede gorunur olur: forest zemin, cream metin (7.43:1 kontrast). */
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 9999;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  background-color: #2B5233;
+  color: #F1EAD9;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(30, 58, 36, 0.3);
+}
+
+/* Reduced motion: her seyi aninda goster, devinimleri durdur */
 @media (prefers-reduced-motion: reduce) {
+  /* Yumusak kaydirmayi kapat — kullanici kaydirma animasyonu istemiyor */
+  html {
+    scroll-behavior: auto;
+  }
+
   .reveal {
     opacity: 1;
     transform: none;
@@ -138,10 +157,6 @@ select:focus {
     opacity: 1;
   }
 
-  .leaf-float,
-  .leaf-float-slow {
-    animation: none;
-  }
 }
 
 /* Custom scrollbar */

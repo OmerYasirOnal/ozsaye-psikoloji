@@ -91,42 +91,24 @@ export default function Services() {
   return (
     <section
       id="calisma-alanlari"
-      className="relative bg-warm-white py-24 lg:py-32"
+      className="bg-warm-white py-28 lg:py-36"
     >
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <svg
-          className="absolute -left-16 top-1/4 h-64 w-64 text-sage/5"
-          viewBox="0 0 200 200"
-          fill="currentColor"
-        >
-          <circle cx="100" cy="100" r="100" />
-        </svg>
-        <svg
-          className="absolute -right-16 bottom-1/4 h-48 w-48 text-sage/5"
-          viewBox="0 0 200 200"
-          fill="currentColor"
-        >
-          <circle cx="100" cy="100" r="100" />
-        </svg>
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
         {/* Section header */}
         <div className="mx-auto max-w-2xl text-center">
           <ScrollReveal>
-            <span className="inline-block rounded-full bg-sage/15 px-4 py-1.5 text-xs font-semibold tracking-widest text-forest uppercase">
+            <p className="font-body text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
               Çalışma Alanlarımız
-            </span>
+            </p>
           </ScrollReveal>
           <ScrollReveal delay={1}>
             <h2 className="mt-6 font-display text-4xl leading-tight font-light text-forest lg:text-5xl">
-              Hangi Konularda{" "}
-              <span className="font-medium italic">Destek Sunuyoruz?</span>
+              Hangi konularda{" "}
+              <span className="italic">destek sunuyoruz?</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={2}>
-            <p className="mt-4 text-base text-forest/60">
+            <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">
               Uzman kadromuzla çeşitli psikolojik konularda profesyonel destek
               sağlıyoruz.
             </p>
@@ -134,47 +116,29 @@ export default function Services() {
         </div>
 
         {/* Services grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service, idx) => (
             <ScrollReveal key={service.title} delay={Math.min(idx + 1, 5)}>
-              <div className="group relative h-full overflow-hidden rounded-xl border border-sage/10 bg-cream/50 p-6 transition-all duration-500 hover:-translate-y-1 hover:border-sage/30 hover:bg-cream hover:shadow-lg hover:shadow-sage/10">
-                {/* Icon */}
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-sage/10 transition-colors duration-300 group-hover:bg-forest group-hover:text-cream">
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    viewBox="0 0 24 24"
-                  >
-                    {service.icon}
-                  </svg>
-                </div>
-
-                {/* Content */}
-                <h3 className="font-display text-lg font-semibold text-forest">
+              <article className="flex h-full flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-colors duration-300 hover:border-sage/40 lg:p-10">
+                <svg
+                  aria-hidden="true"
+                  className="h-7 w-7 text-sage"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  {service.icon}
+                </svg>
+                <h3 className="mt-6 font-display text-xl font-medium text-forest">
                   {service.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-forest/60">
+                <p className="mt-3 font-body text-base leading-relaxed text-forest-muted">
                   {service.description}
                 </p>
-
-                {/* Hover arrow */}
-                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-sage-dark opacity-0 transition-all duration-300 group-hover:opacity-100">
-                  <span>Detay</span>
-                  <svg
-                    className="h-3 w-3"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
+              </article>
             </ScrollReveal>
           ))}
         </div>

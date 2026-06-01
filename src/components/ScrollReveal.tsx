@@ -19,6 +19,17 @@ export default function ScrollReveal({
     const el = ref.current;
     if (!el) return;
 
+    // Reduced-motion: devinim istemeyen kullaniciya icerigi aninda goster,
+    // observer'i hic baslatma. (CSS .reveal kurali da bunu garanti eder;
+    // bu kontrol JS tarafinda ek guvence saglar.)
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      el.classList.add("visible");
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
