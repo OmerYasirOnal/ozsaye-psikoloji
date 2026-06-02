@@ -61,7 +61,7 @@ export default function Footer() {
                 { href: "/#hakkimizda", label: "Hakkımızda" },
                 { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
                 { href: "/#biz-kimiz", label: "Biz Kimiz" },
-                { href: "/yazilar", label: "Yazılar" },
+                { href: "/blog", label: "Yazılar" },
                 { href: "/#iletisim", label: "İletişim" },
               ].map((link) => (
                 <li key={link.href}>

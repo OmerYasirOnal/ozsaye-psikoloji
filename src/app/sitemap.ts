@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getServiceSlugs } from "@/lib/services";
-import { getPostSlugs } from "@/lib/blog";
+import { getAllPosts } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
 // Statik export için route handler statik üretilmeli.
@@ -14,6 +14,8 @@ export const dynamic = "force-static";
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
+  const posts = getAllPosts();
+  const lastBlog = posts[0]?.date ? new Date(posts[0].date) : lastModified;
 
   return [
     {
@@ -47,14 +49,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
     {
-      url: absoluteUrl("/yazilar"),
-      lastModified,
+      url: absoluteUrl("/blog"),
+      lastModified: lastBlog,
       changeFrequency: "weekly",
       priority: 0.7,
     },
-    ...getPostSlugs().map((slug) => ({
-      url: absoluteUrl(`/yazilar/${slug}`),
-      lastModified,
+    ...posts.map((post) => ({
+      url: absoluteUrl(`/blog/${post.slug}`),
+      lastModified: new Date(post.date),
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),

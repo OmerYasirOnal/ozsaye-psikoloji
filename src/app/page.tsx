@@ -5,6 +5,7 @@ import ProcessSection from "@/components/ProcessSection";
 import Team from "@/components/Team";
 import AppointmentForm from "@/components/AppointmentForm";
 import FaqSection from "@/components/FaqSection";
+import Articles from "@/components/Articles";
 import Contact from "@/components/Contact";
 
 // Header / Footer / StickyCta artık kök layout'ta (tüm sayfalarda ortak).
@@ -18,6 +19,7 @@ export default function Home() {
       <Team />
       <AppointmentForm />
       <FaqSection />
+      <Articles />
       <Contact />
     </main>
   );

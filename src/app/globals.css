@@ -176,3 +176,55 @@ select:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: #2B5233;
 }
+
+/* Blog makale içeriği (markdown -> html) */
+.article-prose {
+  color: color-mix(in srgb, #2B5233 85%, transparent);
+  font-family: var(--font-body);
+  line-height: 1.8;
+  font-size: 1.075rem;
+}
+.article-prose h2 {
+  font-family: var(--font-display);
+  color: #2B5233;
+  font-size: 1.9rem;
+  font-weight: 600;
+  margin: 2.2rem 0 0.9rem;
+  line-height: 1.25;
+}
+.article-prose h3 {
+  font-family: var(--font-display);
+  color: #2B5233;
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin: 1.8rem 0 0.7rem;
+}
+.article-prose p { margin: 0 0 1.15rem; }
+.article-prose ul,
+.article-prose ol { margin: 0 0 1.15rem; padding-left: 1.4rem; }
+.article-prose li { margin: 0.35rem 0; }
+.article-prose ul li { list-style: none; position: relative; }
+.article-prose ul li::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #92B594;
+}
+.article-prose strong { color: #2B5233; font-weight: 700; }
+.article-prose a { color: #7A9E7C; text-decoration: underline; text-underline-offset: 3px; }
+.article-prose a:hover { color: #2B5233; }
+.article-prose blockquote {
+  margin: 1.6rem 0;
+  padding: 1rem 1.4rem;
+  border-left: 3px solid #92B594;
+  background: color-mix(in srgb, #92B594 10%, transparent);
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-size: 0.97rem;
+  color: color-mix(in srgb, #2B5233 75%, transparent);
+}
+.article-prose blockquote p { margin: 0; }
+.article-prose hr { margin: 2rem 0; border: none; border-top: 1px solid color-mix(in srgb, #2B5233 15%, transparent); }
