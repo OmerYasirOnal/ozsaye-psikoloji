@@ -139,7 +139,7 @@ export const site: Site = {
   // TODO: GERÇEK VERİ -- yasal/tüzel işletme adını girin (ör. "Özsaye Psikoloji Danışmanlık Hizmetleri Ltd. Şti.")
   legalName: "[DOLDUR] Özsaye Psikoloji Danışmanlık Hizmetleri Ltd. Şti.",
 
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ozsayepsikoloji.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ozsaye.com",
 
   // Tüm gerçek NAP/kimlik verisi girilip doğrulanınca `true` yapın.
   dataReady: false,
