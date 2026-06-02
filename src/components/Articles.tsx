@@ -36,6 +36,7 @@ export default function Articles() {
                 stroke="currentColor"
                 strokeWidth="2"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -60,6 +61,7 @@ export default function Articles() {
                       stroke="currentColor"
                       strokeWidth="1"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
@@ -75,7 +77,7 @@ export default function Articles() {
                 <div className="flex flex-1 flex-col p-6">
                   <div className="mb-3 flex items-center gap-3 text-xs text-forest-muted">
                     <span>{formatDateTR(article.date)}</span>
-                    <span className="h-1 w-1 rounded-full bg-sage" />
+                    <span className="h-1 w-1 rounded-full bg-sage" aria-hidden="true" />
                     <span>{article.readTime} okuma</span>
                   </div>
 
@@ -95,6 +97,7 @@ export default function Articles() {
                       stroke="currentColor"
                       strokeWidth="2"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
