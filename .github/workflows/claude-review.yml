@@ -4,8 +4,9 @@ name: Claude PR Review
 # değişiklikleri inceler ve bulgularını PR'a yorum olarak ekler.
 # scripts/review.sh ile aynı amaca hizmet eder; bu sürüm CI'da otomatik çalışır.
 #
-# GEREKSİNİM: Depo ayarlarında `ANTHROPIC_API_KEY` secret'ı tanımlı olmalı
-# (Settings → Secrets and variables → Actions → New repository secret).
+# Kimlik doğrulama: depoya kurulu Claude GitHub App (OIDC) üzerinden yapılır;
+# ayrı bir API anahtarı secret'ı gerekmez. (İlk ekleyen PR'da GitHub güvenlik
+# gereği bir kez "atlanır"; main'e merge edildikten sonra çalışır.)
 
 on:
   pull_request:
@@ -20,7 +21,7 @@ permissions:
 jobs:
   review:
     runs-on: ubuntu-latest
-    # Secret tanımlı değilse iş atlanır (gürültü olmaması için)
+    # Fork'lardan gelen PR'larda çalıştırma (App erişimi olmaz)
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - name: Checkout
@@ -31,7 +32,6 @@ jobs:
       - name: Claude review
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: "--max-turns 20"
           prompt: |
             Sen kıdemli, titiz ve BAĞIMSIZ bir kod gözden geçiricisin. Bu Pull

@@ -29,5 +29,6 @@ Amaç, çalışan oturumun kör noktalarını yakalamaktır. `review-rapor.md` g
 çıktıdır (repoya commit'lenmez; `.gitignore`'da).
 
 Ayrıca CI'da otomatik çalışır: `.github/workflows/claude-review.yml` her PR'da
-bağımsız review yapıp bulgularını yorum olarak ekler (gereksinim: `ANTHROPIC_API_KEY`
-secret'ı). Yerel `review.sh` ile CI Action birbirini tamamlar.
+bağımsız review yapıp bulgularını yorum olarak ekler. Kimlik doğrulama kurulu
+Claude GitHub App (OIDC) ile yapılır; ayrı secret gerekmez. Yerel `review.sh`
+ile CI Action birbirini tamamlar.
