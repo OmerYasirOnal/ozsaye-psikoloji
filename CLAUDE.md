@@ -27,3 +27,7 @@ Türkçe tek sayfa (tek route `/`) psikoloji kliniği tanıtım sitesi; tüm ara
 
 Amaç, çalışan oturumun kör noktalarını yakalamaktır. `review-rapor.md` geçici
 çıktıdır (repoya commit'lenmez; `.gitignore`'da).
+
+Ayrıca CI'da otomatik çalışır: `.github/workflows/claude-review.yml` her PR'da
+bağımsız review yapıp bulgularını yorum olarak ekler (gereksinim: `ANTHROPIC_API_KEY`
+secret'ı). Yerel `review.sh` ile CI Action birbirini tamamlar.

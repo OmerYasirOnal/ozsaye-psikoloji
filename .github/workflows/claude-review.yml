@@ -1,0 +1,53 @@
+name: Claude PR Review
+
+# PR açıldığında/güncellendiğinde, bağımsız (sıfır bağlamlı) bir Claude oturumu
+# değişiklikleri inceler ve bulgularını PR'a yorum olarak ekler.
+# scripts/review.sh ile aynı amaca hizmet eder; bu sürüm CI'da otomatik çalışır.
+#
+# GEREKSİNİM: Depo ayarlarında `ANTHROPIC_API_KEY` secret'ı tanımlı olmalı
+# (Settings → Secrets and variables → Actions → New repository secret).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Secret tanımlı değilse iş atlanır (gürültü olmaması için)
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--max-turns 20"
+          prompt: |
+            Sen kıdemli, titiz ve BAĞIMSIZ bir kod gözden geçiricisin. Bu Pull
+            Request'in değişikliklerini sıfırdan, önyargısız incele.
+
+            Bağlam: Next.js 16 App Router + React 19 + Tailwind v4, TypeScript,
+            `output: export` ile statik export (GoDaddy'de saf HTML). Türkçe
+            içerik. Marka kütüphanesi `scripts/lib/brand.cjs`.
+
+            Şunlara odaklan:
+            - Doğruluk hataları ve kenar durumları
+            - Güvenlik / gizli bilgi sızıntısı / XSS (özellikle dangerouslySetInnerHTML, dış veri)
+            - Next.js 16 statik export uyumu (force-static, generateStaticParams vb.)
+            - Türkçe karakter / encoding sorunları
+            - Ölü kod, kullanılmayan değişken, tutarsızlık, gereksiz tekrar
+
+            Bulgularını PR'a TEK bir kısa Türkçe yorum olarak ekle. Her bulgu:
+            **[Yüksek|Orta|Düşük]** `dosya:satır` — sorun. Öneri: ...
+            Belirgin sorun yoksa bunu açıkça yaz. Kod DEĞİŞTİRME; yalnızca yorum yap.
