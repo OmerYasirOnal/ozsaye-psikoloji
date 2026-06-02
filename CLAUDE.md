@@ -15,3 +15,15 @@ Türkçe tek sayfa (tek route `/`) psikoloji kliniği tanıtım sitesi; tüm ara
 
 ## Notlar
 - SEO/AIO/tasarım/erişilebilirlik incelemesi ve 4 fazlı uygulama yol haritası: `docs/seo-aio-inceleme-yol-haritasi.md`.
+
+## Gözden geçirme (review) akışı — HER ZAMAN
+Önemli bir değişiklik bitince ve **PR açmadan/merge etmeden önce**, sıfır bağlamlı
+(fresh) bir Claude oturumuyla bağımsız review çalıştır:
+
+1. `bash scripts/review.sh` → `review-rapor.md` üretir (main'e göre diff'i ayrı,
+   önyargısız bir oturuma inceletir).
+2. Rapordaki **Yüksek/Orta** öncelikli bulguları düzelt; ardından `npm run lint && npm run build`.
+3. Gerekiyorsa review'i tekrar çalıştır.
+
+Amaç, çalışan oturumun kör noktalarını yakalamaktır. `review-rapor.md` geçici
+çıktıdır (repoya commit'lenmez; `.gitignore`'da).

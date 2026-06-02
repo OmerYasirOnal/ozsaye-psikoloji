@@ -40,7 +40,7 @@ const args = process.argv.slice(2);
 const has = (f) => args.includes(f);
 const opt = (name) => {
   const a = args.find((x) => x.startsWith(`--${name}=`));
-  return a ? a.split("=")[1] : null;
+  return a ? a.slice(a.indexOf("=") + 1) : null;
 };
 const FLAGS = { watch: has("--watch"), force: has("--force"), noLlm: has("--no-llm"), slug: opt("slug") };
 
@@ -52,7 +52,7 @@ function publishedPosts() {
     .filter((f) => f.endsWith(".md"))
     .map((f) => {
       const slug = f.replace(/\.md$/, "");
-      const { data, content } = matter(fs.readFileSync(path.join(BLOG_DIR, f), "utf8"));
+      const { data } = matter(fs.readFileSync(path.join(BLOG_DIR, f), "utf8"));
       return {
         slug,
         title: String(data.title ?? slug),
@@ -60,7 +60,6 @@ function publishedPosts() {
         category: String(data.category ?? "Yazı"),
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         draft: data.draft === true,
-        body: content,
       };
     })
     .filter((p) => !p.draft)
@@ -247,7 +246,7 @@ async function main() {
   console.log(FLAGS.noLlm ? "Mod: şablon (LLM kapalı)" : `Mod: Ollama (${OLLAMA_MODEL} @ ${OLLAMA_URL})`);
   await runOnce();
   if (FLAGS.watch) {
-    const interval = Number(opt("interval") || 60) * 1000;
+    const interval = Math.max(5, Number(opt("interval") || 60)) * 1000;
     console.log(`\n👀 İzleme modu açık — her ${interval / 1000}s'de yeni yazı kontrol edilir. Durdurmak için Ctrl+C.`);
     setInterval(() => { runOnce().catch((e) => console.error(e.message)); }, interval);
   }
