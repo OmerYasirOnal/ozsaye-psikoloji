@@ -1,0 +1,47 @@
+name: GoDaddy'ye Deploy (FTP)
+
+# Statik siteyi build edip GoDaddy paylaşımlı hosting'e (Apache/FTP) yükler.
+# Çalışması için repo Settings > Secrets and variables > Actions altında
+# şu secret'lar tanımlanmalıdır:
+#   FTP_SERVER    -> ör. ftp.alanadiniz.com  (GoDaddy cPanel > FTP Hesapları)
+#   FTP_USERNAME  -> FTP kullanıcı adı
+#   FTP_PASSWORD  -> FTP şifresi
+# Opsiyonel:
+#   FTP_SERVER_DIR sabiti aşağıda; WordPress'i koruyup alt klasöre
+#   yüklemek için "public_html/yeni/" gibi değiştirin.
+
+on:
+  workflow_dispatch: # Actions sekmesinden elle tetikleme
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js kurulumu
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Bağımlılıkları yükle
+        run: npm ci
+
+      - name: Statik build (out/ üretir)
+        run: npm run build
+
+      - name: FTP ile GoDaddy'ye yükle
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./out/
+          # WordPress'i tamamen değiştirmek için: public_html/
+          # WordPress'i koruyup alt dizine koymak için: public_html/yeni/
+          server-dir: public_html/
