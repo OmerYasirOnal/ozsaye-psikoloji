@@ -34,12 +34,12 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { href: "#anasayfa", label: "Anasayfa" },
-                { href: "#hakkimizda", label: "Hakkımızda" },
-                { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
-                { href: "#biz-kimiz", label: "Biz Kimiz" },
-                { href: "#yazilar", label: "Yazılar" },
-                { href: "#iletisim", label: "İletişim" },
+                { href: "/#anasayfa", label: "Anasayfa" },
+                { href: "/#hakkimizda", label: "Hakkımızda" },
+                { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
+                { href: "/#biz-kimiz", label: "Biz Kimiz" },
+                { href: "/blog", label: "Yazılar" },
+                { href: "/#iletisim", label: "İletişim" },
               ].map((link) => (
                 <li key={link.href}>
                   <a
@@ -163,7 +163,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-8 md:flex-row">
           <p className="text-xs text-cream/40">
-            &copy; {currentYear} Özsaye Psikoloji. Tüm hakları saklıdır.
+            &copy; {currentYear} Öz &amp; Saye Psikoloji. Tüm hakları saklıdır.
           </p>
           <div className="flex gap-6">
             <a
