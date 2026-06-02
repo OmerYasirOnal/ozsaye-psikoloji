@@ -1,3 +1,5 @@
+import LogoMark from "./LogoMark";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -8,22 +10,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-cream/30">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 22c-4-3-8-7.5-8-12a8 8 0 0 1 16 0c0 4.5-4 9-8 12z" />
-                  <path d="M12 6v8" />
-                  <path d="M9 9c1.5 1 4.5 1 6 0" />
-                </svg>
-              </div>
+              <LogoMark className="h-11 w-11 text-cream" />
               <div className="flex flex-col">
                 <span className="font-display text-xl font-semibold">
                   Özsaye
