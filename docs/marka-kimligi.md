@@ -1,10 +1,22 @@
 # Öz & Saye Psikoloji — Marka Kimliği Rehberi
 
 Bu doküman markanın görsel temelini özetler: logo kullanımı, renkler, tipografi,
-ses tonu ve hazır sosyal medya şablonları. Görsel üretici script:
-`scripts/generate-brand-assets.cjs` (`node scripts/generate-brand-assets.cjs`) —
-hem site varlıklarını (`public/og.png`, `public/logo.png`) hem de
-`brand/social/` altındaki şablonları üretir.
+ses tonu ve hazır sosyal medya şablonları.
+
+**Görsel üretici script'ler** (tümü `scripts/lib/brand.cjs` ortak kütüphanesini
+kullanır; metin marka fontlarıyla **vektör yola** çevrilir, böylece çıktılar net
+ve fontsuz ortamda da doğru görünür):
+
+| Script | Üretir |
+| --- | --- |
+| `node scripts/generate-logo-kit.cjs` | `brand/logo/` — tüm logo varyantları (SVG + PNG) + `public/logo.png` |
+| `node scripts/generate-instagram.cjs` | `brand/social/instagram/` — Instagram seti |
+| `node scripts/generate-brand-assets.cjs` | `public/og.png` + `brand/social/linkedin-*.png` |
+
+> **Ön koşul — marka fontları:** Script'ler Cormorant Garamond (Bold/SemiBold/
+> MediumItalic) ve Nunito fontlarını `/usr/share/fonts/brand/` altında bekler.
+> Kurulum için `bash scripts/setup-fonts.sh` çalıştırın (Türkçe karakter kapsamı
+> tam olan komple TTF'leri indirir). `opentype.js` devDependency'dir (`npm install`).
 
 ## 0. Marka Adı
 
@@ -17,6 +29,22 @@ kalır; SEO anahtar kelimelerinde hem "Öz & Saye" hem "Özsaye" varyantları tu
 Amblem; **dairesel çerçeve** (güvenli bölge) içinde **kollarını açan figür**
 (kendi özüne doğru), üstte **yaprak kanopisi** (büyüme/şefkat) ve altta
 **nilüfer tabanından** (köklenme) oluşur.
+
+### Logo kiti (`brand/logo/`)
+
+`generate-logo-kit.cjs` ile üretilen, baskı/dijital için hazır tam set. SVG'ler
+vektör (metin outline → font gerektirmez), PNG'ler saydam zeminli yüksek çözünürlük.
+
+| Dosya (svg + png) | Açıklama |
+| --- | --- |
+| `ozsaye-logo` | Ana logo — dikey (amblem üstte, wordmark altta) |
+| `ozsaye-logo-yatay` | Yatay logo |
+| `ozsaye-amblem` (+128/256/512) | Sadece amblem |
+| `ozsaye-logo-ters`, `...-yatay-ters`, `ozsaye-amblem-ters` | Koyu zemin için (cream mürekkep) |
+| `ozsaye-logo-mono-forest` / `-siyah` / `-beyaz` | Tek renk varyantlar |
+| `ozsaye-logo-overview.png` | Tüm varyantların önizleme tablosu |
+
+### Site / sistem varlıkları
 
 | Dosya | Kullanım |
 | --- | --- |
@@ -52,29 +80,38 @@ Renk tokenları `src/app/globals.css` içinde `@theme inline` ile tanımlıdır 
 - **Başlık / vurgu:** Cormorant Garamond (`font-display`) — zarif serif, italik slogan vurgusu.
 - **Gövde:** Nunito (`font-body`) — yumuşak, okunaklı sans-serif.
 
-> Not: PNG marka görselleri, sunucuda Cormorant bulunmadığından serif benzeri sistem fontuyla üretilir. Web sitesinde gerçek Cormorant/Nunito kullanılır.
+> Hem web sitesi hem de tüm PNG/SVG marka görselleri **gerçek Cormorant Garamond
+> ve Nunito** ile üretilir. Görsel üretici script'ler metni vektör yola çevirdiği
+> için çıktılar fontsuz ortamlarda bile birebir aynı görünür.
 
 ## 4. Ses Tonu
 
 Sıcak, güven veren, sakin ve profesyonel. Patolojikleştirmeyen, yargısız,
 kapsayıcı bir dil. Slogan: **"Güvenli Bir Bölgede Kendi Özüne Doğru."**
 
-## 5. Sosyal Medya Şablonları (`brand/social/`)
+## 5. Sosyal Medya Şablonları
+
+### Instagram (`brand/social/instagram/`) — `generate-instagram.cjs`
 
 | Dosya | Boyut | Amaç |
 | --- | --- | --- |
-| `instagram-duyuru.png` | 1080×1080 | Genel duyuru / tanıtım gönderisi |
-| `instagram-alinti.png` | 1080×1080 | Slogan / alıntı kartı (koyu) |
-| `instagram-hizmetler.png` | 1080×1080 | Hizmet listesi |
-| `instagram-story.png` | 1080×1920 | Story / dikey paylaşım |
-| `instagram-avatar.png` | 320×320 | Profil fotoğrafı |
-| `uzman-melek-yildiz.png` | 1080×1350 | Uzman tanıtım kartı (fotoğraf yer tutuculu) |
-| `uzman-sacide-sahin.png` | 1080×1350 | Uzman tanıtım kartı (fotoğraf yer tutuculu) |
+| `profil.png` | 1080×1080 | Profil fotoğrafı (sade amblem, koyu zemin) |
+| `tanitim.png` | 1080×1080 | Genel tanıtım / kilit gönderisi |
+| `alinti.png` | 1080×1080 | Slogan / alıntı kartı (koyu) |
+| `hizmetler.png` | 1080×1080 | Hizmet listesi |
+| `uzman-melek-yildiz.png` | 1080×1350 | Uzman kartı (fotoğraf yer tutuculu) |
+| `uzman-sacide-sahin.png` | 1080×1350 | Uzman kartı (fotoğraf yer tutuculu) |
+| `story.png` | 1080×1920 | Story / dikey paylaşım |
+
+### LinkedIn (`brand/social/`) — `generate-brand-assets.cjs`
+
+| Dosya | Boyut | Amaç |
+| --- | --- | --- |
 | `linkedin-kapak.png` | 1584×396 | LinkedIn kapak görseli |
 | `linkedin-post.png` | 1200×627 | LinkedIn paylaşım görseli |
 
 > Uzman kartlarındaki dairesel alan, baş harfler yerine gerçek vesikalık/portre
 > fotoğrafıyla değiştirilmek üzere tasarlanmıştır.
 
-Şablonları çoğaltmak / metnini değiştirmek için `scripts/generate-brand-assets.cjs`
-içindeki ilgili bölümü düzenleyip script'i yeniden çalıştırın.
+Metni/şablonları değiştirmek için ilgili script'teki bölümü düzenleyip yeniden
+çalıştırın. Ortak çizim mantığı `scripts/lib/brand.cjs` içindedir.
