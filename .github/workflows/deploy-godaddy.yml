@@ -3,7 +3,7 @@ name: GoDaddy'ye Deploy (FTP)
 # Statik siteyi build edip GoDaddy paylaşımlı hosting'e (Apache/FTP) yükler.
 # Çalışması için repo Settings > Secrets and variables > Actions altında
 # şu secret'lar tanımlanmalıdır:
-#   FTP_SERVER    -> ör. ftp.alanadiniz.com  (GoDaddy cPanel > FTP Hesapları)
+#   FTP_SERVER    -> ör. ftp.ozsaye.com  (GoDaddy cPanel > FTP Hesapları)
 #   FTP_USERNAME  -> FTP kullanıcı adı
 #   FTP_PASSWORD  -> FTP şifresi
 # Opsiyonel:

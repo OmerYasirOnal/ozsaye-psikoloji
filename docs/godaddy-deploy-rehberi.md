@@ -20,14 +20,14 @@ npm run build      # -> out/ klasörü oluşur
 Şu anda domain GoDaddy'de WordPress'i gösteriyor. İki seçenek var:
 
 ### Seçenek A — WordPress'i bu site ile DEĞİŞTİR (önerilen)
-Domain (`alanadiniz.com`) doğrudan yeni siteyi açar.
+Domain (`ozsaye.com`) doğrudan yeni siteyi açar.
 - Yükleme hedefi: `public_html/`
 - WordPress dosyaları (wp-admin, wp-content, wp-includes, wp-config.php...)
   ve veritabanı artık kullanılmayacak. **Önce yedek alın** (aşağıya bakın).
 
 ### Seçenek B — WordPress'i KORU, yeni siteyi alt adres/klasöre koy
-- Alt klasör: `public_html/yeni/` -> `alanadiniz.com/yeni/`
-- Veya subdomain: cPanel'den `yeni.alanadiniz.com` subdomain'i oluşturup
+- Alt klasör: `public_html/yeni/` -> `ozsaye.com/yeni/`
+- Veya subdomain: cPanel'den `yeni.ozsaye.com` subdomain'i oluşturup
   onun kök klasörüne yükleyin.
 
 > Seçimi yaptıktan sonra GitHub Actions iş akışındaki `server-dir` değerini
@@ -56,7 +56,7 @@ Domain (`alanadiniz.com`) doğrudan yeni siteyi açar.
 ## Yöntem 2 — FTP ile elle yükleme
 
 1. cPanel > **FTP Accounts** > bir FTP hesabı oluştur/şifre al.
-2. FileZilla ile bağlan (Host: `ftp.alanadiniz.com`, kullanıcı/şifre).
+2. FileZilla ile bağlan (Host: `ftp.ozsaye.com`, kullanıcı/şifre).
 3. `out/` klasörünün **içindeki** tüm dosyaları `public_html/`
    (veya hedef klasöre) sürükle.
 
@@ -68,7 +68,7 @@ GoDaddy'ye FTP ile yüklenir.
 
 Kurulum:
 1. GitHub repo > **Settings > Secrets and variables > Actions > New secret**:
-   - `FTP_SERVER` = `ftp.alanadiniz.com` (cPanel FTP sunucu adresi)
+   - `FTP_SERVER` = `ftp.ozsaye.com` (cPanel FTP sunucu adresi)
    - `FTP_USERNAME` = FTP kullanıcı adınız
    - `FTP_PASSWORD` = FTP şifreniz
 2. İş akışındaki `server-dir`'i seçeneğinize göre ayarlayın
