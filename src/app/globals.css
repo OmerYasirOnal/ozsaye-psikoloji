@@ -144,6 +144,79 @@ select:focus {
   }
 }
 
+/* Blog/yazı gövdesi tipografisi (.prose-ozsaye) */
+.prose-ozsaye {
+  color: color-mix(in srgb, #2B5233 78%, transparent);
+  font-size: 1.0625rem;
+  line-height: 1.85;
+}
+
+.prose-ozsaye > * + * {
+  margin-top: 1.25rem;
+}
+
+.prose-ozsaye h2 {
+  font-family: "Cormorant Garamond", "Cormorant", serif;
+  color: #2B5233;
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 2.5rem;
+}
+
+.prose-ozsaye h3 {
+  font-family: "Cormorant Garamond", "Cormorant", serif;
+  color: #2B5233;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+.prose-ozsaye strong {
+  color: #2B5233;
+  font-weight: 700;
+}
+
+.prose-ozsaye em {
+  font-style: italic;
+}
+
+.prose-ozsaye a {
+  color: #7A9E7C;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-ozsaye a:hover {
+  color: #2B5233;
+}
+
+.prose-ozsaye ul,
+.prose-ozsaye ol {
+  padding-left: 1.5rem;
+}
+
+.prose-ozsaye ul {
+  list-style: disc;
+}
+
+.prose-ozsaye ol {
+  list-style: decimal;
+}
+
+.prose-ozsaye li + li {
+  margin-top: 0.5rem;
+}
+
+.prose-ozsaye blockquote {
+  border-left: 3px solid #92B594;
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  font-style: italic;
+  color: color-mix(in srgb, #2B5233 70%, transparent);
+  background: color-mix(in srgb, #92B594 8%, transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

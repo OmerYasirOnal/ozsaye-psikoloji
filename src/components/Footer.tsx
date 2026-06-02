@@ -1,3 +1,4 @@
+import Link from "next/link";
 import LogoMark from "./LogoMark";
 
 export default function Footer() {
@@ -34,20 +35,20 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { href: "#anasayfa", label: "Anasayfa" },
-                { href: "#hakkimizda", label: "Hakkımızda" },
-                { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
-                { href: "#biz-kimiz", label: "Biz Kimiz" },
-                { href: "#yazilar", label: "Yazılar" },
-                { href: "#iletisim", label: "İletişim" },
+                { href: "/#anasayfa", label: "Anasayfa" },
+                { href: "/#hakkimizda", label: "Hakkımızda" },
+                { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
+                { href: "/#biz-kimiz", label: "Biz Kimiz" },
+                { href: "/yazilar/", label: "Yazılar" },
+                { href: "/#iletisim", label: "İletişim" },
               ].map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-cream/60 transition-colors hover:text-cream"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

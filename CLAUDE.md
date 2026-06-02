@@ -2,7 +2,7 @@
 
 # Proje: Özsaye Psikoloji
 
-Türkçe tek sayfa (tek route `/`) psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<html lang="tr">`). Uzmanlar: Psk. Dan. Melek Yıldız, Kl. Psk. Sacide Şahin. Bölümler hash-anchor ile bağlı (`#hakkimizda`, `#randevu` vb.) — gerçek alt route yok.
+Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<html lang="tr">`). Uzmanlar: Psk. Dan. Melek Yıldız, Kl. Psk. Sacide Şahin. Anasayfa (`/`) bölümleri hash-anchor ile bağlı (`#hakkimizda`, `#randevu` vb.). Ayrıca blog/haber route'ları: `/yazilar` (liste) ve `/yazilar/[slug]` (detay).
 
 ## Stack & konvansiyonlar
 - Next.js 16 App Router + React 19 + Tailwind v4 + TypeScript.
@@ -15,3 +15,5 @@ Türkçe tek sayfa (tek route `/`) psikoloji kliniği tanıtım sitesi; tüm ara
 
 ## Notlar
 - SEO/AIO/tasarım/erişilebilirlik incelemesi ve 4 fazlı uygulama yol haritası: `docs/seo-aio-inceleme-yol-haritasi.md`.
+- Blog/haber altyapısı: yazılar `content/yazilar/*.md` (frontmatter + markdown), `src/lib/blog.ts` build sırasında okur; statik export için `generateStaticParams` + `dynamicParams=false`.
+- Otomatik içerik & çok platformlu yayın (Ollama + Instagram/Facebook/web): `automation/` (ayrı Node projesi), mimari `docs/otomatik-icerik-sistemi.md`. `automation/` kök lint/build'in dışındadır (eslint ignore + tsconfig exclude).

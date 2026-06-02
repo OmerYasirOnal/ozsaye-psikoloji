@@ -1,33 +1,11 @@
+import Link from "next/link";
 import ScrollReveal from "./ScrollReveal";
-
-const articles = [
-  {
-    title: "Kaygı ile Başa Çıkmanın 5 Etkili Yolu",
-    excerpt:
-      "Günlük yaşamda kaygıyı azaltmak ve daha huzurlu bir yaşam sürmek için uygulayabileceğiniz pratik yöntemler.",
-    date: "15 Mayıs 2026",
-    category: "Anksiyete",
-    readTime: "5 dk",
-  },
-  {
-    title: "Sağlıklı İlişkilerin Temel Dinamikleri",
-    excerpt:
-      "İlişkilerde güvenli bağlanma, sağlıklı iletişim ve karşılıklı saygının önemi üzerine bir değerlendirme.",
-    date: "8 Mayıs 2026",
-    category: "İlişkiler",
-    readTime: "7 dk",
-  },
-  {
-    title: "Çocuklarda Duygusal Gelişim Evreleri",
-    excerpt:
-      "Çocukların duygusal gelişim sürecini anlamak ve ebeveyn olarak nasıl destekleyebileceğinizi keşfedin.",
-    date: "1 Mayıs 2026",
-    category: "Çocuk Gelişimi",
-    readTime: "6 dk",
-  },
-];
+import { getAllPosts } from "@/lib/blog";
 
 export default function Articles() {
+  // En güncel 3 yazıyı (içerik klasöründen) gösterir.
+  const articles = getAllPosts().slice(0, 3);
+
   return (
     <section id="yazilar" className="relative bg-cream py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -46,8 +24,8 @@ export default function Articles() {
             </ScrollReveal>
           </div>
           <ScrollReveal delay={2}>
-            <a
-              href="#yazilar"
+            <Link
+              href="/yazilar/"
               className="group inline-flex items-center gap-2 rounded-full border-2 border-forest/20 px-6 py-3 text-sm font-semibold text-forest transition-all hover:border-forest hover:bg-forest hover:text-cream"
             >
               Tüm Yazılar
@@ -60,14 +38,14 @@ export default function Articles() {
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </ScrollReveal>
         </div>
 
         {/* Articles grid */}
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article, idx) => (
-            <ScrollReveal key={article.title} delay={idx + 1}>
+            <ScrollReveal key={article.slug} delay={idx + 1}>
               <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-warm-white transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-sage/10">
                 {/* Image placeholder */}
                 <div className="relative h-48 overflow-hidden bg-sage/10">
@@ -92,9 +70,9 @@ export default function Articles() {
                 {/* Content */}
                 <div className="flex flex-1 flex-col p-6">
                   <div className="mb-3 flex items-center gap-3 text-xs text-forest/50">
-                    <span>{article.date}</span>
+                    <span>{article.formattedDate}</span>
                     <span className="h-1 w-1 rounded-full bg-sage" />
-                    <span>{article.readTime} okuma</span>
+                    <span>{article.readingTime} okuma</span>
                   </div>
 
                   <h3 className="font-display text-xl font-semibold leading-snug text-forest transition-colors group-hover:text-forest-light">
@@ -102,11 +80,11 @@ export default function Articles() {
                   </h3>
 
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-forest/60">
-                    {article.excerpt}
+                    {article.description}
                   </p>
 
-                  <a
-                    href="#"
+                  <Link
+                    href={`/yazilar/${article.slug}/`}
                     className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-sage-dark transition-colors group-hover:text-forest"
                   >
                     Devamını Oku
@@ -119,7 +97,7 @@ export default function Articles() {
                     >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </article>
             </ScrollReveal>

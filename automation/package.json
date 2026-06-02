@@ -1,0 +1,23 @@
+{
+  "name": "ozsaye-otomasyon",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Öz & Saye Psikoloji için Local LLM (Ollama) tabanlı otomatik içerik üretim ve çok platformlu yayın sistemi.",
+  "bin": {
+    "ozsaye": "src/cli.js"
+  },
+  "scripts": {
+    "generate": "node src/cli.js generate",
+    "review": "node src/cli.js review",
+    "publish": "node src/cli.js publish",
+    "start": "node src/cli.js start"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

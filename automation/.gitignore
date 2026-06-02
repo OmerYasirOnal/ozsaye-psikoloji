@@ -1,0 +1,6 @@
+node_modules/
+.env
+# Çalışma zamanı verileri (üretilen taslaklar, kuyruk durumu) repoya girmez.
+data/queue/
+data/state.json
+*.log

@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Node tabanlı build araçları (uygulama kodu değil):
     "scripts/**",
+    // Otomatik içerik sistemi — kendi Node projesi, ayrı çalışır:
+    "automation/**",
   ]),
 ]);
 
