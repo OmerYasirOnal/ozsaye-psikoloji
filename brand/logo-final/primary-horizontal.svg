@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="600" viewBox="0 0 1800 600" role="img" aria-label="Öz &amp; Saye Psikoloji yatay logosu">
+  <rect width="1800" height="600" fill="#F5F2EB"/>
+  <g transform="translate(170,88) scale(0.92)">
+    <g transform="translate(0,8)">
+      <path d="M132 205 A168 168 0 0 1 468 205" fill="none" stroke="#1F3B2E" stroke-width="16" stroke-linecap="round"/>
+      <path d="M300 226 C278 170 242 128 188 96 C228 101 273 124 300 178 C327 124 372 101 412 96 C358 128 322 170 300 226Z" fill="#1F3B2E"/>
+      <circle cx="300" cy="83" r="25" fill="#1F3B2E"/>
+      <path d="M110 211 C155 215 216 254 258 334 C189 318 128 283 91 231 C82 218 90 208 110 211Z" fill="#A6B79B"/>
+      <path d="M490 211 C445 215 384 254 342 334 C411 318 472 283 509 231 C518 218 510 208 490 211Z" fill="#A6B79B"/>
+      <path d="M226 234 C258 262 276 298 286 340 C248 320 221 285 207 235 C205 227 214 226 226 234Z" fill="#D8A7A5"/>
+      <path d="M374 234 C342 262 324 298 314 340 C352 320 379 285 393 235 C395 227 386 226 374 234Z" fill="#D8A7A5"/>
+      <path d="M143 244 C170 270 204 295 244 315" fill="none" stroke="#F5F2EB" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+      <path d="M457 244 C430 270 396 295 356 315" fill="none" stroke="#F5F2EB" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+    </g>
+  </g>
+  <line x1="770" y1="155" x2="770" y2="445" stroke="#1F3B2E" stroke-width="2" opacity="0.22"/>
+  <text x="870" y="290" fill="#1F3B2E" font-family="Playfair Display, Cormorant Garamond, Georgia, serif" font-size="150" font-weight="500" letter-spacing="1">Öz &amp; Saye</text>
+  <text x="875" y="405" fill="#D8A7A5" font-family="Montserrat, Nunito, Arial, sans-serif" font-size="48" font-weight="400" letter-spacing="45">PSİKOLOJİ</text>
+</svg>
