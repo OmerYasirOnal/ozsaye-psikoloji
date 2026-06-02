@@ -42,6 +42,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./out/
-          # WordPress'i tamamen değiştirmek için: public_html/
-          # WordPress'i koruyup alt dizine koymak için: public_html/yeni/
-          server-dir: public_html/
+          # FTP hesabı public_html'e kilitli (Directory = public_html) olduğu
+          # için yüklenecek hedef, hesabın kendi kök dizinidir.
+          server-dir: ./
