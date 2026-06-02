@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import LogoMark from "./LogoMark";
 
 const navLinks = [
-  { href: "#anasayfa", label: "Anasayfa" },
-  { href: "#hakkimizda", label: "Hakkımızda" },
-  { href: "#calisma-alanlari", label: "Çalışma Alanlarımız" },
-  { href: "#biz-kimiz", label: "Biz Kimiz" },
-  { href: "#yazilar", label: "Yazılar" },
-  { href: "#iletisim", label: "İletişim" },
+  { href: "/#anasayfa", label: "Anasayfa" },
+  { href: "/#hakkimizda", label: "Hakkımızda" },
+  { href: "/#calisma-alanlari", label: "Çalışma Alanlarımız" },
+  { href: "/#biz-kimiz", label: "Biz Kimiz" },
+  { href: "/blog", label: "Yazılar" },
+  { href: "/#iletisim", label: "İletişim" },
 ];
 
 export default function Header() {
@@ -43,7 +44,7 @@ export default function Header() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <a href="#anasayfa" className="group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3">
           <LogoMark className="h-11 w-11 text-forest transition-transform duration-300 group-hover:scale-105" />
           <div className="flex flex-col">
             <span className="font-display text-xl font-semibold tracking-wide text-forest">
@@ -53,7 +54,7 @@ export default function Header() {
               Psikoloji
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex">
@@ -69,12 +70,12 @@ export default function Header() {
         </nav>
 
         {/* CTA Button */}
-        <a
-          href="#randevu"
+        <Link
+          href="/#randevu"
           className="hidden rounded-full bg-forest px-6 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/20 lg:block"
         >
           Online Randevu
-        </a>
+        </Link>
 
         {/* Mobile menu button */}
         <button
@@ -119,13 +120,13 @@ export default function Header() {
               {link.label}
             </a>
           ))}
-          <a
-            href="#randevu"
+          <Link
+            href="/#randevu"
             onClick={() => setMobileOpen(false)}
             className="mt-4 rounded-full bg-forest px-8 py-3 text-lg font-semibold text-cream transition-all hover:bg-forest-dark"
           >
             Online Randevu
-          </a>
+          </Link>
         </nav>
       </div>
     </header>
