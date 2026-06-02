@@ -10,7 +10,7 @@ export default function NotFound() {
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-warm-white px-6">
       {/* Tek hafif atmosfer (Hero ile aynı dil) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-12%] h-[60vh] w-[60vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(146,181,148,0.14),transparent_68%)]" />
+        <div className="absolute left-1/2 top-[-12%] h-[60vh] w-[60vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(167,191,167,0.14),transparent_68%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-2xl text-center">

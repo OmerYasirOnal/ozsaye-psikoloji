@@ -6,7 +6,7 @@ export default function Hero() {
     >
       {/* Tek, çok hafif atmosfer: üst-merkezde sıcak sage ışıması (sade derinlik) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-12%] h-[62vh] w-[62vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(146,181,148,0.16),transparent_68%)]" />
+        <div className="absolute left-1/2 top-[-12%] h-[62vh] w-[62vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(167,191,167,0.16),transparent_68%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl text-center">
@@ -31,7 +31,7 @@ export default function Hero() {
           Psikolojik Danışmanlık &amp; Klinik Psikoloji
         </p>
 
-        {/* Başlık — marka sloganı, zarif Cormorant, tek italik vurgu */}
+        {/* Başlık — marka sloganı, zarif Playfair Display, tek italik vurgu */}
         <h1 className="hero-animate hero-animate-delay-1 mt-6 font-display text-5xl leading-[1.06] font-light tracking-tight text-forest sm:text-6xl lg:text-7xl">
           Güvenli bir bölgede
           <br />

@@ -1,6 +1,6 @@
 // Öz & Saye Psikoloji — profesyonel Instagram seti
 // Çalıştırma: node scripts/generate-instagram.cjs
-// Tüm metin marka fontlarıyla (Cormorant Garamond + Nunito) vektör yola
+// Tüm metin marka fontlarıyla (Playfair Display + Montserrat) vektör yola
 // çevrilir; çıktı net ve tutarlıdır. Bkz. scripts/lib/brand.cjs ön koşulları.
 const fs = require("fs");
 const path = require("path");

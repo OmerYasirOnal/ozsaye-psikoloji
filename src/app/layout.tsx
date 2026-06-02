@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Nunito } from "next/font/google";
+import { Playfair_Display, Montserrat } from "next/font/google";
 import { site } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import Header from "@/components/Header";
@@ -7,14 +7,14 @@ import Footer from "@/components/Footer";
 import StickyCta from "@/components/StickyCta";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
-const nunito = Nunito({
+const montserrat = Montserrat({
   variable: "--font-body",
   subsets: ["latin", "latin-ext"],
   display: "swap",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2B5233",
+  themeColor: "#23472E",
   colorScheme: "light",
 };
 
@@ -88,7 +88,7 @@ export default function RootLayout({
     <html
       lang="tr"
       dir="ltr"
-      className={`${cormorant.variable} ${nunito.variable}`}
+      className={`${playfair.variable} ${montserrat.variable}`}
     >
       <body className="min-h-screen bg-cream font-body text-forest antialiased">
         <a href="#icerik" className="skip-link">

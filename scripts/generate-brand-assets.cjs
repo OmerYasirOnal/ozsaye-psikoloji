@@ -1,6 +1,6 @@
 // Öz & Saye Psikoloji — site + LinkedIn marka görselleri
 // Çalıştırma: node scripts/generate-brand-assets.cjs
-// Metin marka fontlarıyla (Cormorant Garamond + Nunito) vektör yola çevrilir.
+// Metin marka fontlarıyla (Playfair Display + Montserrat) vektör yola çevrilir.
 // Bkz. scripts/lib/brand.cjs ön koşulları.
 //   public/og.png            (1200x630 — OpenGraph/Twitter paylaşım görseli)
 //   brand/social/linkedin-kapak.png, linkedin-post.png

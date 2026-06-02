@@ -8,8 +8,8 @@ export const dynamic = "force-static";
 /**
  * Web App Manifest (app/manifest.ts → /manifest.webmanifest).
  *
- * Marka renkleri palet token'larıyla birebir: background_color cream (#F1EAD9),
- * theme_color forest (#2B5233). Arayüz dili Türkçe (lang "tr", dir "ltr").
+ * Marka renkleri palet token'larıyla birebir: background_color cream (#F3EFE6),
+ * theme_color forest (#23472E). Arayüz dili Türkçe (lang "tr", dir "ltr").
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -18,8 +18,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: site.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#F1EAD9",
-    theme_color: "#2B5233",
+    background_color: "#F3EFE6",
+    theme_color: "#23472E",
     lang: "tr",
     dir: "ltr",
     // TODO: GERÇEK VERİ -- Gerçek maskable PNG ikonlar eklenecek (örn. 192x192 ve

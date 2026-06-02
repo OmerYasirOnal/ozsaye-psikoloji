@@ -223,11 +223,16 @@ export default function GizlilikPolitikasiPage() {
               </p>
             ) : (
               <p>
-                {/* TODO: GERÇEK VERİ -- site.email gerçek adresle doldurulunca bu placeholder otomatik gerçek bağlantıya döner */}
-                E-posta:{" "}
-                <span className="font-semibold text-forest">
-                  {site.email.address}
-                </span>
+                {/* TODO: GERÇEK VERİ -- site.email doldurulunca üstteki emailReady dalı gerçek bağlantıyı gösterir */}
+                İletişim e-posta adresimiz yakında bu sayfada paylaşılacaktır; o
+                zamana dek{" "}
+                <Link
+                  href="/#randevu"
+                  className="font-semibold text-forest underline decoration-sage/50 underline-offset-4 transition-colors hover:decoration-forest"
+                >
+                  randevu formu
+                </Link>{" "}
+                üzerinden bize ulaşabilirsiniz.
               </p>
             )}
           </Section>

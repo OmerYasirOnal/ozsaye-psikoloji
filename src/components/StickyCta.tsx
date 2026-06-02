@@ -33,7 +33,7 @@ export default function StickyCta() {
       }}
     >
       <div className="mx-auto max-w-xl px-4 pt-3">
-        <div className="flex items-center justify-between gap-3 rounded-2xl bg-forest px-4 py-3 text-cream shadow-[0_-4px_24px_rgba(30,58,36,0.25)] ring-1 ring-cream/10">
+        <div className="flex items-center justify-between gap-3 rounded-2xl bg-forest px-4 py-3 text-cream shadow-[0_-4px_24px_rgba(23,49,31,0.25)] ring-1 ring-cream/10">
           <div className="min-w-0 flex-1">
             <p className="font-display text-lg leading-tight font-medium">
               İlk adımı <span className="italic text-sage-light">birlikte</span> atalım

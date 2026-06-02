@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni",
   description:
     "Öz & Saye Psikoloji kişisel verilerin korunması (KVKK 6698) aydınlatma metni taslağı.",
+  alternates: { canonical: "/kvkk-aydinlatma-metni" },
   robots: { index: false, follow: true },
 };
 
@@ -40,7 +41,7 @@ export default function KvkkAydinlatmaMetniPage() {
         {/* Taslak uyarı kutusu */}
         <div
           role="note"
-          className="mt-8 rounded-2xl border border-forest/20 bg-warm-white px-6 py-5 shadow-[0_1px_12px_rgba(43,82,51,0.06)]"
+          className="mt-8 rounded-2xl border border-forest/20 bg-warm-white px-6 py-5 shadow-[0_1px_12px_rgba(35,71,46,0.06)]"
         >
           <p className="flex items-start gap-3 text-sm leading-relaxed text-forest-muted">
             <svg

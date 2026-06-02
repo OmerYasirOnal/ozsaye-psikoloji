@@ -3,13 +3,31 @@ import Link from "next/link";
 
 import { ServiceIcon } from "@/components/ServiceIcon";
 import { services } from "@/lib/services";
+import { site } from "@/lib/site";
+
+const description =
+  "Öz & Saye Psikoloji çalışma alanları: bireysel psikoterapi, çift terapisi, aile danışmanlığı, çocuk ve ergen terapisi ve daha fazlasında profesyonel destek.";
 
 export const metadata: Metadata = {
   title: "Çalışma Alanlarımız",
-  description:
-    "Öz & Saye Psikoloji çalışma alanları: bireysel psikoterapi, çift terapisi, aile danışmanlığı, çocuk ve ergen terapisi ve daha fazlasında profesyonel destek.",
+  description,
   alternates: {
     canonical: "/hizmetler",
+  },
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    url: "/hizmetler",
+    siteName: site.shortName,
+    title: `Çalışma Alanlarımız | ${site.shortName}`,
+    description,
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Çalışma Alanlarımız | ${site.shortName}`,
+    description,
+    images: ["/og.png"],
   },
 };
 
@@ -45,7 +63,7 @@ export default function HizmetlerPage() {
                 <Link
                   key={service.slug}
                   href={`/hizmetler/${service.slug}`}
-                  className="group flex h-full flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(43,82,51,0.15)] motion-reduce:transition-none lg:p-10"
+                  className="group flex h-full flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(35,71,46,0.15)] motion-reduce:transition-none lg:p-10"
                 >
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage/10">
                     <ServiceIcon name={service.iconKey} className="h-6 w-6 text-sage" />

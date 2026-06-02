@@ -3,35 +3,38 @@
 // yerleştirme yardımcıları. generate-logo-kit.cjs ve generate-instagram.cjs
 // bu modülü kullanır.
 //
-// ÖN KOŞUL: marka fontları /usr/share/fonts/brand/ altında kurulu olmalı
-// (Cormorant Garamond Bold/SemiBold/MediumItalic + Nunito). Bkz. README/doküman.
+// ÖN KOŞUL: marka fontları BRAND_FONT_DIR (varsayılan /usr/share/fonts/brand/)
+// altında kurulu olmalı (Playfair Display + Italic, Montserrat). Bkz. setup-fonts.sh.
 const opentype = require("opentype.js");
 const sharp = require("sharp");
 const fs = require("fs");
 
 const C = {
-  forest: "#2B5233",
-  forestDark: "#1E3A24",
-  forestLight: "#3A6B45",
-  sage: "#92B594",
-  sageLight: "#AFC6B0",
-  sageDark: "#7A9E7C",
-  cream: "#F1EAD9",
-  creamDark: "#E5D9C3",
-  warmWhite: "#FDFBF7",
+  forest: "#23472E",
+  forestDark: "#17311F",
+  forestLight: "#2F5A3B",
+  sage: "#A7BFA7",
+  sageLight: "#C2D4C2",
+  sageDark: "#7E9E80",
+  cream: "#F3EFE6",
+  creamDark: "#E6DFCD",
+  stone: "#DAD7CE",
+  warmWhite: "#FAF7F1",
   black: "#1A1A1A",
 };
 
-const FONT_DIR = "/usr/share/fonts/brand";
+// Marka fontları: Playfair Display (başlık/serif) + Montserrat (gövde/sans).
+// BRAND_FONT_DIR ile yerel bir dizine yönlendirilebilir (bkz. scripts/setup-fonts.sh).
+const FONT_DIR = process.env.BRAND_FONT_DIR || "/usr/share/fonts/brand";
 const load = (f) => {
   const b = fs.readFileSync(`${FONT_DIR}/${f}`);
   return opentype.parse(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength));
 };
 const fonts = {
-  serif: load("CormorantGaramond-Bold.ttf"),
-  serifSemi: load("CormorantGaramond-SemiBold.ttf"),
-  italic: load("CormorantGaramond-MediumItalic.ttf"),
-  sans: load("Nunito.ttf"),
+  serif: load("PlayfairDisplay.ttf"),
+  serifSemi: load("PlayfairDisplay.ttf"),
+  italic: load("PlayfairDisplay-Italic.ttf"),
+  sans: load("Montserrat.ttf"),
 };
 
 // opentype.toPathData() çok küçük koordinatları üstel gösterimle (1e-15)
@@ -91,22 +94,23 @@ function place(t, fill, x, top, { opacity = 1, align = "center" } = {}) {
   return `<path d="${t.d}" fill="${fill}"${op} transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)})"/>`;
 }
 
-// Dikey yaprak (tip yukarı): base (0,0) -> tip (0,-46), 200'lük kutuda kullanılır
+// Dikey yaprak (tip yukarı): base (0,0) -> tip (0,-50), 200'lük kutuda kullanılır
 function leaf(cx, cy, rot, scale, fill, opacity) {
   const op = opacity != null && opacity !== 1 ? ` fill-opacity="${opacity}"` : "";
-  return `<path d="M0 0 C-13 -9 -13 -33 0 -46 C13 -33 13 -9 0 0 Z" fill="${fill}"${op} transform="translate(${cx} ${cy}) rotate(${rot}) scale(${scale})"/>`;
+  return `<path d="M0 0 C-14 -10 -15 -34 0 -50 C15 -34 14 -10 0 0 Z" fill="${fill}"${op} transform="translate(${cx} ${cy}) rotate(${rot}) scale(${scale})"/>`;
 }
 
-// Amblem — "Figür + Kanat" (Konsept B): kollarını açan figür, iki yaprak kanat.
+// Amblem — açık halka içinde kollarını yukarı açan figür, iki kucaklayan yaprak.
 // 200x200 kutuda tanımlı. o: {ink, leafA, leafB, leafAOp?, leafBOp?}
 function emblem(o) {
   return `
-    ${leaf(86, 116, -28, 1.5, o.leafA, o.leafAOp)}
-    ${leaf(114, 116, 28, 1.5, o.leafB, o.leafBOp)}
-    <circle cx="100" cy="78" r="11" fill="${o.ink}"/>
-    <path d="M100 92 C92 104 92 132 100 150 C108 132 108 104 100 92 Z" fill="${o.ink}"/>
-    <path d="M99 100 C88 96 80 90 78 82" stroke="${o.ink}" stroke-width="7" stroke-linecap="round" fill="none"/>
-    <path d="M101 100 C112 96 120 90 122 82" stroke="${o.ink}" stroke-width="7" stroke-linecap="round" fill="none"/>`;
+    <path d="M132 25 A82 82 0 1 1 68 25" fill="none" stroke="${o.ink}" stroke-width="5.5" stroke-linecap="round"/>
+    ${leaf(86, 142, -43, 1.4, o.leafA, o.leafAOp)}
+    ${leaf(114, 142, 43, 1.4, o.leafB, o.leafBOp)}
+    <circle cx="100" cy="64" r="9.5" fill="${o.ink}"/>
+    <path d="M100 76 C94 88 94 116 100 130 C106 116 106 88 100 76 Z" fill="${o.ink}"/>
+    <path d="M99 85 C89 80 81 69 79 58" stroke="${o.ink}" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M101 85 C111 80 119 69 121 58" stroke="${o.ink}" stroke-width="6.5" stroke-linecap="round" fill="none"/>`;
 }
 const emblemAt = (o, x, y, size) =>
   `<g transform="translate(${x} ${y}) scale(${size / 200})">${emblem(o)}</g>`;

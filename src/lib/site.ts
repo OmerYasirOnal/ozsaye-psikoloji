@@ -152,10 +152,10 @@ export const site: Site = {
   },
 
   email: {
-    // TODO: GERÇEK VERİ -- iletişim e-postası (ör. "iletisim@ozsayepsikoloji.com")
-    address: "[DOLDUR] iletisim@ozsayepsikoloji.com",
-    // TODO: GERÇEK VERİ -- mailto bağlantısı (ör. "mailto:iletisim@ozsayepsikoloji.com")
-    href: "[DOLDUR] mailto:iletisim@ozsayepsikoloji.com",
+    // TODO: GERÇEK VERİ -- iletişim e-postası (ör. "info@ozsaye.com")
+    address: "[DOLDUR] info@ozsaye.com",
+    // TODO: GERÇEK VERİ -- mailto bağlantısı (ör. "mailto:info@ozsaye.com")
+    href: "[DOLDUR] mailto:info@ozsaye.com",
   },
 
   address: {

@@ -21,7 +21,7 @@ export default function About() {
              *   />
              * </div>
              */}
-            <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl border border-sage/15 bg-sage/10 bg-[radial-gradient(circle,rgba(146,181,148,0.18),transparent_70%)]">
+            <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl border border-sage/15 bg-sage/10 bg-[radial-gradient(circle,rgba(167,191,167,0.18),transparent_70%)]">
               <svg
                 aria-hidden="true"
                 className="h-16 w-16 text-sage"

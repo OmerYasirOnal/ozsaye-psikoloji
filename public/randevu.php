@@ -31,9 +31,9 @@ function fail(string $message): void {
     echo '<!doctype html><html lang="tr"><head><meta charset="utf-8">'
         . '<meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<title>Form Gönderilemedi — Öz & Saye Psikoloji</title>'
-        . '<style>body{font-family:system-ui,sans-serif;background:#F1EAD9;color:#2B5233;'
+        . '<style>body{font-family:system-ui,sans-serif;background:#F3EFE6;color:#23472E;'
         . 'display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:24px}'
-        . '.box{max-width:30rem;text-align:center}a{color:#2B5233}</style></head><body><div class="box">'
+        . '.box{max-width:30rem;text-align:center}a{color:#23472E}</style></head><body><div class="box">'
         . '<h1>Form gönderilemedi</h1><p>' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p>'
         . '<p><a href="/#randevu">&larr; Geri dön ve tekrar deneyin</a></p>'
         . '</div></body></html>';

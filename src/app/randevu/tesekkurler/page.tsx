@@ -40,7 +40,7 @@ export default function TesekkurlerPage() {
     >
       {/* Tek hafif atmosfer */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-10%] h-[56vh] w-[56vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(146,181,148,0.14),transparent_68%)]" />
+        <div className="absolute left-1/2 top-[-10%] h-[56vh] w-[56vh] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(167,191,167,0.14),transparent_68%)]" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-2xl text-center">
