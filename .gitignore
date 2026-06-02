@@ -54,3 +54,6 @@ ozsaye-psikoloji-static.zip
 # Sıfır bağlamlı review raporu (geçici, üretici çıktısı)
 review-rapor.md
 review-rapor.md.log
+
+# Sürekli review/geliştirme döngüsü çıktıları (review-loop.sh / improve-loop.sh)
+/loglar/
