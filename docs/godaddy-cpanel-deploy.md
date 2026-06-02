@@ -34,12 +34,21 @@ cPanel → **Setup Node.js App** → **Create Application**:
 ```
 NODE_ENV=production
 NEXT_PUBLIC_SITE_URL=https://ozsaye.com
-DATABASE_URL=...            # Neon/Postgres (KVKK rıza kaydı) — yoksa form e-posta/log fallback
-RESEND_API_KEY=...          # randevu e-postası — yoksa console log
-RESEND_FROM=Özsaye Psikoloji <randevu@ozsaye.com>
+
+# Randevu bildirimi — GoDaddy mail SMTP (önerilen; sende bu var). SMTP, Resend'e göre önceliklidir.
+SMTP_HOST=mail.ozsaye.com          # cPanel mail sunucusu (alternatif: smtpout.secureserver.net)
+SMTP_PORT=465                      # 465=SSL, 587=STARTTLS
+SMTP_USER=info@ozsaye.com
+SMTP_PASS=********                 # info@ozsaye.com posta şifresi
+SMTP_FROM=Özsaye Psikoloji <info@ozsaye.com>
 APPOINTMENT_TO_EMAIL=info@ozsaye.com
+
+# (opsiyonel) KVKK rıza kalıcı kaydı — yoksa form çalışır, başvuru loglanır:
+DATABASE_URL=...                   # Neon/Postgres
+# (alternatif e-posta sağlayıcı, SMTP yoksa) RESEND_API_KEY=... / RESEND_FROM=...
 ```
 > `PORT`'u Passenger yönetir; standalone `server.js` `process.env.PORT`'u okur.
+> E-posta önceliği: **SMTP > Resend > log**. SMTP_* girilirse GoDaddy mail kullanılır.
 
 ## 5. Başlat
 - cPanel Node app → **Restart**.

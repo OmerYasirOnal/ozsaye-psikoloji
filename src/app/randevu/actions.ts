@@ -7,8 +7,8 @@
  * tarafı doğrulama yapılır, honeypot + basit token-bucket rate-limit uygulanır.
  * KVKK açık rızası + başvuru, DATABASE_URL yapılandırılmışsa kalıcı olarak
  * veritabanına yazılır (src/lib/db.ts) — KVKK m.6 ispat yükümlülüğü için birincil
- * kayıt budur. Ayrıca RESEND_API_KEY varsa bildirim e-postası gönderilir (yoksa
- * dev fallback olarak console.info ile loglanır). Başarıda
+ * kayıt budur. Bildirim e-postası SMTP (GoDaddy/cPanel mail) veya Resend ile
+ * gönderilir (ikisi de yapılandırılmadıysa console.info ile loglanır). Başarıda
  * /randevu/tesekkurler'e redirect edilir.
  */
 
@@ -134,6 +134,64 @@ async function getRequestMeta(): Promise<{ ip: string; userAgent: string }> {
   return { ip, userAgent };
 }
 
+type NotifyResult = { configured: boolean; sent: boolean; error?: string };
+
+/**
+ * Randevu bildirimini gönderir. Öncelik: SMTP (GoDaddy/cPanel mail) > Resend >
+ * log fallback. `configured=true` ama `sent=false` ise gerçek bir gönderim
+ * hatası vardır (kullanıcıya tekrar denemesi söylenir); `configured=false` ise
+ * hiç sağlayıcı tanımlı değildir (form yine başarılı sayılır, başvuru loglanır).
+ */
+async function sendAppointmentNotification(
+  subject: string,
+  text: string,
+  replyTo: string,
+): Promise<NotifyResult> {
+  // 1) SMTP (GoDaddy / cPanel mail) — öncelikli.
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const port = Number(process.env.SMTP_PORT ?? "465");
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port,
+        secure: port === 465, // 465 = SSL, 587 = STARTTLS
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      });
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+        to: process.env.APPOINTMENT_TO_EMAIL ?? process.env.SMTP_USER,
+        replyTo,
+        subject,
+        text,
+      });
+      return { configured: true, sent: true };
+    } catch (error) {
+      return { configured: true, sent: false, error: String(error) };
+    }
+  }
+
+  // 2) Resend (alternatif sağlayıcı).
+  if (process.env.RESEND_API_KEY) {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: process.env.RESEND_FROM ?? "Özsaye Psikoloji <onboarding@resend.dev>",
+      to: process.env.APPOINTMENT_TO_EMAIL ?? site.email.address,
+      replyTo,
+      subject,
+      text,
+    });
+    return error
+      ? { configured: true, sent: false, error: String(error) }
+      : { configured: true, sent: true };
+  }
+
+  // 3) Sağlayıcı yok: başvuruyu logla (form yine başarılı sayılır).
+  console.info("[Randevu başvurusu — e-posta sağlayıcısı yapılandırılmadı]\n" + text);
+  return { configured: false, sent: false };
+}
+
 /**
  * Randevu başvurusunu işler. useActionState imzasına uygun:
  * ilk parametre önceki durum, ikincisi FormData.
@@ -228,34 +286,16 @@ export async function submitAppointment(
   ];
   const textBody = bodyLines.join("\n");
 
-  // 6) Gönderim: RESEND_API_KEY varsa Resend ile e-posta, yoksa dev fallback log.
-  if (process.env.RESEND_API_KEY) {
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const from =
-      process.env.RESEND_FROM ?? "Özsaye Psikoloji <onboarding@resend.dev>";
-    const to = process.env.APPOINTMENT_TO_EMAIL ?? site.email.address;
-
-    const { error } = await resend.emails.send({
-      from,
-      to,
-      replyTo: data.email,
-      subject,
-      text: textBody,
-    });
-
-    if (error) {
-      // E-posta gönderilemezse kullanıcıya bilgi ver (redirect etme).
-      console.error("Randevu e-postası gönderilemedi:", error);
-      return {
-        status: "error",
-        message:
-          "Başvurunuz alınamadı. Lütfen kısa süre sonra tekrar deneyin veya telefonla iletişime geçin.",
-      };
-    }
-  } else {
-    // Dev fallback: e-posta sağlayıcısı yapılandırılmamış, başvuruyu logla.
-    console.info("[Randevu başvurusu — dev fallback]\n" + textBody);
+  // 6) Bildirim: SMTP (GoDaddy mail) > Resend > log fallback.
+  const notify = await sendAppointmentNotification(subject, textBody, data.email);
+  if (notify.configured && !notify.sent) {
+    // Sağlayıcı tanımlı ama gönderim başarısız — kullanıcıya tekrar dene de.
+    console.error("Randevu bildirimi gönderilemedi:", notify.error);
+    return {
+      status: "error",
+      message:
+        "Başvurunuz alınamadı. Lütfen kısa süre sonra tekrar deneyin veya telefonla iletişime geçin.",
+    };
   }
 
   // 7) Başarı: teşekkür sayfasına yönlendir.
