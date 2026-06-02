@@ -1,0 +1,16 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="56" fill="#2B5233" />
+
+  <!-- Canopy leaves -->
+  <path d="M128 132 C98 118 98 74 128 48 C158 74 158 118 128 132 Z" transform="rotate(-50 128 132)" fill="#92B594" />
+  <path d="M128 132 C98 118 98 74 128 48 C158 74 158 118 128 132 Z" transform="rotate(50 128 132)" fill="#7A9E7C" />
+
+  <!-- Lotus base -->
+  <path d="M128 196 C108 186 108 150 128 126 C148 150 148 186 128 196 Z" fill="#AFC6B0" />
+
+  <!-- Figure -->
+  <circle cx="128" cy="116" r="15" fill="#FDFBF7" />
+  <path d="M128 136 C116 148 116 170 128 186 C140 170 140 148 128 136 Z" fill="#FDFBF7" />
+  <path d="M125 142 C108 132 96 120 94 106" stroke="#FDFBF7" stroke-width="14" stroke-linecap="round" />
+  <path d="M131 142 C148 132 160 120 162 106" stroke="#FDFBF7" stroke-width="14" stroke-linecap="round" />
+</svg>
