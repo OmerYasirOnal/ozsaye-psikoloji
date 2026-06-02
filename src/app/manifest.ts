@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 
 import { site } from "@/lib/site";
 
+// Statik export için route handler statik üretilmeli.
+export const dynamic = "force-static";
+
 /**
  * Web App Manifest (app/manifest.ts → /manifest.webmanifest).
  *

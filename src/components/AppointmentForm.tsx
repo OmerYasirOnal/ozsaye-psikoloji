@@ -1,22 +1,14 @@
-"use client";
-
-import { useActionState } from "react";
 import Link from "next/link";
 
-import { submitAppointment } from "@/app/randevu/actions";
-import { initialState } from "@/app/randevu/types";
-
+/**
+ * Randevu başvuru formu (statik site).
+ *
+ * Statik export'ta Server Action çalışmadığı için form, klasik bir HTML POST ile
+ * `public/randevu.php`'ye gönderilir; PHP doğrular, info@ozsaye.com'a e-posta
+ * yollar, KVKK rızasını kaydeder ve /randevu/tesekkurler/'e yönlendirir.
+ * İstemci tarafı: HTML5 `required`/tip doğrulaması; sunucu doğrulaması PHP'de.
+ */
 export default function AppointmentForm() {
-  const [state, formAction, isPending] = useActionState(
-    submitAppointment,
-    initialState,
-  );
-
-  const errors = state.errors ?? {};
-
-  // Bugünün yerel tarihi "YYYY-MM-DD" — geçmiş tarih seçimini engeller.
-  const minTarih = new Date().toISOString().slice(0, 10);
-
   return (
     <section id="randevu" className="relative bg-forest py-28 lg:py-36">
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
@@ -76,24 +68,9 @@ export default function AppointmentForm() {
             </div>
           </div>
 
-          {/* Right: Form */}
+          {/* Right: Form — public/randevu.php'ye POST */}
           <div className="rounded-2xl bg-cream/95 p-8 shadow-2xl backdrop-blur-sm lg:p-10">
-            <form action={formAction} className="space-y-5" noValidate>
-              {/* Üst seviye durum mesajı (validasyon özeti / sunucu hatası) */}
-              {state.status === "error" && state.message ? (
-                <div
-                  role="alert"
-                  aria-live="polite"
-                  className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
-                >
-                  {state.message}
-                </div>
-              ) : (
-                <div aria-live="polite" role="status" className="sr-only">
-                  {state.message ?? ""}
-                </div>
-              )}
-
+            <form action="/randevu.php" method="post" className="space-y-5">
               {/* Honeypot: görsel + ekran okuyuculardan gizli; botlar doldurur */}
               <div
                 aria-hidden="true"
@@ -123,20 +100,10 @@ export default function AppointmentForm() {
                     name="ad"
                     autoComplete="name"
                     required
+                    minLength={2}
                     placeholder="Adınız Soyadınız"
-                    aria-invalid={errors.ad ? true : undefined}
-                    aria-describedby={errors.ad ? "ad-error" : undefined}
-                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all"
                   />
-                  {errors.ad ? (
-                    <p
-                      id="ad-error"
-                      role="alert"
-                      className="mt-1.5 text-xs text-red-700"
-                    >
-                      {errors.ad}
-                    </p>
-                  ) : null}
                 </div>
                 <div>
                   <label
@@ -152,19 +119,8 @@ export default function AppointmentForm() {
                     autoComplete="tel"
                     required
                     placeholder="05XX XXX XX XX"
-                    aria-invalid={errors.telefon ? true : undefined}
-                    aria-describedby={errors.telefon ? "telefon-error" : undefined}
-                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all"
                   />
-                  {errors.telefon ? (
-                    <p
-                      id="telefon-error"
-                      role="alert"
-                      className="mt-1.5 text-xs text-red-700"
-                    >
-                      {errors.telefon}
-                    </p>
-                  ) : null}
                 </div>
               </div>
 
@@ -182,19 +138,8 @@ export default function AppointmentForm() {
                   autoComplete="email"
                   required
                   placeholder="ornek@email.com"
-                  aria-invalid={errors.email ? true : undefined}
-                  aria-describedby={errors.email ? "email-error" : undefined}
-                  className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                  className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all"
                 />
-                {errors.email ? (
-                  <p
-                    id="email-error"
-                    role="alert"
-                    className="mt-1.5 text-xs text-red-700"
-                  >
-                    {errors.email}
-                  </p>
-                ) : null}
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2">
@@ -210,9 +155,7 @@ export default function AppointmentForm() {
                     name="uzman"
                     required
                     defaultValue=""
-                    aria-invalid={errors.uzman ? true : undefined}
-                    aria-describedby={errors.uzman ? "uzman-error" : undefined}
-                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all aria-[invalid=true]:border-red-400"
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all"
                   >
                     <option value="" disabled>
                       Seçiniz
@@ -221,15 +164,6 @@ export default function AppointmentForm() {
                     <option value="sacide-sahin">Kl. Psk. Sacide Şahin</option>
                     <option value="farketmez">Farketmez</option>
                   </select>
-                  {errors.uzman ? (
-                    <p
-                      id="uzman-error"
-                      role="alert"
-                      className="mt-1.5 text-xs text-red-700"
-                    >
-                      {errors.uzman}
-                    </p>
-                  ) : null}
                 </div>
                 <div>
                   <label
@@ -242,20 +176,8 @@ export default function AppointmentForm() {
                     type="date"
                     id="tarih"
                     name="tarih"
-                    min={minTarih}
-                    aria-invalid={errors.tarih ? true : undefined}
-                    aria-describedby={errors.tarih ? "tarih-error" : undefined}
-                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all aria-[invalid=true]:border-red-400"
+                    className="w-full rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest transition-all"
                   />
-                  {errors.tarih ? (
-                    <p
-                      id="tarih-error"
-                      role="alert"
-                      className="mt-1.5 text-xs text-red-700"
-                    >
-                      {errors.tarih}
-                    </p>
-                  ) : null}
                 </div>
               </div>
 
@@ -270,20 +192,10 @@ export default function AppointmentForm() {
                   id="mesaj"
                   name="mesaj"
                   rows={4}
+                  maxLength={2000}
                   placeholder="Başvurunuzla ilgili eklemek istediğiniz bilgiler..."
-                  aria-invalid={errors.mesaj ? true : undefined}
-                  aria-describedby={errors.mesaj ? "mesaj-error" : undefined}
-                  className="w-full resize-none rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all aria-[invalid=true]:border-red-400"
+                  className="w-full resize-none rounded-lg border border-sage/20 bg-warm-white px-4 py-3 text-sm text-forest placeholder:text-forest-muted transition-all"
                 />
-                {errors.mesaj ? (
-                  <p
-                    id="mesaj-error"
-                    role="alert"
-                    className="mt-1.5 text-xs text-red-700"
-                  >
-                    {errors.mesaj}
-                  </p>
-                ) : null}
               </div>
 
               {/* KVKK açık rıza */}
@@ -294,10 +206,7 @@ export default function AppointmentForm() {
                     id="kvkk"
                     name="kvkk"
                     required
-                    aria-invalid={errors.kvkk ? true : undefined}
-                    aria-describedby={
-                      errors.kvkk ? "kvkk-error kvkk-note" : "kvkk-note"
-                    }
+                    aria-describedby="kvkk-note"
                     className="mt-0.5 h-4 w-4 shrink-0 rounded border-sage/40 text-forest accent-forest"
                   />
                   <label htmlFor="kvkk" className="text-xs leading-relaxed text-forest-muted">
@@ -323,23 +232,13 @@ export default function AppointmentForm() {
                   (hassas) bilgileri paylaşmayın; bu tür ayrıntıları
                   görüşmemizde ele alacağız.
                 </p>
-                {errors.kvkk ? (
-                  <p
-                    id="kvkk-error"
-                    role="alert"
-                    className="mt-1.5 text-xs text-red-700"
-                  >
-                    {errors.kvkk}
-                  </p>
-                ) : null}
               </div>
 
               <button
                 type="submit"
-                disabled={isPending}
-                className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30 disabled:cursor-not-allowed disabled:opacity-70"
+                className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30"
               >
-                {isPending ? "Gönderiliyor..." : "Randevu Talebini Gönder"}
+                Randevu Talebini Gönder
               </button>
 
               <p className="text-center text-xs text-forest-muted">

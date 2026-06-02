@@ -4,6 +4,9 @@ import { getServiceSlugs } from "@/lib/services";
 import { getPostSlugs } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
+// Statik export için route handler statik üretilmeli.
+export const dynamic = "force-static";
+
 /**
  * Sitemap — indekslenmesi istenen genel sayfalar.
  * noindex sayfalar dahil edilmez: /randevu/tesekkurler (teşekkür sayfası),

@@ -7,6 +7,11 @@ ErrorDocument 404 /404.html
 # Varsayılan belge
 DirectoryIndex index.html
 
+# KVKK rıza kayıt logunu (randevu.php yazar) dışarıya kapat.
+<Files "randevu-kayitlari.log">
+  Require all denied
+</Files>
+
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>

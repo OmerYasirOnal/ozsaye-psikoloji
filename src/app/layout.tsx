@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Nunito } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import Header from "@/components/Header";
@@ -101,8 +99,6 @@ export default function RootLayout({
         <Footer />
         <StickyCta />
         <JsonLd />
-        <SpeedInsights />
-        <Analytics />
       </body>
     </html>
   );
