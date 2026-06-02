@@ -17,7 +17,8 @@ const nunito = Nunito({
 });
 
 const siteUrl = "https://ozsayepsikoloji.com";
-const siteTitle = "Özsaye Psikoloji | Güvenli Bir Bölgede Kendi Özüne Doğru";
+const siteName = "Öz & Saye Psikoloji";
+const siteTitle = "Öz & Saye Psikoloji | Güvenli Bir Bölgede Kendi Özüne Doğru";
 const siteDescription =
   "Psikolojik Danışman Melek Yıldız ve Klinik Psikolog Sacide Şahin ile güvenli bir alanda profesyonel psikolojik destek alın.";
 
@@ -34,7 +35,9 @@ export const metadata: Metadata = {
     "online terapi",
     "Melek Yıldız",
     "Sacide Şahin",
+    "Öz & Saye Psikoloji",
     "Özsaye Psikoloji",
+    "ozsaye psikoloji",
   ],
   alternates: {
     canonical: "/",
@@ -43,7 +46,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "tr_TR",
     url: siteUrl,
-    siteName: "Özsaye Psikoloji",
+    siteName,
     title: siteTitle,
     description: siteDescription,
     images: [
@@ -51,7 +54,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Özsaye Psikoloji — Güvenli Bir Bölgede Kendi Özüne Doğru",
+        alt: "Öz & Saye Psikoloji — Güvenli Bir Bölgede Kendi Özüne Doğru",
       },
     ],
   },

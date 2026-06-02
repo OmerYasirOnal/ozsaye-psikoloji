@@ -13,7 +13,7 @@ export default function Footer() {
               <LogoMark className="h-11 w-11 text-cream" />
               <div className="flex flex-col">
                 <span className="font-display text-xl font-semibold">
-                  Özsaye
+                  Öz &amp; Saye
                 </span>
                 <span className="text-[10px] font-light tracking-[0.2em] text-cream/60 uppercase">
                   Psikoloji

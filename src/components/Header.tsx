@@ -47,7 +47,7 @@ export default function Header() {
           <LogoMark className="h-11 w-11 text-forest transition-transform duration-300 group-hover:scale-105" />
           <div className="flex flex-col">
             <span className="font-display text-xl font-semibold tracking-wide text-forest">
-              Özsaye
+              Öz &amp; Saye
             </span>
             <span className="font-body text-[10px] font-light tracking-[0.2em] text-sage-dark uppercase">
               Psikoloji

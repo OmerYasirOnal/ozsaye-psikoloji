@@ -1,8 +1,16 @@
-# Özsaye Psikoloji — Marka Kimliği Rehberi
+# Öz & Saye Psikoloji — Marka Kimliği Rehberi
 
 Bu doküman markanın görsel temelini özetler: logo kullanımı, renkler, tipografi,
 ses tonu ve hazır sosyal medya şablonları. Görsel üretici script:
-`scripts/generate-brand-assets.cjs` (`node scripts/generate-brand-assets.cjs`).
+`scripts/generate-brand-assets.cjs` (`node scripts/generate-brand-assets.cjs`) —
+hem site varlıklarını (`public/og.png`, `public/logo.png`) hem de
+`brand/social/` altındaki şablonları üretir.
+
+## 0. Marka Adı
+
+Görünen marka adı **"Öz & Saye Psikoloji"**dir (wordmark: büyük serif **"Öz & Saye"** +
+altında tracked **"PSİKOLOJİ"**). Alan adı tek kelime `ozsayepsikoloji.com` olarak
+kalır; SEO anahtar kelimelerinde hem "Öz & Saye" hem "Özsaye" varyantları tutulur.
 
 ## 1. Logo
 
@@ -58,9 +66,15 @@ kapsayıcı bir dil. Slogan: **"Güvenli Bir Bölgede Kendi Özüne Doğru."**
 | `instagram-duyuru.png` | 1080×1080 | Genel duyuru / tanıtım gönderisi |
 | `instagram-alinti.png` | 1080×1080 | Slogan / alıntı kartı (koyu) |
 | `instagram-hizmetler.png` | 1080×1080 | Hizmet listesi |
+| `instagram-story.png` | 1080×1920 | Story / dikey paylaşım |
 | `instagram-avatar.png` | 320×320 | Profil fotoğrafı |
+| `uzman-melek-yildiz.png` | 1080×1350 | Uzman tanıtım kartı (fotoğraf yer tutuculu) |
+| `uzman-sacide-sahin.png` | 1080×1350 | Uzman tanıtım kartı (fotoğraf yer tutuculu) |
 | `linkedin-kapak.png` | 1584×396 | LinkedIn kapak görseli |
 | `linkedin-post.png` | 1200×627 | LinkedIn paylaşım görseli |
+
+> Uzman kartlarındaki dairesel alan, baş harfler yerine gerçek vesikalık/portre
+> fotoğrafıyla değiştirilmek üzere tasarlanmıştır.
 
 Şablonları çoğaltmak / metnini değiştirmek için `scripts/generate-brand-assets.cjs`
 içindeki ilgili bölümü düzenleyip script'i yeniden çalıştırın.
