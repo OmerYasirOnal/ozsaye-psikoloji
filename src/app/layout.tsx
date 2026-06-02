@@ -22,13 +22,29 @@ const nunito = Nunito({
   display: "swap",
 });
 
+const title = `${site.shortName} | ${site.slogan}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | ${site.slogan}`,
-    template: "%s | Özsaye Psikoloji",
+    default: title,
+    template: `%s | ${site.shortName}`,
   },
   description: site.description,
+  keywords: [
+    "psikolog",
+    "psikolojik danışman",
+    "klinik psikolog",
+    "terapi",
+    "psikoterapi",
+    "online terapi",
+    "çift terapisi",
+    "aile danışmanlığı",
+    "Melek Yıldız",
+    "Sacide Şahin",
+    "Öz & Saye Psikoloji",
+    "Özsaye Psikoloji",
+  ],
   alternates: {
     canonical: "/",
   },
@@ -37,15 +53,24 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: "/",
     siteName: site.shortName,
-    title: `${site.name} | ${site.slogan}`,
+    title,
     description: site.description,
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: `${site.shortName} — ${site.slogan}`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} | ${site.slogan}`,
+    title,
     description: site.description,
+    images: ["/og.png"],
   },
-  // dataReady=false iken (placeholder içerik) arama motorlarına kapalı; veri hazır olunca açılır.
+  // dataReady=false iken (placeholder NAP/kimlik) arama motorlarına kapalı; veri hazır olunca açılır.
   robots: site.dataReady
     ? { index: true, follow: true }
     : { index: false, follow: false },

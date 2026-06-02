@@ -38,7 +38,7 @@ export default function JsonLd() {
     slogan: site.slogan,
     telephone: site.phone.e164,
     email: site.email.address,
-    image: absoluteUrl("/opengraph-image"),
+    image: absoluteUrl("/og.png"),
     address: {
       "@type": "PostalAddress",
       streetAddress: site.address.streetAddress,

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Node tabanlı build/araç betikleri (uygulama kodu değil):
+    "scripts/**",
     // cPanel deploy paketi (scripts/build-cpanel.sh çıktısı — derlenmiş bundle).
     "deploy/**",
   ]),

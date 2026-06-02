@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   // Self-host (GoDaddy cPanel Node.js App / Passenger) için kendine yeterli
   // sunucu çıktısı: .next/standalone/server.js (minimal node_modules ile).
-  // Vercel gibi platformlarda yok sayılır.
+  // (Statik export YOLU değil — randevu formu/Server Action sunucu gerektirir.)
   output: "standalone",
 };
 

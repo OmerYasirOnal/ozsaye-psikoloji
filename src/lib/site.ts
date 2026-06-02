@@ -128,14 +128,12 @@ export interface Site {
 }
 
 export const site: Site = {
-  // TODO: GERÇEK VERİ -- tam resmî unvanı girin (ör. "Özsaye Psikoloji Danışmanlık Merkezi")
-  name: "[DOLDUR] Özsaye Psikoloji Danışmanlık Merkezi",
-  shortName: "Özsaye Psikoloji",
-  // TODO: GERÇEK VERİ -- markanın sloganını girin (ör. "Birlikte iyileşmenin alanı")
-  slogan: "[DOLDUR] Birlikte iyileşmenin alanı",
-  // TODO: GERÇEK VERİ -- SEO meta açıklaması, 150-160 karakter (ör. "İstanbul'da bireysel terapi, çift ve aile danışmanlığı sunan Özsaye Psikoloji ekibiyle tanışın.")
+  // Marka adı (gerçek). Tescilli tüzel ünvan ayrıdır: bkz. legalName.
+  name: "Öz & Saye Psikoloji",
+  shortName: "Öz & Saye Psikoloji",
+  slogan: "Güvenli Bir Bölgede Kendi Özüne Doğru",
   description:
-    "[DOLDUR] İstanbul'da bireysel terapi, çift ve aile danışmanlığı sunan Özsaye Psikoloji ekibiyle tanışın.",
+    "Psikolojik Danışman Melek Yıldız ve Klinik Psikolog Sacide Şahin ile güvenli bir alanda profesyonel psikolojik destek alın.",
   // TODO: GERÇEK VERİ -- yasal/tüzel işletme adını girin (ör. "Özsaye Psikoloji Danışmanlık Hizmetleri Ltd. Şti.")
   legalName: "[DOLDUR] Özsaye Psikoloji Danışmanlık Hizmetleri Ltd. Şti.",
 

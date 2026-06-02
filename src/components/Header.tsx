@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import LogoMark from "./LogoMark";
 
 const navLinks = [
   { href: "/#anasayfa", label: "Anasayfa" },
@@ -95,26 +96,10 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
         <Link href="/#anasayfa" className="group flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-forest transition-colors group-hover:bg-forest group-hover:text-cream">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 22c-4-3-8-7.5-8-12a8 8 0 0 1 16 0c0 4.5-4 9-8 12z" />
-              <path d="M12 6v8" />
-              <path d="M9 9c1.5 1 4.5 1 6 0" />
-            </svg>
-          </div>
+          <LogoMark className="h-11 w-11 text-forest transition-transform duration-300 group-hover:scale-105" />
           <div className="flex flex-col">
             <span className="font-display text-xl font-semibold tracking-wide text-forest">
-              Özsaye
+              Öz &amp; Saye
             </span>
             <span className="font-body text-[10px] font-light tracking-[0.2em] text-forest-muted uppercase">
               Psikoloji
