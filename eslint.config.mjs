@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Node tabanlı build/otomasyon araçları (uygulama kodu değil):
     "scripts/**",
     "tools/**",
+    // Gitignore'lu yerel build artefaktları (eski cPanel denemesi vb.).
+    "deploy/**",
   ]),
 ]);
 
