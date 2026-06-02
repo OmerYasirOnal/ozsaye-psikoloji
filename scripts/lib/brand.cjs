@@ -91,33 +91,33 @@ function place(t, fill, x, top, { opacity = 1, align = "center" } = {}) {
   return `<path d="${t.d}" fill="${fill}"${op} transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)})"/>`;
 }
 
-// Amblem (LogoMark bileşeniyle birebir aynı geometri). o: {ink,l1,l2,l3,vein,leafOp}
+// Dikey yaprak (tip yukarı): base (0,0) -> tip (0,-46), 200'lük kutuda kullanılır
+function leaf(cx, cy, rot, scale, fill, opacity) {
+  const op = opacity != null && opacity !== 1 ? ` fill-opacity="${opacity}"` : "";
+  return `<path d="M0 0 C-13 -9 -13 -33 0 -46 C13 -33 13 -9 0 0 Z" fill="${fill}"${op} transform="translate(${cx} ${cy}) rotate(${rot}) scale(${scale})"/>`;
+}
+
+// Amblem — "Figür + Kanat" (Konsept B): kollarını açan figür, iki yaprak kanat.
+// 200x200 kutuda tanımlı. o: {ink, leafA, leafB, leafAOp?, leafBOp?}
 function emblem(o) {
-  const lo = o.leafOp || [1, 1, 1];
-  const fo = (i) => (lo[i] !== 1 ? ` fill-opacity="${lo[i]}"` : "");
   return `
-    <circle cx="128" cy="128" r="96" stroke="${o.ink}" stroke-width="7" fill="none"/>
-    <path d="M128 120 C102 108 102 72 128 50 C154 72 154 108 128 120 Z" transform="rotate(-52 128 120)" fill="${o.l1}"${fo(0)}/>
-    <path d="M128 120 C102 108 102 72 128 50 C154 72 154 108 128 120 Z" transform="rotate(52 128 120)" fill="${o.l2}"${fo(1)}/>
-    <path d="M128 120 L93 80" stroke="${o.vein}" stroke-width="2.4" stroke-linecap="round" opacity="0.35"/>
-    <path d="M128 120 L163 80" stroke="${o.vein}" stroke-width="2.4" stroke-linecap="round" opacity="0.3"/>
-    <path d="M105 182 C92 175 92 153 105 140 C118 153 118 175 105 182 Z" transform="rotate(-40 105 182)" fill="${o.l3}"${fo(2)}/>
-    <path d="M151 182 C138 175 138 153 151 140 C164 153 164 175 151 182 Z" transform="rotate(40 151 182)" fill="${o.l3}"${fo(2)}/>
-    <path d="M128 184 C112 176 112 148 128 130 C144 148 144 176 128 184 Z" fill="${o.l1}"${fo(0)}/>
-    <circle cx="128" cy="110" r="12" fill="${o.ink}"/>
-    <path d="M128 126 C118 136 118 154 128 168 C138 154 138 136 128 126 Z" fill="${o.ink}"/>
-    <path d="M126 130 C112 122 102 112 100 100" stroke="${o.ink}" stroke-width="11" stroke-linecap="round" fill="none"/>
-    <path d="M130 130 C144 122 154 112 156 100" stroke="${o.ink}" stroke-width="11" stroke-linecap="round" fill="none"/>`;
+    ${leaf(86, 116, -28, 1.5, o.leafA, o.leafAOp)}
+    ${leaf(114, 116, 28, 1.5, o.leafB, o.leafBOp)}
+    <circle cx="100" cy="78" r="11" fill="${o.ink}"/>
+    <path d="M100 92 C92 104 92 132 100 150 C108 132 108 104 100 92 Z" fill="${o.ink}"/>
+    <path d="M99 100 C88 96 80 90 78 82" stroke="${o.ink}" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M101 100 C112 96 120 90 122 82" stroke="${o.ink}" stroke-width="7" stroke-linecap="round" fill="none"/>`;
 }
 const emblemAt = (o, x, y, size) =>
-  `<g transform="translate(${x} ${y}) scale(${size / 256})">${emblem(o)}</g>`;
+  `<g transform="translate(${x} ${y}) scale(${size / 200})">${emblem(o)}</g>`;
 
 // Hazır amblem paletleri
 const inkPalettes = {
-  color: { ink: C.forest, l1: C.sage, l2: C.sageDark, l3: C.sageLight, vein: C.forest, leafOp: [1, 1, 1] },
-  reversed: { ink: C.cream, l1: C.sage, l2: C.sageDark, l3: C.sageLight, vein: C.cream, leafOp: [1, 1, 1] },
-  forest: { ink: C.forest, l1: C.forest, l2: C.forest, l3: C.forest, vein: C.forest, leafOp: [0.9, 0.62, 0.42] },
-  white: { ink: C.warmWhite, l1: C.warmWhite, l2: C.warmWhite, l3: C.warmWhite, vein: C.warmWhite, leafOp: [0.9, 0.62, 0.42] },
+  color: { ink: C.forest, leafA: C.sage, leafB: C.sageDark },
+  reversed: { ink: C.cream, leafA: C.sage, leafB: C.sageDark },
+  forest: { ink: C.forest, leafA: C.forest, leafB: C.forest, leafAOp: 0.5, leafBOp: 0.78 },
+  black: { ink: C.black, leafA: C.black, leafB: C.black, leafAOp: 0.5, leafBOp: 0.78 },
+  white: { ink: C.warmWhite, leafA: C.warmWhite, leafB: C.warmWhite, leafAOp: 0.5, leafBOp: 0.78 },
 };
 
 // SVG -> PNG (genişlik hedefli, isteğe bağlı arka plan rengi)
