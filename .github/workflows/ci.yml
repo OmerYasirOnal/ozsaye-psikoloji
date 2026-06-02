@@ -1,0 +1,39 @@
+name: CI (Lint & Build)
+
+# Pull request'lerde ve main'e push'ta projeyi doğrular: bağımlılıkları
+# kurar, lint çalıştırır ve statik build alır. Böylece bozuk/çakışan
+# değişiklikler merge edilmeden önce yakalanır.
+# (Deploy ayrı bir workflow'dadır: deploy-godaddy.yml)
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# Aynı dal için eski çalışmaları iptal et (kaynak tasarrufu)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js kurulumu
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Bağımlılıkları yükle
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Statik build (out/ üretir)
+        run: npm run build
