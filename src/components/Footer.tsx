@@ -208,7 +208,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-cream/15 pt-8 md:flex-row">
           <p className="font-body text-xs text-sage-light">
-            &copy; {currentYear} Özsaye Psikoloji. Tüm hakları saklıdır.
+            &copy; {currentYear} Öz &amp; Saye Psikoloji. Tüm hakları saklıdır.
           </p>
           <div className="flex gap-6">
             <Link

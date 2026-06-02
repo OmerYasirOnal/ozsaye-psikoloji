@@ -6,7 +6,7 @@ import { getAllPosts, formatPostDate } from "@/lib/blog";
 export const metadata: Metadata = {
   title: "Yazılar",
   description:
-    "Özsaye Psikoloji ekibinden terapi süreci, kaygı, ilişkiler ve ruh sağlığı üzerine sade, güvenilir ve yanıt biçimli yazılar.",
+    "Öz & Saye Psikoloji ekibinden terapi süreci, kaygı, ilişkiler ve ruh sağlığı üzerine sade, güvenilir ve yanıt biçimli yazılar.",
   alternates: { canonical: "/yazilar" },
 };
 

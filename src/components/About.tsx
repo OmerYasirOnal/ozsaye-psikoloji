@@ -57,7 +57,7 @@ export default function About() {
 
             <ScrollReveal delay={3}>
               <p className="mt-7 max-w-2xl font-body text-base leading-relaxed text-forest-muted lg:text-lg">
-                Özsaye Psikoloji olarak, bireylerin kendilerini güvende
+                Öz & Saye Psikoloji olarak, bireylerin kendilerini güvende
                 hissettikleri bir ortamda iç dünyalarını keşfetmelerine yardımcı
                 oluyoruz. Her bireyin benzersiz hikayesine saygı duyarak,
                 bilimsel temelli ve etik değerlere bağlı bir yaklaşımla

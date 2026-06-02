@@ -145,8 +145,8 @@ export const services: Service[] = [
     "title": "Aile Danışmanlığı",
     "shortDesc": "Aile içi dinamikler, ebeveyn-çocuk ilişkisi ve aile içi iletişim sorunlarında destek.",
     "iconKey": "home",
-    "metaDescription": "Aile danışmanlığı nedir, kimler için uygundur ve süreç nasıl ilerler? Aile içi iletişim, çatışma ve ebeveyn-çocuk ilişkisinde destek için Özsaye Psikoloji.",
-    "intro": "Aile danışmanlığı; aile üyelerinin birbirini daha iyi anlaması, iletişimini güçlendirmesi ve zorlandığı konuları birlikte ele alması için sunulan profesyonel bir destek sürecidir. Görüşmeler, ailenin tamamıyla ya da konuya göre belirli üyelerle yürütülebilir. Amaç kimseyi suçlamak değil; ailenin kendi içindeki örüntüleri fark etmesine ve daha sağlıklı bir denge kurmasına eşlik etmektir.\n\nHer ailenin hikâyesi kendine özgüdür. Bu sayfa genel bilgilendirme amaçlıdır; sizin ailenize uygun yaklaşım, ilk görüşmede birlikte değerlendirilir. Özsaye Psikoloji olarak hedefimiz, her üyenin kendini açıkça ifade edebildiği güvenli bir alan sunmaktır.",
+    "metaDescription": "Aile danışmanlığı nedir, kimler için uygundur ve süreç nasıl ilerler? Aile içi iletişim, çatışma ve ebeveyn-çocuk ilişkisinde destek için Öz & Saye Psikoloji.",
+    "intro": "Aile danışmanlığı; aile üyelerinin birbirini daha iyi anlaması, iletişimini güçlendirmesi ve zorlandığı konuları birlikte ele alması için sunulan profesyonel bir destek sürecidir. Görüşmeler, ailenin tamamıyla ya da konuya göre belirli üyelerle yürütülebilir. Amaç kimseyi suçlamak değil; ailenin kendi içindeki örüntüleri fark etmesine ve daha sağlıklı bir denge kurmasına eşlik etmektir.\n\nHer ailenin hikâyesi kendine özgüdür. Bu sayfa genel bilgilendirme amaçlıdır; sizin ailenize uygun yaklaşım, ilk görüşmede birlikte değerlendirilir. Öz & Saye Psikoloji olarak hedefimiz, her üyenin kendini açıkça ifade edebildiği güvenli bir alan sunmaktır.",
     "sections": [
       {
         "heading": "Aile danışmanlığı nedir?",
@@ -195,8 +195,8 @@ export const services: Service[] = [
     "title": "Çocuk & Ergen Terapisi",
     "shortDesc": "Çocuk ve ergenlerin gelişimsel, duygusal ve davranışsal sorunlarına özel yaklaşım.",
     "iconKey": "child",
-    "metaDescription": "Çocuk ve ergen terapisi nedir, kimler için uygundur ve süreç nasıl ilerler? Çocuğunuzun duygusal ve davranışsal zorluklarında destek için Özsaye Psikoloji.",
-    "intro": "Çocuk ve ergen terapisi; çocukların ve gençlerin yaşadıkları duygusal, davranışsal ya da gelişimsel zorlukları, gelişim dönemlerine uygun yöntemlerle ele alan bir destek sürecidir. Çocuklar duygularını her zaman sözcüklerle anlatamadığı için terapide oyun, çizim ve yaşına uygun etkinliklerden de yararlanılabilir. Ergenlerle ise daha çok konuşmaya dayalı, onların özerkliğine saygılı bir çalışma yürütülür.\n\nBu sayfa genel bir bilgilendirmedir ve tanı niteliği taşımaz. Çocuğunuza ya da gencinize uygun yaklaşım, ilk görüşmede birlikte değerlendirilir. Özsaye Psikoloji olarak amacımız, çocuğun kendini güvende hissettiği, yargılanmadan ifade edebildiği bir alan sunmaktır.",
+    "metaDescription": "Çocuk ve ergen terapisi nedir, kimler için uygundur ve süreç nasıl ilerler? Çocuğunuzun duygusal ve davranışsal zorluklarında destek için Öz & Saye Psikoloji.",
+    "intro": "Çocuk ve ergen terapisi; çocukların ve gençlerin yaşadıkları duygusal, davranışsal ya da gelişimsel zorlukları, gelişim dönemlerine uygun yöntemlerle ele alan bir destek sürecidir. Çocuklar duygularını her zaman sözcüklerle anlatamadığı için terapide oyun, çizim ve yaşına uygun etkinliklerden de yararlanılabilir. Ergenlerle ise daha çok konuşmaya dayalı, onların özerkliğine saygılı bir çalışma yürütülür.\n\nBu sayfa genel bir bilgilendirmedir ve tanı niteliği taşımaz. Çocuğunuza ya da gencinize uygun yaklaşım, ilk görüşmede birlikte değerlendirilir. Öz & Saye Psikoloji olarak amacımız, çocuğun kendini güvende hissettiği, yargılanmadan ifade edebildiği bir alan sunmaktır.",
     "sections": [
       {
         "heading": "Çocuk ve ergen terapisi nedir?",
@@ -252,8 +252,8 @@ export const services: Service[] = [
     "title": "Depresyon & Anksiyete",
     "shortDesc": "Depresyon, kaygı bozuklukları ve panik atak tedavisinde uzman terapi desteği.",
     "iconKey": "check",
-    "metaDescription": "Depresyon, kaygı bozuklukları ve panik atakta terapi desteği. Özsaye Psikoloji'de güvenli bir alanda, size uygun bir süreçle birlikte yol alın.",
-    "intro": "Depresyon ve anksiyete, hayatın bir döneminde pek çok kişinin yaşadığı, yalnız olmadığınız deneyimlerdir. Sürekli bir isteksizlik, tükenmişlik, kontrol edilemez bir kaygı ya da yoğun panik anları yaşamınızı zorlaştırıyorsa, bunlarla baş başa kalmak zorunda değilsiniz.\n\nÖzsaye Psikoloji'de amacımız, duygularınızı yargılamadan dinleyebileceğiniz güvenli bir alan sunmak ve size uygun adımları birlikte belirlemek. Bu sayfada depresyon ile anksiyetenin ne olduğunu, kimler için destek alma sürecinin uygun olabileceğini ve terapinin nasıl ilerlediğini sade bir dille açıklıyoruz.",
+    "metaDescription": "Depresyon, kaygı bozuklukları ve panik atakta terapi desteği. Öz & Saye Psikoloji'de güvenli bir alanda, size uygun bir süreçle birlikte yol alın.",
+    "intro": "Depresyon ve anksiyete, hayatın bir döneminde pek çok kişinin yaşadığı, yalnız olmadığınız deneyimlerdir. Sürekli bir isteksizlik, tükenmişlik, kontrol edilemez bir kaygı ya da yoğun panik anları yaşamınızı zorlaştırıyorsa, bunlarla baş başa kalmak zorunda değilsiniz.\n\nÖz & Saye Psikoloji'de amacımız, duygularınızı yargılamadan dinleyebileceğiniz güvenli bir alan sunmak ve size uygun adımları birlikte belirlemek. Bu sayfada depresyon ile anksiyetenin ne olduğunu, kimler için destek alma sürecinin uygun olabileceğini ve terapinin nasıl ilerlediğini sade bir dille açıklıyoruz.",
     "sections": [
       {
         "heading": "Depresyon ve anksiyete nedir?",
@@ -304,8 +304,8 @@ export const services: Service[] = [
     "title": "Travma Terapisi",
     "shortDesc": "Travmatik yaşantılar, kayıp ve yas süreçlerinde iyileşmeye yönelik terapi.",
     "iconKey": "heart",
-    "metaDescription": "Travmatik yaşantılar, kayıp ve yas süreçlerinde iyileşmeye yönelik terapi. Özsaye Psikoloji'de güvenli bir alanda kendi hızınızda iyileşin.",
-    "intro": "Zorlayıcı bir olay, ani bir kayıp ya da uzun süre etkisi devam eden bir yaşantı, zihninizde ve bedeninizde derin izler bırakabilir. Yaşadıklarınız hâlâ sizi etkiliyorsa, geçmiş bir an bugüne taşınıyorsa ya da bir yas sürecinin içinde kendinizi kaybolmuş hissediyorsanız bu yükü tek başınıza taşımak zorunda değilsiniz.\n\nÖzsaye Psikoloji'de travma terapisini, acele ettirmeyen, güvenliği önceleyen bir yaklaşımla ele alıyoruz. Bu sayfada travmanın ne olduğunu, kimler için destek almanın uygun olabileceğini ve sürecin nasıl ilerlediğini sade bir dille paylaşıyoruz.",
+    "metaDescription": "Travmatik yaşantılar, kayıp ve yas süreçlerinde iyileşmeye yönelik terapi. Öz & Saye Psikoloji'de güvenli bir alanda kendi hızınızda iyileşin.",
+    "intro": "Zorlayıcı bir olay, ani bir kayıp ya da uzun süre etkisi devam eden bir yaşantı, zihninizde ve bedeninizde derin izler bırakabilir. Yaşadıklarınız hâlâ sizi etkiliyorsa, geçmiş bir an bugüne taşınıyorsa ya da bir yas sürecinin içinde kendinizi kaybolmuş hissediyorsanız bu yükü tek başınıza taşımak zorunda değilsiniz.\n\nÖz & Saye Psikoloji'de travma terapisini, acele ettirmeyen, güvenliği önceleyen bir yaklaşımla ele alıyoruz. Bu sayfada travmanın ne olduğunu, kimler için destek almanın uygun olabileceğini ve sürecin nasıl ilerlediğini sade bir dille paylaşıyoruz.",
     "sections": [
       {
         "heading": "Travma terapisi nedir?",

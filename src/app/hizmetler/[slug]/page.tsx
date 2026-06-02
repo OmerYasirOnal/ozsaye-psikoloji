@@ -112,9 +112,7 @@ export default async function HizmetDetayPage({
                 Ana sayfa
               </Link>
             </li>
-            <li aria-hidden="true" className="text-sage">
-              /
-            </li>
+            <li aria-hidden="true">/</li>
             <li>
               <Link
                 href="/hizmetler"
@@ -123,9 +121,7 @@ export default async function HizmetDetayPage({
                 Çalışma Alanları
               </Link>
             </li>
-            <li aria-hidden="true" className="text-sage">
-              /
-            </li>
+            <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-forest">
               {service.title}
             </li>

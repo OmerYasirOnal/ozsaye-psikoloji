@@ -8,7 +8,7 @@ const HENUZ_DOLDURULMADI = "[Yayından önce doldurulacak]";
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni",
   description:
-    "Özsaye Psikoloji kişisel verilerin korunması (KVKK 6698) aydınlatma metni taslağı.",
+    "Öz & Saye Psikoloji kişisel verilerin korunması (KVKK 6698) aydınlatma metni taslağı.",
   robots: { index: false, follow: true },
 };
 

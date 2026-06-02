@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 // Teşekkür sayfası randevu formu başarıyla gönderildiğinde gösterilir
-// (actions.ts -> submitAppointment başarıda buraya redirect eder).
+// (public/randevu.php başarılı POST sonrası buraya yönlendirir).
 // Arama motorlarında dizine eklenmemeli: noindex.
 export const metadata: Metadata = {
   title: "Teşekkürler",
@@ -115,7 +115,7 @@ export default function TesekkurlerPage() {
         {/* KVKK koruma notu */}
         <p className="mx-auto mt-8 flex max-w-xl items-start justify-center gap-2 font-body text-sm leading-relaxed text-forest-muted">
           <svg
-            className="mt-0.5 h-4 w-4 shrink-0 text-sage"
+            className="mt-0.5 h-4 w-4 shrink-0 text-forest-muted"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"

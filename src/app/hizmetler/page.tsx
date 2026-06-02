@@ -7,7 +7,7 @@ import { services } from "@/lib/services";
 export const metadata: Metadata = {
   title: "Çalışma Alanlarımız",
   description:
-    "Özsaye Psikoloji çalışma alanları: bireysel psikoterapi, çift terapisi, aile danışmanlığı, çocuk ve ergen terapisi ve daha fazlasında profesyonel destek.",
+    "Öz & Saye Psikoloji çalışma alanları: bireysel psikoterapi, çift terapisi, aile danışmanlığı, çocuk ve ergen terapisi ve daha fazlasında profesyonel destek.",
   alternates: {
     canonical: "/hizmetler",
   },

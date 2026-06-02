@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Gizlilik Politikası",
   // TODO: GERÇEK VERİ -- politika hukuk onayından geçince bu açıklamayı gözden geçirin
   description:
-    "Özsaye Psikoloji web sitesi gizlilik politikası taslağı: hangi verileri topladığımız, nasıl kullandığımız ve haklarınız.",
+    "Öz & Saye Psikoloji web sitesi gizlilik politikası taslağı: hangi verileri topladığımız, nasıl kullandığımız ve haklarınız.",
   // Taslak/onaysız belge: arama motorlarınca dizine eklenmesin.
   robots: { index: false, follow: true },
 };
@@ -81,7 +81,7 @@ export default function GizlilikPolitikasiPage() {
         {/* İçerik metni — marka prose tipografisi */}
         <article className="mt-16 space-y-12 text-forest-muted">
           <p className="text-base leading-relaxed">
-            Özsaye Psikoloji olarak gizliliğinize değer veriyoruz. Bu politika,
+            Öz & Saye Psikoloji olarak gizliliğinize değer veriyoruz. Bu politika,
             bu web sitesini ziyaret ettiğinizde veya randevu formumuzu
             kullandığınızda kişisel verilerinizin nasıl toplandığını,
             kullanıldığını ve korunduğunu açıklar.
