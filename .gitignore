@@ -43,3 +43,10 @@ next-env.d.ts
 # playwright mcp artifacts
 .playwright-mcp/
 ozsaye-psikoloji-static.zip
+
+# Sosyal medya taslak kuyruğu (yerel, üretici çıktısı)
+/taslaklar/
+
+# Sıfır bağlamlı review raporu (geçici, üretici çıktısı)
+review-rapor.md
+review-rapor.md.log
