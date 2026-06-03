@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { getAllPosts, getPostBySlug, formatDateTR } from "@/lib/blog";
+import { site } from "@/lib/site";
 
-const siteUrl = "https://ozsayepsikoloji.com";
+const siteUrl = site.url;
 
 export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
@@ -18,11 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) return { title: "Yazı bulunamadı | Öz & Saye Psikoloji" };
+  if (!post) return { title: "Yazı bulunamadı" };
 
   const url = `${siteUrl}/blog/${post.slug}`;
   return {
-    title: `${post.title} | Öz & Saye Psikoloji`,
+    title: post.title,
     description: post.excerpt,
     keywords: post.tags,
     authors: [{ name: post.author }],
@@ -73,21 +72,22 @@ export default async function BlogPostPage({
     publisher: {
       "@type": "Organization",
       name: "Öz & Saye Psikoloji",
-      logo: { "@type": "ImageObject", url: `${siteUrl}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${siteUrl}/icon-512.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
   };
 
   return (
     <>
-      <Header />
-      <main className="bg-cream pt-32 pb-24 lg:pt-40">
+      <main id="icerik" className="bg-cream pt-32 pb-24 lg:pt-40">
         <article className="mx-auto max-w-3xl px-6 lg:px-8">
-          <nav className="mb-8 text-sm text-forest/50">
+          <nav className="mb-8 text-sm text-forest-muted">
             <Link href="/" className="transition-colors hover:text-forest">
               Anasayfa
             </Link>
-            <span className="mx-2">/</span>
+            <span className="mx-2" aria-hidden="true">
+              /
+            </span>
             <Link href="/blog" className="transition-colors hover:text-forest">
               Yazılar
             </Link>
@@ -100,11 +100,11 @@ export default async function BlogPostPage({
             <h1 className="mt-5 font-display text-4xl leading-tight font-medium text-forest lg:text-5xl">
               {post.title}
             </h1>
-            <div className="mt-5 flex items-center gap-3 text-sm text-forest/50">
+            <div className="mt-5 flex items-center gap-3 text-sm text-forest-muted">
               <span>{formatDateTR(post.date)}</span>
-              <span className="h-1 w-1 rounded-full bg-sage" />
+              <span className="h-1 w-1 rounded-full bg-sage" aria-hidden="true" />
               <span>{post.readTime} okuma</span>
-              <span className="h-1 w-1 rounded-full bg-sage" />
+              <span className="h-1 w-1 rounded-full bg-sage" aria-hidden="true" />
               <span>{post.author}</span>
             </div>
           </header>
@@ -118,7 +118,7 @@ export default async function BlogPostPage({
             <p className="font-display text-2xl font-medium">
               Desteğe ihtiyaç duyduğunuzda buradayız.
             </p>
-            <p className="mt-2 text-sm text-cream/70">
+            <p className="mt-2 text-sm text-sage-light">
               Online veya yüz yüze görüşme için bizimle iletişime geçebilirsiniz.
             </p>
             <Link
@@ -132,9 +132,16 @@ export default async function BlogPostPage({
           <div className="mt-10">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-sage-dark transition-colors hover:text-forest"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-forest-muted transition-colors hover:text-forest"
             >
-              <svg className="h-4 w-4 rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4 rotate-180"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
               Tüm Yazılar
@@ -142,7 +149,6 @@ export default async function BlogPostPage({
           </div>
         </article>
       </main>
-      <Footer />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

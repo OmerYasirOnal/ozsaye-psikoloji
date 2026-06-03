@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
 # Öz & Saye Psikoloji — marka fontlarını kurar (görsel üretici script'ler için).
-# Türkçe karakter kapsamı tam olan komple TTF'leri indirir:
-#   Cormorant Garamond (Bold/SemiBold/MediumItalic) — CatharsisFonts/Cormorant (OFL)
-#   Nunito (variable) — google/fonts (OFL)
+# Türkçe karakter kapsamı tam olan variable TTF'leri indirir:
+#   Playfair Display (+ Italic) — başlık/serif (Google Fonts, OFL)
+#   Montserrat — gövde/sans (Google Fonts, OFL)
 # Kullanım: bash scripts/setup-fonts.sh
+#   Yerel (sudo'suz) için: BRAND_FONT_DIR=./.fonts bash scripts/setup-fonts.sh
+#   brand.cjs aynı BRAND_FONT_DIR'i okur.
 set -euo pipefail
 
-DEST="${FONT_DEST:-/usr/share/fonts/brand}"
+DEST="${BRAND_FONT_DIR:-${FONT_DEST:-/usr/share/fonts/brand}}"
 mkdir -p "$DEST"
 
-CORM="https://github.com/CatharsisFonts/Cormorant/raw/master/fonts/ttf"
-for f in CormorantGaramond-Bold.ttf CormorantGaramond-SemiBold.ttf CormorantGaramond-MediumItalic.ttf; do
-  echo "indiriliyor: $f"
-  curl -sL -m 60 "$CORM/$f" -o "$DEST/$f"
-done
-
-echo "indiriliyor: Nunito.ttf"
-curl -sL -m 60 "https://github.com/google/fonts/raw/main/ofl/nunito/Nunito%5Bwght%5D.ttf" -o "$DEST/Nunito.ttf"
+GF="https://github.com/google/fonts/raw/main/ofl"
+echo "indiriliyor: PlayfairDisplay.ttf"
+curl -sL -m 60 "$GF/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf" -o "$DEST/PlayfairDisplay.ttf"
+echo "indiriliyor: PlayfairDisplay-Italic.ttf"
+curl -sL -m 60 "$GF/playfairdisplay/PlayfairDisplay-Italic%5Bwght%5D.ttf" -o "$DEST/PlayfairDisplay-Italic.ttf"
+echo "indiriliyor: Montserrat.ttf"
+curl -sL -m 60 "$GF/montserrat/Montserrat%5Bwght%5D.ttf" -o "$DEST/Montserrat.ttf"
 
 fc-cache -f >/dev/null 2>&1 || true
-echo "Tamam. Kurulu marka fontları:"
-fc-list | grep -iE "cormorant|nunito" || true
+echo "Tamam. Kurulu marka fontları ($DEST):"
+ls -1 "$DEST" | grep -iE "playfair|montserrat" || true

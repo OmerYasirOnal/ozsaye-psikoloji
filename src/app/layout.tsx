@@ -1,31 +1,34 @@
-import type { Metadata } from "next";
-import { Cormorant_Garamond, Nunito } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Playfair_Display, Montserrat } from "next/font/google";
+import { site } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import StickyCta from "@/components/StickyCta";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const nunito = Nunito({
+const montserrat = Montserrat({
   variable: "--font-body",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
-const siteUrl = "https://ozsayepsikoloji.com";
-const siteName = "Öz & Saye Psikoloji";
-const siteTitle = "Öz & Saye Psikoloji | Güvenli Bir Bölgede Kendi Özüne Doğru";
-const siteDescription =
-  "Psikolojik Danışman Melek Yıldız ve Klinik Psikolog Sacide Şahin ile güvenli bir alanda profesyonel psikolojik destek alın.";
+const title = `${site.shortName} | ${site.slogan}`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: siteTitle,
-  description: siteDescription,
+  metadataBase: new URL(site.url),
+  title: {
+    default: title,
+    template: `%s | ${site.shortName}`,
+  },
+  description: site.description,
   keywords: [
     "psikolog",
     "psikolojik danışman",
@@ -33,11 +36,12 @@ export const metadata: Metadata = {
     "terapi",
     "psikoterapi",
     "online terapi",
+    "çift terapisi",
+    "aile danışmanlığı",
     "Melek Yıldız",
     "Sacide Şahin",
     "Öz & Saye Psikoloji",
     "Özsaye Psikoloji",
-    "ozsaye psikoloji",
   ],
   alternates: {
     canonical: "/",
@@ -45,25 +49,34 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "tr_TR",
-    url: siteUrl,
-    siteName,
-    title: siteTitle,
-    description: siteDescription,
+    url: "/",
+    siteName: site.shortName,
+    title,
+    description: site.description,
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Öz & Saye Psikoloji — Güvenli Bir Bölgede Kendi Özüne Doğru",
+        alt: `${site.shortName} — ${site.slogan}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: siteTitle,
-    description: siteDescription,
+    title,
+    description: site.description,
     images: ["/og.png"],
   },
+  // dataReady=false iken (placeholder NAP/kimlik) arama motorlarına kapalı; veri hazır olunca açılır.
+  robots: site.dataReady
+    ? { index: true, follow: true }
+    : { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1F3B2E",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -72,9 +85,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={`${cormorant.variable} ${nunito.variable}`}>
+    <html
+      lang="tr"
+      dir="ltr"
+      className={`${playfair.variable} ${montserrat.variable}`}
+    >
       <body className="min-h-screen bg-cream font-body text-forest antialiased">
+        <a href="#icerik" className="skip-link">
+          İçeriğe geç
+        </a>
+        <Header />
         {children}
+        <Footer />
+        <StickyCta />
+        <JsonLd />
       </body>
     </html>
   );

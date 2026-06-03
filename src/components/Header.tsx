@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import LogoMark from "./LogoMark";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/#anasayfa", label: "Anasayfa" },
@@ -16,6 +16,10 @@ const navLinks = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  // Menü en az bir kez açıldı mı? İlk mount'ta odağı butona kaçırmamak için.
+  const hasOpenedRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -34,38 +38,88 @@ export default function Header() {
     };
   }, [mobileOpen]);
 
+  // Açılınca ilk menü linkine odaklan; kapanınca odağı menü butonuna geri ver.
+  // İlk mount'ta (menü hiç açılmadan) odağı butona taşıma.
+  useEffect(() => {
+    if (mobileOpen) {
+      hasOpenedRef.current = true;
+      const first = mobileMenuRef.current?.querySelector<HTMLElement>("a[href]");
+      first?.focus();
+    } else if (hasOpenedRef.current) {
+      menuButtonRef.current?.focus();
+    }
+  }, [mobileOpen]);
+
+  // ESC ile kapat + basit focus-trap (Tab overlay içinde dönsün).
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const menu = mobileMenuRef.current;
+      if (!menu) return;
+      const focusable = menu.querySelectorAll<HTMLElement>("a[href]");
+      if (focusable.length === 0) return;
+      const firstEl = focusable[0];
+      const lastEl = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_12px_rgba(43,82,51,0.08)]"
+          ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_12px_rgba(31,59,46,0.08)]"
           : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <LogoMark className="h-11 w-11 text-forest transition-transform duration-300 group-hover:scale-105" />
-          <div className="flex flex-col">
-            <span className="font-display text-xl font-semibold tracking-wide text-forest">
-              Öz &amp; Saye
-            </span>
-            <span className="font-body text-[10px] font-light tracking-[0.2em] text-sage-dark uppercase">
-              Psikoloji
-            </span>
-          </div>
+        <Link
+          href="/#anasayfa"
+          className="group flex items-center"
+          aria-label="Öz & Saye Psikoloji — Anasayfa"
+        >
+          <Image
+            src="/logo.png"
+            alt="Öz & Saye Psikoloji"
+            width={460}
+            height={480}
+            priority
+            className="h-16 w-auto transition-transform duration-300 group-hover:scale-105 sm:h-20"
+          />
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
-              className="relative px-3 py-2 text-sm font-medium text-forest/70 transition-colors hover:text-forest after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-sage after:transition-all after:duration-300 hover:after:w-2/3"
+              className="relative px-3 py-2 text-sm font-medium text-forest-muted transition-colors hover:text-forest after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-sage after:transition-all after:duration-300 hover:after:w-2/3"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -79,9 +133,13 @@ export default function Header() {
 
         {/* Mobile menu button */}
         <button
+          ref={menuButtonRef}
+          type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
           className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
-          aria-label="Menü"
+          aria-expanded={mobileOpen}
+          aria-controls="mobil-menu"
+          aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
         >
           <span
             className={`h-[2px] w-6 bg-forest transition-all duration-300 ${
@@ -103,22 +161,30 @@ export default function Header() {
 
       {/* Mobile menu overlay */}
       <div
+        id="mobil-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menü"
+        inert={!mobileOpen}
         className={`fixed inset-0 z-40 bg-cream transition-all duration-500 lg:hidden ${
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
       >
-        <nav className="flex h-full flex-col items-center justify-center gap-6">
+        <nav
+          ref={mobileMenuRef}
+          className="flex h-full flex-col items-center justify-center gap-6"
+        >
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="font-display text-3xl font-medium text-forest transition-colors hover:text-sage-dark"
+              className="font-display text-3xl font-medium text-forest transition-colors hover:text-forest-light"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <Link
             href="/#randevu"

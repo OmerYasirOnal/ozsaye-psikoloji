@@ -102,12 +102,12 @@ async function writePNG(c, file, targetW, bg) {
   const tile = (c, x, y, tw, label, labelColor) => {
     const k = tw / c.w, hh = c.h * k;
     return `<g transform="translate(${x} ${y})"><g transform="scale(${k})">${c.inner}</g>
-      <text x="${tw / 2}" y="${hh + 34}" text-anchor="middle" font-family="Nunito" font-size="22" fill="${labelColor}">${label}</text></g>`;
+      <text x="${tw / 2}" y="${hh + 34}" text-anchor="middle" font-family="Montserrat" font-size="22" fill="${labelColor}">${label}</text></g>`;
   };
   const OW = 1680, panelH = 470;
   const overview = `<svg width="${OW}" height="${panelH * 2 + 120}" viewBox="0 0 ${OW} ${panelH * 2 + 120}" xmlns="http://www.w3.org/2000/svg">
     <rect width="${OW}" height="${panelH * 2 + 120}" fill="${C.warmWhite}"/>
-    <text x="${OW / 2}" y="64" text-anchor="middle" font-family="Cormorant Garamond" font-weight="700" font-size="44" fill="${C.forest}">Öz &amp; Saye Psikoloji — Logo Kiti</text>
+    <text x="${OW / 2}" y="64" text-anchor="middle" font-family="Playfair Display" font-weight="700" font-size="44" fill="${C.forest}">Öz &amp; Saye Psikoloji — Logo Kiti</text>
     <rect x="40" y="100" width="${OW - 80}" height="${panelH}" rx="20" fill="${C.cream}"/>
     ${tile(stacked("color"), 90, 150, 360, "Ana (dikey)", C.forest)}
     ${tile(horizontal("color"), 560, 250, 640, "Yatay", C.forest)}

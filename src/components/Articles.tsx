@@ -36,6 +36,7 @@ export default function Articles() {
                 stroke="currentColor"
                 strokeWidth="2"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -55,11 +56,12 @@ export default function Articles() {
                 <div className="relative h-48 overflow-hidden bg-sage/10">
                   <div className="flex h-full items-center justify-center">
                     <svg
-                      className="h-12 w-12 text-sage/30 transition-transform duration-500 group-hover:scale-110"
+                      className="h-12 w-12 text-sage-light transition-transform duration-500 group-hover:scale-110"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
@@ -73,9 +75,9 @@ export default function Articles() {
 
                 {/* Content */}
                 <div className="flex flex-1 flex-col p-6">
-                  <div className="mb-3 flex items-center gap-3 text-xs text-forest/50">
+                  <div className="mb-3 flex items-center gap-3 text-xs text-forest-muted">
                     <span>{formatDateTR(article.date)}</span>
-                    <span className="h-1 w-1 rounded-full bg-sage" />
+                    <span className="h-1 w-1 rounded-full bg-sage" aria-hidden="true" />
                     <span>{article.readTime} okuma</span>
                   </div>
 
@@ -83,11 +85,11 @@ export default function Articles() {
                     {article.title}
                   </h3>
 
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-forest/60">
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-forest-muted">
                     {article.excerpt}
                   </p>
 
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-sage-dark transition-colors group-hover:text-forest">
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest-muted transition-colors group-hover:text-forest">
                     Devamını Oku
                     <svg
                       className="h-3 w-3 transition-transform group-hover:translate-x-1"
@@ -95,6 +97,7 @@ export default function Articles() {
                       stroke="currentColor"
                       strokeWidth="2"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
