@@ -88,7 +88,7 @@ const cards: ContactCard[] = [
 
 export default function Contact() {
   return (
-    <section id="iletisim" className="bg-cream py-28 lg:py-36">
+    <section id="iletisim" className="bg-cream py-28 lg:py-40">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         {/* Bölüm başlığı */}
         <div className="mx-auto max-w-2xl text-center">
@@ -100,7 +100,7 @@ export default function Contact() {
           <ScrollReveal delay={1}>
             <div
               aria-hidden="true"
-              className="mx-auto mt-6 h-px w-12 bg-sage/40"
+              className="reveal-line mx-auto mt-6 h-px w-12 bg-sage/40"
             />
           </ScrollReveal>
           <ScrollReveal delay={1}>

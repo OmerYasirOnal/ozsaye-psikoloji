@@ -6,12 +6,14 @@ interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
+  variant?: "up" | "fade" | "scale" | "left" | "right";
 }
 
 export default function ScrollReveal({
   children,
   className = "",
   delay = 0,
+  variant = "up",
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -58,7 +60,7 @@ export default function ScrollReveal({
   const delayClass = delay > 0 ? `reveal-delay-${delay}` : "";
 
   return (
-    <div ref={ref} className={`reveal ${delayClass} ${className}`}>
+    <div ref={ref} data-variant={variant} className={`reveal ${delayClass} ${className}`}>
       {children}
     </div>
   );

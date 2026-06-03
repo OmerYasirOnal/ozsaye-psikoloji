@@ -2,11 +2,11 @@ import ScrollReveal from "./ScrollReveal";
 
 export default function About() {
   return (
-    <section id="hakkimizda" className="bg-cream py-28 lg:py-36">
+    <section id="hakkimizda" className="bg-cream py-28 lg:py-40">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
           {/* Image side */}
-          <ScrollReveal>
+          <ScrollReveal variant="scale">
             {/* next/image örneği (genel ofis görseli için):
              *
              * import Image from "next/image";
@@ -45,6 +45,7 @@ export default function About() {
               <p className="font-body text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
                 Hakkımızda
               </p>
+              <span className="reveal-line mt-4 block h-px w-10 origin-left bg-sage/50" aria-hidden="true" />
             </ScrollReveal>
 
             <ScrollReveal delay={2}>

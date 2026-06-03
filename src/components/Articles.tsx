@@ -8,7 +8,7 @@ export default function Articles() {
   if (articles.length === 0) return null;
 
   return (
-    <section id="yazilar" className="relative bg-cream py-24 lg:py-32">
+    <section id="yazilar" className="relative bg-cream py-28 lg:py-40">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header */}
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
@@ -45,7 +45,7 @@ export default function Articles() {
         </div>
 
         {/* Articles grid */}
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
           {articles.map((article, idx) => (
             <ScrollReveal key={article.slug} delay={idx + 1}>
               <Link

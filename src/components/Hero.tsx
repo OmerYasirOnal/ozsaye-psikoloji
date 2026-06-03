@@ -1,3 +1,5 @@
+import Parallax from "./Parallax";
+
 export default function Hero() {
   return (
     <section
@@ -11,20 +13,22 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto max-w-3xl text-center">
         {/* Tek zarif botanik imza */}
-        <svg
-          aria-hidden="true"
-          className="hero-animate mx-auto mb-8 h-9 w-9 text-sage"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.25"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 22V10" />
-          <path d="M12 12c-3.3 0-6-2.7-6-6 3.3 0 6 2.7 6 6Z" />
-          <path d="M12 10.5c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" />
-        </svg>
+        <Parallax speed={0.04} className="mx-auto mb-8 w-fit">
+          <svg
+            aria-hidden="true"
+            className="hero-animate h-9 w-9 text-sage"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 22V10" />
+            <path d="M12 12c-3.3 0-6-2.7-6-6 3.3 0 6 2.7 6 6Z" />
+            <path d="M12 10.5c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" />
+          </svg>
+        </Parallax>
 
         {/* Eyebrow */}
         <p className="hero-animate hero-animate-delay-1 font-body text-xs font-medium tracking-[0.25em] text-forest-muted uppercase">
