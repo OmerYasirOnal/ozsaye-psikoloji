@@ -103,10 +103,10 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt="Öz & Saye Psikoloji"
-            width={460}
-            height={480}
+            width={323}
+            height={331}
             priority
-            className="h-16 w-auto transition-transform duration-300 group-hover:scale-105 sm:h-20"
+            className="h-20 w-auto transition-transform duration-300 group-hover:scale-105 sm:h-24"
           />
         </Link>
 

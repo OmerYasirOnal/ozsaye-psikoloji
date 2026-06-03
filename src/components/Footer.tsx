@@ -39,9 +39,9 @@ export default function Footer() {
               <Image
                 src="/logo.png"
                 alt="Öz & Saye Psikoloji"
-                width={460}
-                height={480}
-                className="h-20 w-auto"
+                width={323}
+                height={331}
+                className="h-24 w-auto"
               />
             </Link>
             <p className="mt-6 font-display text-lg leading-relaxed italic text-sage-light">
