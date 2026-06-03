@@ -91,6 +91,14 @@ export default function RootLayout({
       className={`${playfair.variable} ${montserrat.variable}`}
     >
       <body className="min-h-screen bg-cream font-body text-forest antialiased">
+        {/* Progressive enhancement: JS çalışıyorsa <html>'e `js` sınıfı ekle.
+            Reveal gizleme yalnızca `html.js` altında geçerli; JS yoksa içerik
+            tam görünür kalır. Boyamadan önce çalışması için body'nin ilk öğesi. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
         <a href="#icerik" className="skip-link">
           İçeriğe geç
         </a>

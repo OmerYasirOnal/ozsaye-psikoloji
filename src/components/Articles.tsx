@@ -27,11 +27,11 @@ export default function Articles() {
           <ScrollReveal delay={2}>
             <Link
               href="/blog"
-              className="group inline-flex items-center gap-2 rounded-full border-2 border-forest/20 px-6 py-3 text-sm font-semibold text-forest transition-all hover:border-forest hover:bg-forest hover:text-cream"
+              className="group inline-flex items-center gap-2 rounded-full border-2 border-forest/20 px-6 py-3 text-sm font-semibold text-forest transition-all duration-300 hover:border-forest hover:bg-forest hover:text-cream"
             >
               Tüm Yazılar
               <svg
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -50,13 +50,13 @@ export default function Articles() {
             <ScrollReveal key={article.slug} delay={idx + 1}>
               <Link
                 href={`/blog/${article.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl bg-warm-white transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-sage/10"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl bg-warm-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sage/10"
               >
                 {/* Image placeholder */}
                 <div className="relative h-48 overflow-hidden bg-sage/10">
                   <div className="flex h-full items-center justify-center">
                     <svg
-                      className="h-12 w-12 text-sage-light transition-transform duration-500 group-hover:scale-110"
+                      className="h-12 w-12 text-sage-light transition-transform duration-300 group-hover:scale-110"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1"
@@ -81,7 +81,7 @@ export default function Articles() {
                     <span>{article.readTime} okuma</span>
                   </div>
 
-                  <h3 className="font-display text-xl font-semibold leading-snug text-forest transition-colors group-hover:text-forest-light">
+                  <h3 className="font-display text-xl font-semibold leading-snug text-forest transition-colors duration-300 group-hover:text-forest-light">
                     {article.title}
                   </h3>
 
@@ -89,10 +89,10 @@ export default function Articles() {
                     {article.excerpt}
                   </p>
 
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest-muted transition-colors group-hover:text-forest">
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest-muted transition-colors duration-300 group-hover:text-forest">
                     Devamını Oku
                     <svg
-                      className="h-3 w-3 transition-transform group-hover:translate-x-1"
+                      className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
