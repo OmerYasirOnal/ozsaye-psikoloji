@@ -39,6 +39,9 @@ export default function JsonLd() {
     telephone: site.phone.e164,
     email: site.email.address,
     image: absoluteUrl("/og.png"),
+    // Kurumsal logo (kare, beyaz zeminli site ikonu) — arama motorlarının yeni
+    // markayı işletme kimliğiyle ilişkilendirmesi için. og.png sosyal kart, logo değil.
+    logo: { "@type": "ImageObject", url: absoluteUrl("/icon-512.png") },
     address: {
       "@type": "PostalAddress",
       streetAddress: site.address.streetAddress,

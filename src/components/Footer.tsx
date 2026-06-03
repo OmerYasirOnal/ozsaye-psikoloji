@@ -1,5 +1,5 @@
 import Link from "next/link";
-import LogoMark from "./LogoMark";
+import Image from "next/image";
 import { services } from "@/lib/services";
 import { site, isReady } from "@/lib/site";
 
@@ -31,17 +31,19 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-3">
-              <LogoMark className="h-11 w-11 text-cream" />
-              <div className="flex flex-col">
-                <span className="font-display text-xl font-semibold">
-                  Öz &amp; Saye
-                </span>
-                <span className="font-body text-[10px] tracking-[0.2em] text-sage-light uppercase">
-                  Psikoloji
-                </span>
-              </div>
-            </div>
+            <Link
+              href="/#anasayfa"
+              aria-label="Öz & Saye Psikoloji — Anasayfa"
+              className="inline-flex rounded-2xl bg-warm-white p-4 shadow-[0_2px_16px_rgba(20,42,32,0.18)]"
+            >
+              <Image
+                src="/logo.png"
+                alt="Öz & Saye Psikoloji"
+                width={460}
+                height={480}
+                className="h-20 w-auto"
+              />
+            </Link>
             <p className="mt-6 font-display text-lg leading-relaxed italic text-sage-light">
               &ldquo;Güvenli Bir Bölgede
               <br />

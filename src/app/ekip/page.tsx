@@ -67,7 +67,7 @@ export default function EkipPage() {
             <Link
               key={expert.slug}
               href={`/ekip/${expert.slug}`}
-              className="group flex flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(35,71,46,0.15)] lg:p-10"
+              className="group flex flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(31,59,46,0.15)] lg:p-10"
             >
               {/*
                 FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki monogram

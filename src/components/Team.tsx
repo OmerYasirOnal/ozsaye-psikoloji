@@ -42,7 +42,7 @@ export default function Team() {
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           {site.experts.map((expert, idx) => (
             <ScrollReveal key={expert.slug} delay={idx + 2}>
-              <div className="group rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(35,71,46,0.15)] motion-reduce:transition-none lg:p-10">
+              <div className="group rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(31,59,46,0.15)] motion-reduce:transition-none lg:p-10">
                 {/*
                   FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki SVG geçici
                   yer tutucudur. Görsel hazır olduğunda (public yolu

@@ -27,54 +27,67 @@ anahtar kelimelerinde hem "Öz & Saye" hem "Özsaye" varyantları tutulur.
 
 ## 1. Logo
 
-Amblem; **açık dairesel halka** (güvenli bölge / açılım) içinde **kollarını
-yukarı açan figür** (kendi özüne doğru) ve onu **kucaklayan iki yapraktan**
-(büyüme/şefkat) oluşur.
+Amblem; **kollarını yukarı açan figür** (kendi özüne doğru / iyi oluş) ve onu
+çevreleyen **dört yapraktan** (iki adaçayı yeşili + iki soft pembe; büyüme/şefkat)
+oluşur. Altında dikey kilit hâlinde **`Öz & Saye`** wordmark'ı ve **`PSİKOLOJİ`**
+alt yazısı yer alır.
 
-### Logo kiti (`brand/logo/`)
+### Logo kiti (`brand/logo/final/`)
 
-`generate-logo-kit.cjs` ile üretilen, baskı/dijital için hazır tam set. SVG'ler
-vektör (metin outline → font gerektirmez), PNG'ler saydam zeminli yüksek çözünürlük.
+Onaylanan **final logo paketi — standart boyut** (`oz_saye_final_logo_pack_standard`)
+raster (PNG/JPG) deliverable'lardan oluşur: kare (1:1) kilit, daha okunur/dengeli
+oranda. Beyaz + saydam varyantlar (400–2048 px) + sosyal medya formatları. Kaynak
+dosyalar `brand/logo/final/` altında versiyonlanır.
 
-| Dosya (svg + png) | Açıklama |
+| Dosya (`brand/logo/final/`) | Açıklama |
 | --- | --- |
-| `ozsaye-logo` | Ana logo — dikey (amblem üstte, wordmark altta) |
-| `ozsaye-logo-yatay` | Yatay logo |
-| `ozsaye-amblem` (+128/256/512) | Sadece amblem |
-| `ozsaye-logo-ters`, `...-yatay-ters`, `ozsaye-amblem-ters` | Koyu zemin için (cream mürekkep) |
-| `ozsaye-logo-mono-forest` / `-siyah` / `-beyaz` | Tek renk varyantlar |
-| `ozsaye-logo-overview.png` | Tüm varyantların önizleme tablosu |
+| `logo_standard_1200_transparent.png` (400–2048) | Ana logo — saydam zemin (site/dijital) |
+| `logo_standard_1200_white.png` / `.jpg` | Beyaz zeminli tam kilit |
+| `site_icon_standard_512.png` | Kare site/app ikonu (sıkı kırpılmış) |
+| `favicon_standard_16…256.png` | Favicon kademeleri |
+| `open_graph_standard_1200x630.jpg` | Link önizleme |
+| `instagram_profile_standard_1080.jpg`, `x_profile_standard_400.jpg`, `instagram_story_standard_*` | Sosyal medya formatları |
+| `brand_palette.jpg` | Final renk paleti önizlemesi |
+
+> `public/logo.png` bu paketin saydam ana logosundan; web için boşlukları
+> kırpılıp (`-trim`) yüksekliğe göre optimize edilerek üretilir.
+>
+> Önceki sürümler `brand/archive/` altındadır: `logo-final-v1/` (ilk final paket)
+> ve `eski-site-assetleri/` (ilk jenerik kit). Eski jenerik kit
+> (`generate-logo-kit.cjs`, inline `LogoMark.tsx`, `public/logo-mark.svg`,
+> `src/app/icon.svg`) artık kullanılmaz.
 
 ### Site / sistem varlıkları
 
 | Dosya | Kullanım |
 | --- | --- |
-| `src/components/LogoMark.tsx` | Site içi amblem (inline SVG). "Mürekkep" öğeleri `currentColor` — açık zeminde forest, koyu zeminde cream. |
-| `public/logo-mark.svg` | Statik vektör amblem (dış kullanım, e-imza vb.). |
-| `public/logo.png` | Yatay tam logo kilidi (amblem + yazı). Sunum, antet, kartvizit. |
-| `src/app/icon.svg` · `src/app/favicon.ico` | Tarayıcı sekmesi ikonu. |
+| `public/logo.png` | Tam logo kilidi (amblem + yazı), saydam. Header/Footer `next/image` ile gösterir; blog JSON-LD organizasyon logosu. |
+| `src/app/icon.png` · `src/app/apple-icon.png` · `src/app/favicon.ico` | Tarayıcı sekmesi + Apple touch ikonu (beyaz zeminli). |
+| `public/icon-192.png` · `public/icon-512.png` | PWA manifest ikonları (`purpose: any`). |
 | `public/og.png` | Sosyal paylaşım önizleme görseli (1200×630). |
 
 **Kurallar**
-- Amblemin etrafında en az amblem yüksekliğinin %25'i kadar boşluk bırakın.
-- Açık zeminde forest, koyu/forest zeminde cream mürekkep kullanın; yapraklar her zaman sage tonlarında.
-- Logoyu sıkıştırmayın/eğmeyin, paletten farklı renge boyamayın, gölge/efekt eklemeyin.
+- Amblemin/kilidin etrafında en az amblem yüksekliğinin %25'i kadar boşluk bırakın.
+- Logo raster ve çok renklidir — yeniden renklendirmeyin. Koyu zeminde okunması için
+  logoyu warm-white/ivory bir yüzey (çip) üstüne koyun (footer'daki gibi).
+- Logoyu sıkıştırmayın/eğmeyin, gölge/efekt eklemeyin.
 
 ## 2. Renk Paleti
 
 | Token | HEX | Kullanım |
 | --- | --- | --- |
-| Forest (Orman Yeşili) | `#23472E` | Ana marka rengi, başlık, mürekkep |
-| Forest Dark | `#17311F` | Hover, derinlik |
-| Forest Light | `#2F5A3B` | İkincil vurgu |
-| Forest Muted | `#3D5C45` | Gövde metni (WCAG AA, tüm zeminlerde ≥5:1) |
-| Sage (Adaçayı) | `#A7BFA7` | Yaprak, aksan, ayraç |
-| Sage Light | `#C2D4C2` | Yumuşak aksan, forest zeminde ikincil metin |
-| Sage Dark | `#7E9E80` | İnce aksan |
-| Cream (Sıcak Krem) | `#F3EFE6` | Ana zemin |
-| Cream Dark | `#E6DFCD` | Bölüm zemini |
+| Forest (Orman Yeşili) | `#1F3B2E` | Ana marka rengi, başlık, mürekkep |
+| Forest Dark | `#142A20` | Hover, derinlik |
+| Forest Light | `#2F5A3B` | İkincil vurgu, bağlantı hover |
+| Forest Muted | `#385440` | Gövde metni (WCAG AA, tüm zeminlerde ≥4.5:1) |
+| Sage (Adaçayı) | `#A6B79B` | Yaprak, aksan, ayraç |
+| Sage Light | `#C7D6C0` | Yumuşak aksan, forest zeminde ikincil metin |
+| Sage Dark | `#7C9077` | İnce aksan |
+| Soft Blush (Soft Pembe) | `#D8A7A5` | Logo aksanı; yalnızca ince aksan (metin değil) |
+| Cream / Warm Ivory | `#F5F2EB` | Ana zemin |
+| Cream Dark | `#E9E3D6` | Bölüm zemini / ince kenarlık |
 | Stone (Taş) | `#DAD7CE` | Nötr ayraç / yüzey |
-| Warm White | `#FAF7F1` | Kart/yüzey |
+| Warm White (White) | `#FFFFFF` | Kart/yüzey, en parlak |
 
 Renk tokenları `src/app/globals.css` içinde `@theme inline` ile tanımlıdır — palet tek kaynaktan yönetilir.
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import LogoMark from "./LogoMark";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/#anasayfa", label: "Anasayfa" },
@@ -89,22 +89,25 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_12px_rgba(35,71,46,0.08)]"
+          ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_12px_rgba(31,59,46,0.08)]"
           : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
-        <Link href="/#anasayfa" className="group flex items-center gap-3">
-          <LogoMark className="h-11 w-11 text-forest transition-transform duration-300 group-hover:scale-105" />
-          <div className="flex flex-col">
-            <span className="font-display text-xl font-semibold tracking-wide text-forest">
-              Öz &amp; Saye
-            </span>
-            <span className="font-body text-[10px] font-light tracking-[0.2em] text-forest-muted uppercase">
-              Psikoloji
-            </span>
-          </div>
+        <Link
+          href="/#anasayfa"
+          className="group flex items-center"
+          aria-label="Öz & Saye Psikoloji — Anasayfa"
+        >
+          <Image
+            src="/logo.png"
+            alt="Öz & Saye Psikoloji"
+            width={460}
+            height={480}
+            priority
+            className="h-16 w-auto transition-transform duration-300 group-hover:scale-105 sm:h-20"
+          />
         </Link>
 
         {/* Desktop nav */}

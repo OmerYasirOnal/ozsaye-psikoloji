@@ -72,7 +72,7 @@ export default async function BlogPostPage({
     publisher: {
       "@type": "Organization",
       name: "Öz & Saye Psikoloji",
-      logo: { "@type": "ImageObject", url: `${siteUrl}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${siteUrl}/icon-512.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
   };

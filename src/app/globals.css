@@ -1,25 +1,28 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-cream: #F3EFE6;
-  --color-cream-dark: #E6DFCD;
-  --color-cream-light: #F8F4EC;
-  --color-forest: #23472E;
-  --color-forest-dark: #17311F;
+  /* Marka paleti — final logo renkleri (brand/logo/final).
+     Forest #1F3B2E · Sage #A6B79B · Soft Blush #D8A7A5 · White #FFFFFF · Warm Ivory #F5F2EB */
+  --color-cream: #F5F2EB;        /* Warm Ivory — ana sıcak yüzey + body zemini */
+  --color-cream-dark: #E9E3D6;   /* daha derin ivory — ince kenarlık / kart ayrımı */
+  --color-cream-light: #FBFAF6;  /* ivory ile beyaz arası */
+  --color-forest: #1F3B2E;
+  --color-forest-dark: #142A20;
   --color-forest-light: #2F5A3B;
   /* Yumuşak/soluk koyu yeşil — gövde metni için WCAG AA (>= 4.5:1) uyumlu.
-     Kontrast oranları (hesaplanmıştır):
-       cream      (#F3EFE6) zemine karşı: 6.50:1  AA ✓
-       cream-dark (#E6DFCD) zemine karşı: 5.61:1  AA ✓
-       warm-white (#FAF7F1) zemine karşı: 6.98:1  AA ✓
-       stone      (#DAD7CE) zemine karşı: 5.18:1  AA ✓ (en zorlu zemin, >= 4.5:1)
+     Kontrast oranları (hesaplanmıştır, #385440):
+       cream/ivory (#F5F2EB) zemine karşı: 7.48:1  AA ✓
+       cream-dark  (#E9E3D6) zemine karşı: 6.54:1  AA ✓
+       warm-white  (#FFFFFF) zemine karşı: 8.37:1  AA ✓
+       stone       (#DAD7CE) zemine karşı: 5.81:1  AA ✓ (en zorlu zemin, >= 4.5:1)
      Markanın orman yeşili tonunda kalan, hafif desature edilmiş bir yeşildir. */
-  --color-forest-muted: #3D5C45;
-  --color-sage: #A7BFA7;
-  --color-sage-light: #C2D4C2;
-  --color-sage-dark: #7E9E80;
+  --color-forest-muted: #385440;
+  --color-sage: #A6B79B;
+  --color-sage-light: #C7D6C0;
+  --color-sage-dark: #7C9077;
+  --color-blush: #D8A7A5;        /* Soft Blush — logoyla uyumlu sıcak pembe aksan */
   --color-stone: #DAD7CE;
-  --color-warm-white: #FAF7F1;
+  --color-warm-white: #FFFFFF;   /* White — en parlak yüzey */
   --font-display: "Playfair Display", Georgia, serif;
   --font-body: "Montserrat", system-ui, sans-serif;
 }
@@ -30,16 +33,16 @@ html {
 }
 
 body {
-  background-color: #F3EFE6;
-  color: #23472E;
+  background-color: #F5F2EB;
+  color: #1F3B2E;
   font-family: "Montserrat", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: #A7BFA7;
-  color: #23472E;
+  background-color: #A6B79B;
+  color: #1F3B2E;
 }
 
 /* Scroll animation base */
@@ -82,10 +85,10 @@ body {
 .hero-animate-delay-3 { animation-delay: 600ms; opacity: 0; }
 
 /* Global erişilebilir odak halkası.
-   forest (#23472E) odak halkası: cream zemine karşı 9.09:1, cream-dark'a karşı 7.85:1,
-   warm-white'a karşı 9.76:1 — hepsi WCAG odak göstergesi eşiği (>= 3:1) üzerinde. */
+   forest (#1F3B2E) odak halkası: cream/ivory zemine karşı 10.90:1, cream-dark'a karşı ~9.6:1,
+   warm-white'a karşı 12.19:1, stone'a karşı 8.47:1 — hepsi WCAG odak göstergesi eşiği (>= 3:1) üzerinde. */
 :focus-visible {
-  outline: 2px solid #23472E;
+  outline: 2px solid #1F3B2E;
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -95,13 +98,13 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #FAF7F1, 0 0 0 4px #23472E;
-  border-color: #23472E;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1F3B2E;
+  border-color: #1F3B2E;
 }
 
 /* "İçeriğe geç" bağlantısı (skip-link).
    Normalde görsel olarak gizli (klavye/odak erişimini korur);
-   odaklanınca sol-üst köşede görünür olur: forest zemin, cream metin (9.09:1 kontrast). */
+   odaklanınca sol-üst köşede görünür olur: forest zemin, ivory metin (10.90:1 kontrast). */
 .skip-link {
   position: absolute;
   width: 1px;
@@ -128,12 +131,12 @@ select:focus {
   overflow: visible;
   clip: auto;
   clip-path: none;
-  background-color: #23472E;
-  color: #F3EFE6;
+  background-color: #1F3B2E;
+  color: #F5F2EB;
   font-family: "Montserrat", system-ui, sans-serif;
   font-weight: 600;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(23, 49, 31, 0.3);
+  box-shadow: 0 4px 12px rgba(20, 42, 32, 0.3);
 }
 
 /* Reduced motion: her şeyi anında göster, devinimleri durdur */
@@ -165,28 +168,28 @@ select:focus {
 }
 
 ::-webkit-scrollbar-track {
-  background: #F3EFE6;
+  background: #F5F2EB;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #A7BFA7;
+  background: #A6B79B;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #23472E;
+  background: #1F3B2E;
 }
 
 /* Blog makale içeriği (markdown -> html) */
 .article-prose {
-  color: #3D5C45;
+  color: #385440;
   font-family: var(--font-body);
   line-height: 1.8;
   font-size: 1.075rem;
 }
 .article-prose h2 {
   font-family: var(--font-display);
-  color: #23472E;
+  color: #1F3B2E;
   font-size: 1.9rem;
   font-weight: 600;
   margin: 2.2rem 0 0.9rem;
@@ -194,7 +197,7 @@ select:focus {
 }
 .article-prose h3 {
   font-family: var(--font-display);
-  color: #23472E;
+  color: #1F3B2E;
   font-size: 1.45rem;
   font-weight: 600;
   margin: 1.8rem 0 0.7rem;
@@ -212,19 +215,19 @@ select:focus {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #A7BFA7;
+  background: #A6B79B;
 }
-.article-prose strong { color: #23472E; font-weight: 700; }
-.article-prose a { color: #23472E; text-decoration: underline; text-underline-offset: 3px; }
+.article-prose strong { color: #1F3B2E; font-weight: 700; }
+.article-prose a { color: #1F3B2E; text-decoration: underline; text-underline-offset: 3px; }
 .article-prose a:hover { color: #2F5A3B; }
 .article-prose blockquote {
   margin: 1.6rem 0;
   padding: 1rem 1.4rem;
-  border-left: 3px solid #A7BFA7;
-  background: color-mix(in srgb, #A7BFA7 14%, transparent);
+  border-left: 3px solid #A6B79B;
+  background: color-mix(in srgb, #A6B79B 14%, transparent);
   border-radius: 0 0.75rem 0.75rem 0;
   font-size: 0.97rem;
-  color: #3D5C45;
+  color: #385440;
 }
 .article-prose blockquote p { margin: 0; }
 .article-prose hr { margin: 2rem 0; border: none; border-top: 1px solid #DAD7CE; }

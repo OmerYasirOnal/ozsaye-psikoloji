@@ -1,0 +1,3 @@
+Logo boyutu standarda getirildi.
+
+Önceki pakette logo fazla küçük kalıyordu. Bu pakette logo kare alanın yaklaşık %72'sini kaplıyor. Böylece Instagram, X, site icon ve web kullanımında daha okunur ve profesyonel durur.
