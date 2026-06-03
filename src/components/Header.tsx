@@ -87,15 +87,15 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         scrolled
           ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_12px_rgba(31,59,46,0.08)]"
           : "bg-transparent"
       }`}
     >
       <div
-        className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 lg:px-8 ${
-          scrolled ? "py-2.5" : "py-4"
+        className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
+          scrolled ? "py-2" : "py-3"
         }`}
       >
         {/* Logo */}
@@ -110,8 +110,8 @@ export default function Header() {
             width={323}
             height={331}
             priority
-            className={`w-auto transition-all duration-500 group-hover:scale-105 ${
-              scrolled ? "h-12 sm:h-14" : "h-16 sm:h-20"
+            className={`w-auto transition-[height,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 ${
+              scrolled ? "h-11 sm:h-12" : "h-14 sm:h-16"
             }`}
           />
         </Link>
@@ -172,7 +172,7 @@ export default function Header() {
         aria-modal="true"
         aria-label="Menü"
         inert={!mobileOpen}
-        className={`fixed inset-0 z-40 bg-cream transition-all duration-500 lg:hidden ${
+        className={`fixed inset-0 z-40 bg-cream transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden ${
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

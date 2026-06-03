@@ -41,7 +41,18 @@ export default function ScrollReveal({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Guvenlik agi: gozlemci hic tetiklenmezse (olagandisi yerlesim/zoom/
+    // forced-colors vb.) icerik birkac sn sonra yine de gorunur olsun.
+    const fallbackId = window.setTimeout(() => {
+      el.classList.add("visible");
+      observer.disconnect();
+    }, 2000);
+
+    return () => {
+      window.clearTimeout(fallbackId);
+      observer.disconnect();
+    };
   }, []);
 
   const delayClass = delay > 0 ? `reveal-delay-${delay}` : "";
