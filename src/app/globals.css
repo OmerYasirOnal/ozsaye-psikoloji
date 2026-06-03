@@ -73,6 +73,7 @@ html.js .reveal.visible {
 /* Bölüm etiketi altı büyüyen sage çizgi — içeren .reveal görünür olunca açılır.
    JS yoksa (html.js yok) tam görünür kalır. */
 .reveal-line { transform-origin: center; }
+.reveal-line.origin-left { transform-origin: left center; }
 html.js .reveal-line {
   transform: scaleX(0);
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);

@@ -13,7 +13,7 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto max-w-3xl text-center">
         {/* Tek zarif botanik imza */}
-        <Parallax speed={0.04} className="mx-auto mb-8 w-fit">
+        <Parallax speed={0.12} className="mx-auto mb-8 w-fit">
           <svg
             aria-hidden="true"
             className="hero-animate h-9 w-9 text-sage"

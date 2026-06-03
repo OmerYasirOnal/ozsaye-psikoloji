@@ -26,8 +26,8 @@ export default function Parallax({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
     let ticking = false;
     const update = () => {
       ticking = false;
@@ -42,13 +42,23 @@ export default function Parallax({
         requestAnimationFrame(update);
       }
     };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
-    return () => {
+    const start = () => {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      update();
+    };
+    const stop = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      el.style.transform = ""; // devinim istenmediğinde inline kaymayı temizle
+    };
+    // İlk durum + oturum içi tercih değişimine tepki ver (reduced-motion AÇILIRSA dur).
+    const apply = () => (mql.matches ? stop() : start());
+    apply();
+    mql.addEventListener("change", apply);
+    return () => {
+      mql.removeEventListener("change", apply);
+      stop();
     };
   }, [speed]);
 
