@@ -5,7 +5,7 @@ import ScrollReveal from "./ScrollReveal";
 
 export default function Services() {
   return (
-    <section id="calisma-alanlari" className="bg-warm-white py-28 lg:py-36">
+    <section id="calisma-alanlari" className="bg-warm-white py-28 lg:py-40">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         {/* Section header */}
         <div className="mx-auto max-w-2xl text-center">
@@ -19,6 +19,7 @@ export default function Services() {
               Hangi konularda{" "}
               <span className="italic">destek sunuyoruz?</span>
             </h2>
+            <span aria-hidden="true" className="reveal-line mx-auto mt-6 block h-px w-12 bg-sage/40" />
           </ScrollReveal>
           <ScrollReveal delay={2}>
             <p className="mt-5 font-body text-base leading-relaxed text-forest-muted">

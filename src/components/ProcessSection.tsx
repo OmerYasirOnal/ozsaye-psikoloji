@@ -33,7 +33,7 @@ export default function ProcessSection() {
     isReady(site.pricing.note);
 
   return (
-    <section id="surec" className="bg-cream py-28 lg:py-36">
+    <section id="surec" className="bg-cream py-28 lg:py-40">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         {/* Bölüm başlığı */}
         <div className="mx-auto max-w-2xl text-center">
@@ -50,7 +50,7 @@ export default function ProcessSection() {
           <ScrollReveal delay={2}>
             <span
               aria-hidden="true"
-              className="mx-auto mt-6 block h-px w-12 bg-sage/40"
+              className="reveal-line mx-auto mt-6 block h-px w-12 bg-sage/40"
             />
           </ScrollReveal>
           <ScrollReveal delay={2}>

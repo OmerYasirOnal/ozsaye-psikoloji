@@ -10,7 +10,7 @@ import Link from "next/link";
  */
 export default function AppointmentForm() {
   return (
-    <section id="randevu" className="relative bg-forest py-28 lg:py-36">
+    <section id="randevu" className="relative bg-forest py-28 lg:py-40">
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left: Info */}

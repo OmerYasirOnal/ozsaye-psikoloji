@@ -178,7 +178,7 @@ const faqJsonLd = {
 
 export default function FaqSection() {
   return (
-    <section id="sss" className="bg-warm-white py-28 lg:py-36">
+    <section id="sss" className="bg-warm-white py-28 lg:py-40">
       {/* FAQPage yapısal verisi — içerik gerçek/doğru olduğundan her zaman yayınlanır. */}
       <script
         type="application/ld+json"
@@ -200,7 +200,7 @@ export default function FaqSection() {
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={2}>
-            <div aria-hidden="true" className="mx-auto mt-8 h-px w-12 bg-sage/40" />
+            <div aria-hidden="true" className="reveal-line mx-auto mt-8 h-px w-12 bg-sage/40" />
           </ScrollReveal>
           <ScrollReveal delay={2}>
             <p className="mt-8 font-body text-base leading-relaxed text-forest-muted">
