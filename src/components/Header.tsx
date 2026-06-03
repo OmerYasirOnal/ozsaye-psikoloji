@@ -93,7 +93,11 @@ export default function Header() {
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+      <div
+        className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 lg:px-8 ${
+          scrolled ? "py-2.5" : "py-4"
+        }`}
+      >
         {/* Logo */}
         <Link
           href="/#anasayfa"
@@ -106,7 +110,9 @@ export default function Header() {
             width={323}
             height={331}
             priority
-            className="h-20 w-auto transition-transform duration-300 group-hover:scale-105 sm:h-24"
+            className={`w-auto transition-all duration-500 group-hover:scale-105 ${
+              scrolled ? "h-12 sm:h-14" : "h-16 sm:h-20"
+            }`}
           />
         </Link>
 
