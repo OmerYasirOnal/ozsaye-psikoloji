@@ -90,20 +90,7 @@ if ($kvkk !== 'on' && $kvkk !== 'true') {
 $ip  = strip_crlf((string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'bilinmiyor'));
 $now = date('c');
 
-// 5) KVKK açık rıza kaydı (ispat için; .htaccess ile dışa kapalı).
-$logLine = implode("\t", [
-    $now,
-    $ip,
-    str_replace("\t", ' ', $ad),
-    $telefon,
-    $email,
-    $uzman,
-    $tarih !== '' ? $tarih : '-',
-    'KVKK:evet',
-]) . "\n";
-@file_put_contents(LOG_FILE, $logLine, FILE_APPEND | LOCK_EX);
-
-// 6) Bildirim e-postası.
+// 5) Bildirim e-postası gönder.
 $subject = 'Yeni Randevu Başvurusu — ' . $ad;
 $body =
     "Yeni randevu başvurusu alındı.\n\n"
@@ -124,12 +111,33 @@ $headers = implode("\r\n", [
     'MIME-Version: 1.0',
 ]);
 
-@mail(
+// Zarf göndereni (Return-Path) info@ozsaye.com olarak ayarla (-f). GoDaddy relay'i
+// ozsaye.com SPF'inde (include:secureserver.net) yetkili olduğundan SPF "pass" +
+// From ile hizalı olur → DMARC (p=quarantine) GEÇER → kutuya düşer. Bu -f olmadan
+// zarf göndereni web sunucusunun varsayılanıdır; SPF hizalanmaz, DMARC fail eder ve
+// Microsoft 365 iletiyi Gereksiz/karantinaya alır. FROM_EMAIL sabit (enjeksiyon yok).
+$sent = mail(
     TO_EMAIL,
     '=?UTF-8?B?' . base64_encode($subject) . '?=',
     $body,
-    $headers
+    $headers,
+    '-f' . FROM_EMAIL
 );
+
+// 6) KVKK açık rıza + e-posta teslim durumu kaydı (ispat; .htaccess ile dışa kapalı).
+//    E-posta gitmese bile başvuru burada KAYBOLMAZ; MAIL:ok/fail mail() sonucunu izler.
+$logLine = implode("\t", [
+    $now,
+    $ip,
+    str_replace("\t", ' ', $ad),
+    $telefon,
+    $email,
+    $uzman,
+    $tarih !== '' ? $tarih : '-',
+    'KVKK:evet',
+    'MAIL:' . ($sent ? 'ok' : 'fail'),
+]) . "\n";
+@file_put_contents(LOG_FILE, $logLine, FILE_APPEND | LOCK_EX);
 
 // 7) Teşekkür sayfasına yönlendir.
 header('Location: ' . THANKS_URL);
