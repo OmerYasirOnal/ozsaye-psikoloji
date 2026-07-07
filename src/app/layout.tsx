@@ -5,6 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCta from "@/components/StickyCta";
+import SiteChrome from "@/components/SiteChrome";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -102,10 +103,13 @@ export default function RootLayout({
         <a href="#icerik" className="skip-link">
           İçeriğe geç
         </a>
-        <Header />
-        {children}
-        <Footer />
-        <StickyCta />
+        <SiteChrome
+          header={<Header />}
+          footer={<Footer />}
+          stickyCta={<StickyCta />}
+        >
+          {children}
+        </SiteChrome>
         <JsonLd />
       </body>
     </html>
