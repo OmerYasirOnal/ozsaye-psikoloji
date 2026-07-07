@@ -9,6 +9,12 @@ export type SessionPayload = {
   role: "therapist" | "admin";
 };
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error(
+    "SESSION_SECRET ortam değişkeni ayarlanmalı — oturum imzalama için gerekli.",
+  );
+}
+
 const key = new TextEncoder().encode(process.env.SESSION_SECRET);
 
 export async function encryptSession(payload: SessionPayload): Promise<string> {
