@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import { isStaffEmail } from "@/lib/auth/staff";
 import { createMagicToken } from "@/lib/auth/magic-token";
@@ -22,9 +21,12 @@ export async function requestMagicLink(
   // önlemek için yanıt her durumda aynı ("gönderildi").
   if (await isStaffEmail(email)) {
     const raw = await createMagicToken(email);
-    const base =
-      process.env.APP_URL ??
-      `https://${(await headers()).get("host") ?? "ozsaye.com"}`;
+    const base = process.env.APP_URL;
+    if (!base) {
+      throw new Error(
+        "APP_URL ortam değişkeni ayarlanmalı — giriş linki için gerekli.",
+      );
+    }
     const url = `${base}/panel/giris/dogrula?token=${raw}`;
     await sendMagicLink(email, url);
   }
