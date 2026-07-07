@@ -20,8 +20,9 @@ Klinik "profesyonel örnek" olarak `butunculpsikoloji.com` ve `diyetisyenhale.co
 ## 2. Kapsam DIŞI (v1 — YAGNI)
 - **Hasta hesapları / hasta portalı YOK.** 2 terapist için gereksiz; hasta hesapsız randevu talep eder.
 - **Canlı takvim / anlık slot rezervasyonu YOK.** Talep + onay modeli; sonradan yükseltmeye açık tasarlanır.
+- **Randevu yönetim ekranları (`/panel/talepler` liste/detay/durum/iç not/hızlı iletişim) v1'de YOK.** Kullanıcı kararı (2026-07-07): şimdilik önceliksiz. v1'de form yalnızca DB'ye kaydeder + uzmana e-posta bildirimi gönderir; talepleri panelden görüp durumunu yönetme ekranı **v1.1'e ertelendi**. Veri modeli (§5) buna hazır bırakılır ki ekran sonradan kolayca eklensin.
 - **Online ödeme YOK.**
-- **Otomatik SMS / WhatsApp YOK.** v1'de e-posta bildirimi + panelde manuel "WhatsApp'tan yaz" linki.
+- **Otomatik SMS / WhatsApp YOK.** v1'de e-posta bildirimi + panelde manuel "WhatsApp'tan yaz" linki (bu da v1.1 randevu ekranıyla birlikte gelir).
 - Uzmanların kendi `/ekip` profilini panelden düzenlemesi → v1.1'e opsiyonel (placeholder veri sorununu da çözebilir).
 
 ## 3. Kararlar (özet)
@@ -33,10 +34,12 @@ Klinik "profesyonel örnek" olarak `butunculpsikoloji.com` ve `diyetisyenhale.co
 | DNS | GoDaddy DNS kalır; sadece web (`@`/`www`) Vercel'e | MX/e-posta kayıtları ellenmez → `info@ozsaye.com` kesilmez |
 | DB | Neon Postgres (Vercel Marketplace) | Serverless, ücretsiz kademe klinik ölçeğinde yeterli |
 | ORM | Drizzle + drizzle-kit | TS-first, serverless dostu, hafif |
-| Auth | Auth.js v5, e-posta magic-link, 2 beyaz-listeli e-posta, dışa kayıt kapalı | Parola saklamayız = daha az KVKK/güvenlik yükü |
+| Auth | `jose` imzalı httpOnly cookie + DB'de tek-kullanımlık magic-token + DAL (`verifySession`), 2 beyaz-listeli e-posta, dışa kayıt kapalı | Next 16'nın kendi dokümanının önerdiği desen (bkz. Faz 0 planı); Auth.js v5 beta yerine tercih edildi — aynı UX, sıfır beta-kütüphane/Next 16.2 uyum riski, 2 kullanıcı için daha az kod |
 | Bildirim | Resend, `bildirim.ozsaye.com` alt alanından | Kök alanın GoDaddy mail teslimatına dokunmaz |
 | Görsel yükleme | Vercel Blob (public) | Blog kapak/inline görselleri |
 | Blog editörü | WYSIWYG (Tiptap) → **markdown** olarak sakla | Uzman-dostu; mevcut markdown render hattıyla uyumlu; XSS'e karşı güvenli |
+| Blog yetkisi | **Paylaşımlı** — her uzman tüm yazıları görür/düzenler/yayınlar | Kullanıcı kararı (2026-07-07): küçük ekipte en pratik olanı; biri diğerinin yazısını tamamlayabilir/düzeltebilir |
+| Panel girişi | `/panel/giris` **hiçbir yerde nav/header/footer linki veya buton olarak gösterilmez** | Kullanıcı kararı (2026-07-07): "gizli" sayfa — uzmanlar URL'i doğrudan bilir (WhatsApp/e-posta ile bir kez paylaşılır, bookmarklanır). Erişim kontrolü yine e-posta whitelist + magic-link'te; URL'in gizliliği ek bir kolaylık katmanı, güvenlik sınırı değil. |
 
 ## 4. Mimari değişiklik
 - `next.config.ts`: `output: "export"` **kaldırılır**. `trailingSlash: true` **korunur** (indekslenmiş URL'ler `/yol/` biçiminde; kırılmasın). `images.unoptimized` **kaldırılır** → Vercel'de `next/image` optimizasyonu açılır.
@@ -68,14 +71,13 @@ Auth.js için gereken `users/accounts/sessions/verification_tokens` tabloları D
 3. Hastanın gördüğü akış bugünküyle neredeyse aynı; fark: talep artık kayıt altında + panelde yönetiliyor.
 
 ## 7. Uzman paneli (`/panel`, auth arkasında)
-- **Middleware** ile `/panel/**` korunur; oturum yoksa `/panel/giris`'e.
-- **Giriş** (`/panel/giris`): e-posta gir → magic-link → tıkla → oturum. Yalnız `staff` e-postaları. Oturum uzun ömürlü ("beni hatırla").
-- **Gösterge** (`/panel`): yeni talep sayısı, yaklaşan planlı randevular, son talepler.
-- **Talepler** (`/panel/talepler`): durum-filtreli liste. Uzman kendi taleplerini + "farketmez" havuzunu görür (`admin` hepsini).
-- **Talep detayı** (`/panel/talepler/[id]`): hasta iletişim + not; durum değiştir; iç not; planlanan tarih ata; hızlı aksiyonlar: **WhatsApp** (`wa.me/<telefon>`), **Ara** (`tel:`), **E-posta** (`mailto:`).
-- **Blog listesi** (`/panel/blog`): taslak/yayında yazılar; yeni yazı.
-- **Yeni/düzenle** (`/panel/blog/yeni`, `/panel/blog/[id]/duzenle`): başlık, özet, WYSIWYG içerik (görsel yükleme → Vercel Blob), kapak görseli, slug (başlıktan otomatik + elle düzeltilebilir), taslak kaydet / yayınla. Yayınla → `/blog`'da görünür (ISR revalidate).
-- Panel UI marka token'larıyla (forest/cream/sage) ama yoğunluk/kullanılabilirlik için sade ve işlevsel.
+- **Next 16 `proxy.ts`** (eski adıyla middleware) ile `/panel/**` korunur; oturum yoksa `/panel/giris`'e.
+- **Giriş** (`/panel/giris`): e-posta gir → magic-link → tıkla → oturum. Yalnız `staff` e-postaları. Oturum uzun ömürlü (30 gün). **Sitede hiçbir yerde bu sayfaya link/buton yok** (bkz. §3 "Panel girişi") — doğrudan URL ile girilir.
+- **Gösterge** (`/panel`): v1'de basit karşılama; ileri metrikler (yeni talep sayısı vb.) v1.1 randevu ekranlarıyla birlikte gelir.
+- **Blog listesi** (`/panel/blog`): taslak/yayında yazılar (tüm uzmanların — paylaşımlı yetki); yeni yazı.
+- **Yeni/düzenle** (`/panel/blog/yeni`, `/panel/blog/[id]/duzenle`): başlık, özet, WYSIWYG içerik (görsel yükleme → Vercel Blob), kapak görseli, slug (başlıktan otomatik + elle düzeltilebilir), taslak kaydet / yayınla. Yayınla → `/blog`'da görünür (ISR revalidate). Herhangi bir `staff` herhangi bir yazıyı düzenleyebilir.
+- Panel UI marka token'larıyla (forest/forest-muted/cream/sage aksan) ama yoğunluk/kullanılabilirlik için sade ve işlevsel.
+- **v1.1 (ertelendi, bu spec'in kapsamı dışında — bkz. §2):** `/panel/talepler` durum-filtreli liste (uzman kendi taleplerini + "farketmez" havuzunu görür), `/panel/talepler/[id]` detay (durum değiştir, iç not, planlanan tarih, hızlı iletişim: WhatsApp/ara/e-posta), gösterge panelinde talep sayıları.
 
 ## 8. Blog geçişi
 - `content/blog/*.md` yazıları tek seferlik, idempotent script (`scripts/migrate-blog-to-db.ts`) ile `blog_posts`'a taşınır; **slug, tarih, draft durumu korunur** (SEO/URL kırılmaz).
@@ -86,8 +88,8 @@ Auth.js için gereken `users/accounts/sessions/verification_tokens` tabloları D
 
 ## 9. Bildirimler (v1)
 - **Resend**, gönderen alt alan `bildirim.ozsaye.com` (SPF/DKIM burada; kök alanın GoDaddy mail'ine dokunmaz).
-- Yeni talep → uzmana/kliniğe e-posta (panel linkiyle).
-- "Planlandı" durumu → hastaya opsiyonel bilgilendirme e-postası (uzman tetikler).
+- Yeni talep → uzmana/kliniğe e-posta (hasta adı/iletişim/not içerir). Bu, v1'de talebi öğrenmenin **tek yolu** (panel talep ekranı yok — bkz. §2/§7).
+- **v1.1 (ertelendi):** "Planlandı" durumu → hastaya bilgilendirme e-postası (panelden uzman tetikler — bu ekran henüz yok).
 - **Sonra (v1 dışı):** Netgsm/İleti Merkezi SMS veya WhatsApp Business — maliyet + onay gerektirir.
 
 ## 10. KVKK / güvenlik
@@ -112,9 +114,9 @@ Auth.js için gereken `users/accounts/sessions/verification_tokens` tabloları D
 Vercel **Pro ~$20/ay** (ticari kullanım). Neon / Resend / Auth.js / Blob → ücretsiz kademe (klinik ölçeğinde yeterli). Toplam ≈ $20/ay.
 
 ## 13. Başarı ölçütleri (kabul)
-- [ ] Hasta randevu talebi gönderebiliyor; talep doğru uzmanın panelinde görünüyor; uzmana e-posta gidiyor; durum yaşam döngüsü çalışıyor.
-- [ ] Uzman magic-link ile giriyor; talepleri görüyor; durum/iç not/planlanan tarih güncelliyor; hızlı iletişim linkleri çalışıyor.
-- [ ] Uzman WYSIWYG ile görselli blog yazısı oluşturup yayınlıyor; `/blog`'da doğru slug + SEO ile çıkıyor; anasayfa son 3'ü gösteriyor.
+- [ ] Hasta randevu talebi gönderebiliyor; talep DB'ye kaydediliyor; ilgili uzmana e-posta gidiyor.
+- [ ] Uzman magic-link ile giriyor (site üzerinde görünür bir giriş linki OLMADAN, doğrudan `/panel/giris` URL'iyle).
+- [ ] Uzman WYSIWYG ile görselli blog yazısı oluşturup yayınlıyor; diğer uzman da aynı yazıyı düzenleyebiliyor (paylaşımlı yetki); `/blog`'da doğru slug + SEO ile çıkıyor; anasayfa son 3'ü gösteriyor.
 - [ ] Mevcut blog yazıları taşınmış; URL'ler değişmemiş.
 - [ ] Site Vercel'de `ozsaye.com`'da; `info@ozsaye.com` e-postası etkilenmemiş.
 - [ ] KVKK: onay saklanıyor; erişim kısıtlı; aydınlatma/gizlilik metinleri güncel.
@@ -128,7 +130,10 @@ Vercel **Pro ~$20/ay** (ticari kullanım). Neon / Resend / Auth.js / Blob → ü
 - **Repo hijyeni:** Yerel `main` bayattı; `origin/main` gerçek trunk. Bu dal `origin/main` tabanlı; PR hedefi `main` (= origin/main).
 
 ## 15. Uygulama fazları (writing-plans için)
-- **Faz 0 — Altyapı:** static export kaldır; Vercel + Neon + Drizzle + Auth.js iskele; şema + migration; `staff` seed; magic-link giriş + `/panel` guard.
-- **Faz 1 — Randevu:** form → Server Action → DB + Resend bildirimi; `/panel/talepler` liste + detay + durum/iç not/hızlı iletişim.
-- **Faz 2 — Blog:** DB'ye migration; `blog.ts` DB'den okuma; panel WYSIWYG editör + Blob görsel + yayın/ISR.
-- **Faz 3 — Cutover + KVKK:** DNS repoint (MX korunur); PHP/FTP emekli; KVKK/gizlilik metin güncelle; uçtan uca doğrulama.
+Kullanıcı kararıyla (2026-07-07) sıralama, blog paneli öne alınacak + randevu yönetim ekranları ertelenecek şekilde güncellendi:
+
+- **Faz 0 — Altyapı:** static export kaldır; Postgres (yerelde Docker, üretimde Neon) + Drizzle; jose+cookie+DB-token auth iskeleti; `staff` seed; magic-link giriş + `/panel` guard + DAL. **Plan yazıldı:** `docs/superpowers/plans/2026-07-06-faz0-altyapi-ve-uzman-girisi.md`.
+- **Faz 1 — Blog paneli (öncelik):** `content/blog/*.md` → `blog_posts` migration; `blog.ts` DB'den okuma; panel WYSIWYG editör (paylaşımlı yetki) + Blob görsel yükleme + taslak/yayın + ISR.
+- **Faz 2 — Randevu (sade):** form → Server Action → `appointment_requests`'e yaz + Resend bildirimi. **`/panel/talepler` ekranları bu fazda YOK** (v1.1'e ertelendi — bkz. §2/§7).
+- **Faz 3 — Cutover + KVKK:** Vercel+Neon+Resend provizyon; gerçek uzman e-postalarıyla seed; DNS repoint (MX korunur); PHP/FTP emekli; KVKK/gizlilik metin güncelle; uçtan uca doğrulama.
+- **v1.1 (ayrı, sonraki bir spec/plan döngüsü):** `/panel/talepler` liste/detay/durum/iç not/hızlı iletişim ekranları; ihtiyaç netleşince (klinik gerçek kullanım geri bildirimiyle) ele alınır.
