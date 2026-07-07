@@ -620,8 +620,9 @@ Expected: FAIL ("Cannot find module './magic-token'").
 
 - [ ] **Step 3: `src/lib/auth/magic-token.ts` yaz**
 
+> **Not:** Burada `"server-only"` import edilmez. Bu paket koşulsuz `throw` eden bir `index.js`'e sahiptir (yalnız Next'in `react-server` bundler koşulu altında no-op bir dosyaya çözülür); düz Vitest altında (bu koşul aktif değilken) her zaman patlar. `magic-token.ts` doğrudan `magic-token.test.ts`'ten import edildiği için `"server-only"` koyarsak tüm testler import anında çöker. Bu dosyanın zaten `next/headers` gibi tarayıcı-uyumsuz bir bağımlılığı yok, o yüzden işareti eklemek bir şey kazandırmaz.
+
 ```ts
-import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -738,8 +739,9 @@ Expected: FAIL ("Cannot find module './staff'").
 
 - [ ] **Step 3: `src/lib/auth/staff.ts` yaz**
 
+> **Not (Task 6'da keşfedildi):** Burada da `"server-only"` import edilmez — aynı sebep: bu dosya doğrudan `staff.test.ts`'ten import ediliyor, ve `"server-only"` paketi düz Vitest altında (Next'in `react-server` bundler koşulu aktif değilken) her zaman `throw` eder. `dal.ts` (Adım 4) farklı — o dosya doğrudan test edilmiyor, `"server-only"` orada kalır.
+
 ```ts
-import "server-only";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { staff } from "@/lib/db/schema";
