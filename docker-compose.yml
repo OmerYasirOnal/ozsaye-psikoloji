@@ -6,11 +6,11 @@ services:
       POSTGRES_PASSWORD: ozsaye
       POSTGRES_DB: ozsaye
     ports:
-      # Not: bu makinede 5432 zaten yerel bir Homebrew postgresql@17 servisi
-      # tarafından kullanılıyor (başka projelerin verisiyle) — çakışmayı
-      # önlemek için host tarafında 5433 kullanılıyor. .env.local'daki
-      # DATABASE_URL bu port ile eşleşmeli.
-      - "5433:5432"
+      # Varsayılan host portu 5432 (.env.local.example ile eşleşir). Yerel
+      # makinede 5432 doluysa DB_HOST_PORT ile geçersiz kılın, ör.:
+      #   DB_HOST_PORT=5433 docker compose up -d db
+      # ve .env.local'daki DATABASE_URL'i o porta göre güncelleyin.
+      - "${DB_HOST_PORT:-5432}:5432"
     volumes:
       - ozsaye_pgdata:/var/lib/postgresql/data
 
