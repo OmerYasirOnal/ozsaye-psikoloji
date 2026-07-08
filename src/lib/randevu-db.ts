@@ -1,0 +1,87 @@
+import { and, count, eq, gt } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { appointmentRequests, staff } from "@/lib/db/schema";
+import type { RandevuGirdisi } from "@/lib/randevu";
+
+/**
+ * Randevu taleplerinin DB katmanı.
+ *
+ * `randevu.ts` (saf doğrulama) ile `db` (drizzle) arasındaki köprü. Bilinçli
+ * olarak `server-only` İÇERMEZ: düz Vitest birim testleri bu dosyayı doğrudan
+ * import eder (Faz 0 kuralı: `server-only` düz Vitest'te fırlatır).
+ */
+
+// Aynı IP'den son 30 dk içinde bu kadar veya daha çok talep varsa hız-limitli.
+// (magic-token limiter deseni: count() + gt(createdAt, ...).)
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000; // 30 dk
+
+/**
+ * Doğrulanmış girdiyi `appointment_requests`'e yazar ve yeni satırın id'sini
+ * döndürür. Alan eşlemesi + `preferredNote` kompozisyonu, statik-hosting
+ * dönemindeki `public/randevu.php` e-posta gövdesinin aynasıdır.
+ */
+export async function createAppointmentRequest(
+  girdi: RandevuGirdisi,
+  ip: string,
+): Promise<{ id: string }> {
+  const preferredNote =
+    `Tercih edilen tarih: ${girdi.tarih || "belirtilmedi"}\n\n` +
+    `Mesaj:\n${girdi.mesaj || "(mesaj girilmedi)"}`;
+
+  const rows = await db
+    .insert(appointmentRequests)
+    .values({
+      patientName: girdi.ad,
+      patientPhone: girdi.telefon,
+      patientEmail: girdi.email,
+      expertSlug: girdi.uzman === "farketmez" ? null : girdi.uzman,
+      preferredNote,
+      kvkkConsent: true,
+      consentAt: new Date(),
+      consentIp: ip,
+      // status default'u ("new") şemadan gelir.
+    })
+    .returning({ id: appointmentRequests.id });
+
+  return { id: rows[0].id };
+}
+
+/**
+ * Aynı `consentIp` ile son RATE_LIMIT_WINDOW_MS içinde RATE_LIMIT_MAX veya daha
+ * çok talep varsa true. Spam/kötüye kullanımı sınırlar.
+ */
+export async function isRandevuRateLimited(ip: string): Promise<boolean> {
+  const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
+  const rows = await db
+    .select({ n: count() })
+    .from(appointmentRequests)
+    .where(
+      and(
+        eq(appointmentRequests.consentIp, ip),
+        gt(appointmentRequests.createdAt, since),
+      ),
+    );
+  return (rows[0]?.n ?? 0) >= RATE_LIMIT_MAX;
+}
+
+/**
+ * Bildirim e-postasının gönderileceği adresler. `expertSlug` doluysa yalnız o
+ * uzmanın adresi; null ("farketmez") ise TÜM staff adresleri.
+ *
+ * Not: `site.email` (info@ozsaye.com) şu an placeholder olduğundan alıcılara
+ * bilinçli olarak EKLENMEZ; gerçek info@ adresi cutover'da (Faz 3) buraya
+ * eklenebilir.
+ */
+export async function getBildirimAlicilari(
+  expertSlug: string | null,
+): Promise<string[]> {
+  const rows = expertSlug
+    ? await db
+        .select({ email: staff.email })
+        .from(staff)
+        .where(eq(staff.expertSlug, expertSlug))
+    : await db.select({ email: staff.email }).from(staff);
+
+  return rows.map((r) => r.email);
+}
