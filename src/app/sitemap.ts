@@ -4,16 +4,16 @@ import { getServiceSlugs } from "@/lib/services";
 import { getAllPosts } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
-// Sitemap performans için statik üretilir (build anında bir kez). Statik export
-// KALKTI; force-static artık yalnızca performans tercihi.
-// DİKKAT (Task 9 E2E'de üretim `next start` üzerinde doğrulandı): panel
-// yayınla/taslağa-çek/düzenle akışının çağırdığı revalidatePath("/sitemap.xml")
-// bu force-static metadata route'unu ÜRETİMDE tazelemiyor — /blog, /blog/[slug]
-// ve anasayfa canlı güncellenirken sitemap build anındaki içerikte donuyor; yeni
-// yazılar sitemap'e ancak sonraki deploy/build ile giriyor. İnsan yüzü sayfalar
-// etkilenmez, yalnızca sitemap.xml gecikir. Çözüm (force-static'i kaldırıp ISR'e
-// almak vb.) controller kararına bırakıldı — ayrıntı: .superpowers/sdd/task-9-report.md.
-export const dynamic = "force-static";
+// Sitemap her istekte DB'den üretilir (force-dynamic). Panelden yayınlanan/kaldırılan
+// yazılar sitemap'e ANINDA yansır — yeniden deploy gerekmez.
+// Neden dinamik (Task 9 üretim `next start` E2E kanıtı): eski `force-static` metadata
+// route'u, panel akışının çağırdığı revalidatePath("/sitemap.xml") ile ÜRETİMDE
+// tazelenemiyordu — /blog, /blog/[slug] ve anasayfa canlı güncellenirken sitemap build
+// anındaki 3 slug'da donuyor, yeni yazılar ancak sonraki deploy'da giriyordu. Sitemap
+// trafiği önemsiz (yalnız tarayıcı/crawler) ve sorgu tek ucuz select olduğundan dinamik
+// render bedeli ihmal edilebilir; tazelik anında kanıtlanabilir olur.
+// Ayrıntı: .superpowers/sdd/task-9-report.md.
+export const dynamic = "force-dynamic";
 
 /**
  * Sitemap — indekslenmesi istenen genel sayfalar.

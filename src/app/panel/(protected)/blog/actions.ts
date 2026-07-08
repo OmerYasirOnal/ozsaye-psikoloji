@@ -51,15 +51,17 @@ async function ensureUniqueSlug(
 }
 
 // Public sayfalar SSG — yayınla/taslağa-çek/düzenle sonrası yeniden derleme
-// gerekmeden görünürlük için ilgili yolları on-demand revalidate et.
+// gerekmeden görünürlük için üç yüzey grubu on-demand revalidate edilir:
+// /blog (liste), /blog/{slug} (detay) ve / (anasayfa "Yazılar").
 // Slug değişiminde hem eski hem yeni slug geçilir (ikisi de tazelenir).
+// sitemap.xml artık force-dynamic (her istekte DB'den) — revalidate GEREKMEZ;
+// force-static iken revalidatePath onu üretimde tazeleyemiyordu (Task 9 bulgusu).
 function revalidateBlog(...sluglar: string[]): void {
   revalidatePath("/blog");
   for (const slug of new Set(sluglar.filter(Boolean))) {
     revalidatePath(`/blog/${slug}`);
   }
   revalidatePath("/"); // anasayfa "Yazılar" bölümü
-  revalidatePath("/sitemap.xml");
 }
 
 export async function createPost(
