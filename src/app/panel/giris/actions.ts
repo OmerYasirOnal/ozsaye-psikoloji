@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { isStaffEmail } from "@/lib/auth/staff";
-import { createMagicToken } from "@/lib/auth/magic-token";
+import { createMagicToken, isMagicLinkRateLimited } from "@/lib/auth/magic-token";
 import { sendMagicLink } from "@/lib/email/send";
 
 const schema = z.object({ email: z.email().transform((e) => e.toLowerCase()) });
@@ -30,9 +30,16 @@ export async function requestMagicLink(
   // Yalnız kayıtlı uzman için token üret+gönder; ama e-posta sızıntısını
   // önlemek için yanıt her durumda aynı ("gönderildi").
   if (await isStaffEmail(email)) {
-    const raw = await createMagicToken(email);
-    const url = `${base}/panel/giris/dogrula?token=${raw}`;
-    await sendMagicLink(email, url);
+    // Hız limiti: aynı e-posta 15 dk içinde çok fazla istek yaptıysa yeni
+    // token ÜRETME ve e-posta GÖNDERME (spam/kötüye kullanım koruması).
+    // Yanıt yine de değişmemeli: limitli/limitsiz farkı bir sızıntı kanalı
+    // olurdu, bu yüzden her durumda aynı `return { ok: true }`'ya düşer
+    // (enumerasyon güvenliği).
+    if (!(await isMagicLinkRateLimited(email))) {
+      const raw = await createMagicToken(email);
+      const url = `${base}/panel/giris/dogrula?token=${raw}`;
+      await sendMagicLink(email, url);
+    }
   }
 
   return { ok: true };
