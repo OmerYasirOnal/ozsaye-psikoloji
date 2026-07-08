@@ -77,33 +77,51 @@ test("isRandevuRateLimited: aynı IP ile 30 dk içinde 5 kayıttan sonra true", 
   }
 });
 
-test("getBildirimAlicilari: slug → tek adres, null → tüm staff", async () => {
-  // Seed'li uzman: melek@example.com / slug melek-yildiz
-  expect(await getBildirimAlicilari("melek-yildiz")).toEqual([
-    "melek@example.com",
-  ]);
-  // null (farketmez) → yalnız terapist staff; sıra-bağımsız karşılaştırma
-  expect([...(await getBildirimAlicilari(null))].sort()).toEqual([
-    "melek@example.com",
-    "sacide@example.com",
-  ]);
-});
-
-test("getBildirimAlicilari(null): admin rolündeki staff hariç tutulur (yalnız terapist)", async () => {
-  // Sentetik, klinisyen olmayan admin hesabı: "farketmez" bildirimlerinde
-  // hasta verisi ALMAMALI (role='therapist' filtresinin kanıtı).
-  const adminEmail = `sentetik-admin-${Date.now()}@example.com`;
+test("getBildirimAlicilari(slug): yalnız o uzmanın adresini döndürür", async () => {
+  // Sentetik terapist + benzersiz slug: yerel dev seed'ine (melek/sacide) bağlı
+  // DEĞİL. Slug benzersiz olduğundan tam-eşitlik hem yerelde hem boş CI DB'sinde
+  // geçerlidir — başka hiçbir satır bu slug ile eşleşemez. (staff.test.ts deseni:
+  // sentetik satırı ekle, finally'de sil; hiçbir test önceden var olan veri varsaymaz.)
+  const ts = Date.now();
+  const email = `terapist-${ts}@example.com`;
+  const slug = `test-terapist-${ts}`;
   await db
     .insert(staff)
-    .values({ name: "Sentetik Admin", email: adminEmail, role: "admin" });
+    .values({ name: "Sentetik Terapist", email, expertSlug: slug, role: "therapist" });
   try {
-    const alicilar = await getBildirimAlicilari(null);
-    expect(alicilar).not.toContain(adminEmail); // admin dışarıda
-    // Terapistler hâlâ dahil (regresyon koruması)
-    expect(alicilar).toContain("melek@example.com");
-    expect(alicilar).toContain("sacide@example.com");
+    expect(await getBildirimAlicilari(slug)).toEqual([email]);
   } finally {
     // Assertion başarısız olsa bile sentetik satırı bırakma.
+    await db.delete(staff).where(eq(staff.email, email));
+  }
+});
+
+test("getBildirimAlicilari(null): terapistleri içerir, admin rolünü hariç tutar", async () => {
+  // Sentetik iki terapist + bir admin. null ("farketmez") dalı yalnız
+  // role='therapist' staff'ı döndürmeli; klinisyen olmayan admin hasta verisi
+  // içeren bu bildirimi ALMAMALI. Containment assertion'ları kullanılır: yerel
+  // DB'de ekstra (seed) satırlar olabilir, CI'da hiç yok — ikisinde de geçer.
+  // Tam-eşitlik veya seed e-postalarına bağımlılık YOK.
+  const ts = Date.now();
+  const terapistA = `terapist-a-${ts}@example.com`;
+  const terapistB = `terapist-b-${ts}@example.com`;
+  const adminEmail = `sentetik-admin-${ts}@example.com`;
+  await db.insert(staff).values([
+    { name: "Sentetik Terapist A", email: terapistA, role: "therapist" },
+    { name: "Sentetik Terapist B", email: terapistB, role: "therapist" },
+    { name: "Sentetik Admin", email: adminEmail, role: "admin" },
+  ]);
+  try {
+    const alicilar = await getBildirimAlicilari(null);
+    // Her iki sentetik terapist dahil (regresyon koruması)
+    expect(alicilar).toContain(terapistA);
+    expect(alicilar).toContain(terapistB);
+    // Admin dışarıda (role='therapist' filtresinin kanıtı)
+    expect(alicilar).not.toContain(adminEmail);
+  } finally {
+    // Assertion başarısız olsa bile sentetik satırları bırakma.
+    await db.delete(staff).where(eq(staff.email, terapistA));
+    await db.delete(staff).where(eq(staff.email, terapistB));
     await db.delete(staff).where(eq(staff.email, adminEmail));
   }
 });
