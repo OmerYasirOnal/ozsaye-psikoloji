@@ -5,7 +5,12 @@ import { saveImage } from "./storage";
 
 // Dosya-paralelliği kapalı (vitest.config: fileParallelism:false) → env mutasyonu güvenli.
 const prevToken = process.env.BLOB_READ_WRITE_TOKEN;
-let writtenDiskPath: string | null = null;
+const written: string[] = [];
+
+// Kök-göreli /uploads url'ini diskteki (.uploads) mutlak yola çevir.
+function diskPathFor(url: string): string {
+  return path.join(process.cwd(), ".uploads", url.replace(/^\/uploads\//, ""));
+}
 
 beforeAll(() => {
   // Dev (disk) yolunu garanti et: Blob token'ı yoksa .uploads'a yazılmalı.
@@ -13,7 +18,7 @@ beforeAll(() => {
 });
 
 afterAll(async () => {
-  if (writtenDiskPath) await fs.rm(writtenDiskPath, { force: true });
+  await Promise.all(written.map((p) => fs.rm(p, { force: true })));
   if (prevToken === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
   else process.env.BLOB_READ_WRITE_TOKEN = prevToken;
 });
@@ -31,11 +36,24 @@ test("dev: Blob token yokken .uploads/blog'a yazar; TR-temiz kök-göreli url d�
   expect(url).not.toMatch(/[çÇğĞıIİöÖşŞüÜ]/);
 
   // Dönen url'nin diskteki (.uploads) karşılığı gerçekten var ve içeriği "x".
-  writtenDiskPath = path.join(
-    process.cwd(),
-    ".uploads",
-    url.replace(/^\/uploads\//, ""),
-  );
-  const onDisk = await fs.readFile(writtenDiskPath, "utf8");
+  const onDiskPath = diskPathFor(url);
+  written.push(onDiskPath);
+  const onDisk = await fs.readFile(onDiskPath, "utf8");
   expect(onDisk).toBe("x");
+});
+
+test("dev: uzantısız ad + image/png → uzantı contentType'tan türetilir (.png, .bin değil)", async () => {
+  // Görsel MIME ile doğrulanır (upload endpoint). Ad uzantısız ("fotoğraf")
+  // olsa bile dosya .png olarak saklanmalı — aksi halde .bin olur ve dev-serve
+  // route (uzantı allowlist'i) onu servis edemez (servis edilemeyen upload).
+  const { url } = await saveImage(Buffer.from("y"), "fotoğraf", "image/png");
+
+  expect(url.startsWith("/uploads/blog/")).toBe(true);
+  expect(url.endsWith(".png")).toBe(true);
+  expect(url.endsWith(".bin")).toBe(false);
+
+  const onDiskPath = diskPathFor(url);
+  written.push(onDiskPath);
+  const onDisk = await fs.readFile(onDiskPath, "utf8");
+  expect(onDisk).toBe("y");
 });

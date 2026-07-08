@@ -31,3 +31,16 @@ test("renderMarkdown: script strip edilir, http(s) + kök-göreli görseller kor
   // Güvenli biçimlendirme korunur.
   expect(html).toContain("<strong>dünya</strong>");
 });
+
+test("renderMarkdown: protokol-göreli görsel src'i strip edilir (allowProtocolRelative:false)", () => {
+  // `//host/...` protokol-göreli src, allowProtocolRelative:false ile reddedilir.
+  // Gözlem (deneysel): sanitize-html <img> etiketini korur ama src'yi tümüyle
+  // düşürür (`<img alt="x" />`), böylece host çıktıya sızmaz. Bu regresyon
+  // koruması o davranışı kilitler.
+  const html = renderMarkdown("![x](//evil.example/x.png)");
+
+  // Kötü niyetli host hiçbir biçimde çıktıya sızmaz.
+  expect(html).not.toContain("evil.example");
+  // Protokol-göreli hiçbir src hayatta kalmaz.
+  expect(html).not.toMatch(/src=["']\/\//);
+});
