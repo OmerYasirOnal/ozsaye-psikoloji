@@ -4,7 +4,15 @@ import { getServiceSlugs } from "@/lib/services";
 import { getAllPosts } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
-// Statik export için route handler statik üretilmeli.
+// Sitemap performans için statik üretilir (build anında bir kez). Statik export
+// KALKTI; force-static artık yalnızca performans tercihi.
+// DİKKAT (Task 9 E2E'de üretim `next start` üzerinde doğrulandı): panel
+// yayınla/taslağa-çek/düzenle akışının çağırdığı revalidatePath("/sitemap.xml")
+// bu force-static metadata route'unu ÜRETİMDE tazelemiyor — /blog, /blog/[slug]
+// ve anasayfa canlı güncellenirken sitemap build anındaki içerikte donuyor; yeni
+// yazılar sitemap'e ancak sonraki deploy/build ile giriyor. İnsan yüzü sayfalar
+// etkilenmez, yalnızca sitemap.xml gecikir. Çözüm (force-static'i kaldırıp ISR'e
+// almak vb.) controller kararına bırakıldı — ayrıntı: .superpowers/sdd/task-9-report.md.
 export const dynamic = "force-static";
 
 /**
