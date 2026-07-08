@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getPostByIdAdmin } from "@/lib/blog-admin";
 import PostForm from "../../PostForm";
@@ -14,6 +15,9 @@ export default async function YaziDuzenlePage({
 }) {
   await verifySession(); // DAL cache'li — layout zaten çağırdı, bedava
   const { id } = await params;
+  // Bozuk id (UUID değil) doğrudan getPostByIdAdmin'e gitmemeli — ham Postgres
+  // UUID cast hatası (500) yerine 404. Kardeş action'lardaki z.uuid() ile aynı.
+  if (!z.uuid().safeParse(id).success) notFound();
   const post = await getPostByIdAdmin(id);
   if (!post) notFound();
 

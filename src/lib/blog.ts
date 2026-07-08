@@ -69,7 +69,7 @@ export async function getAllPosts(): Promise<PostMeta[]> {
 export function renderMarkdown(md: string): string {
   const raw = marked.parse(md, { async: false }) as string;
   return sanitizeHtml(raw, {
-    allowedTags: [...sanitizeHtml.defaults.allowedTags, "img", "h1", "h2"],
+    allowedTags: [...sanitizeHtml.defaults.allowedTags, "img"],
     allowedAttributes: {
       a: ["href", "title"],
       img: ["src", "alt", "title", "width", "height"],

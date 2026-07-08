@@ -45,6 +45,8 @@ export async function GET(
     headers: {
       "Content-Type": contentType,
       "Cache-Control": "public, max-age=31536000, immutable",
+      // Tarayıcı MIME-sniffing yapmasın: içerik tipi yalnız uzantı+imzadan gelir.
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

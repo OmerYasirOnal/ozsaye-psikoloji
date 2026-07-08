@@ -19,6 +19,35 @@ const MIME_EXT: Record<string, string> = {
   "image/gif": ".gif",
 };
 
+// Dosya imzasından (magic bytes) gerçek görsel tipini belirler. Upload route'u
+// istemcinin beyan ettiği dosya.type'a GÜVENMEZ (spoofing: rasgele baytları
+// image/png etiketiyle yükleme) — içerik tipi bu imzadan türetilir.
+//   PNG  : 89 50 4E 47 0D 0A 1A 0A  (ilk 8 bayt)
+//   JPEG : FF D8 FF                 (ilk 3 bayt)
+//   WebP : 0-3 "RIFF" VE 8-11 "WEBP"
+// Bağımsız (saf) fonksiyon — birim testi doğrudan çağırır.
+const PNG_SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const JPEG_SIG = Buffer.from([0xff, 0xd8, 0xff]);
+
+export function sniffImageType(
+  data: Buffer,
+): "image/png" | "image/jpeg" | "image/webp" | null {
+  if (data.length >= 8 && data.subarray(0, 8).equals(PNG_SIG)) {
+    return "image/png";
+  }
+  if (data.length >= 3 && data.subarray(0, 3).equals(JPEG_SIG)) {
+    return "image/jpeg";
+  }
+  if (
+    data.length >= 12 &&
+    data.toString("latin1", 0, 4) === "RIFF" &&
+    data.toString("latin1", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
+
 // Görseli saklar. BLOB_READ_WRITE_TOKEN doluysa Vercel Blob'a (public), boşsa
 // (dev) `.uploads/blog/`'a yazar. sendMagicLink'teki dev/prod env-anahtar
 // desenini yansıtır: Faz 3'e kadar bulut hesabı gerekmez.
