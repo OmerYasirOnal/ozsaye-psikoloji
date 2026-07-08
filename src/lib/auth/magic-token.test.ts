@@ -7,8 +7,11 @@ import {
 } from "./magic-token";
 
 test("token bir kez tüketilir", async () => {
-  const raw = await createMagicToken("melek@example.com");
-  expect(await consumeMagicToken(raw)).toBe("melek@example.com");
+  // Sentetik, çalışma-başına e-posta: gerçek seed'lenmiş uzman (melek@…)
+  // e-postasını kullanma — kardeş testlerle tutarlı.
+  const email = `token-${Date.now()}@example.com`;
+  const raw = await createMagicToken(email);
+  expect(await consumeMagicToken(raw)).toBe(email);
   // ikinci kez geçersiz (tek kullanımlık)
   expect(await consumeMagicToken(raw)).toBeNull();
 });
