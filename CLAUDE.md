@@ -5,17 +5,19 @@
 Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<html lang="tr">`). Marka adı **"Öz & Saye"**. Uzmanlar: Psk. Dan. Melek Yıldız, Kl. Psk. Sacide Şahin. Ana sayfa (`/`) bölümleri hash-anchor ile bağlı (`#hakkimizda`, `#randevu`, `#surec`, `#sss` vb.). Ayrıca gerçek alt route'lar: `/hizmetler` + `/hizmetler/[slug]` (8, SSG), `/ekip` + `/ekip/[slug]` (2, SSG), **`/blog` + `/blog/[slug]`** (markdown blog, SSG), `/kvkk-aydinlatma-metni`, `/gizlilik-politikasi`, `/randevu/tesekkurler` (+ `not-found`). SEO dosya-konvansiyonları: `robots.ts`, `sitemap.ts`, `manifest.ts`, `icon.png`/`apple-icon.png`/`favicon.ico`, `og.png`.
 
 ## Stack & konvansiyonlar
-- Next.js 16 App Router + React 19 + Tailwind v4 + TypeScript. **Statik export** (`output: "export"` → `out/`; GoDaddy paylaşımlı hosting'e FTP).
+- Next.js 16 App Router + React 19 + Tailwind v4 + TypeScript. **Sunucu modu** (Faz 0'da statik export — `output: "export"` → `out/` — KALDIRILDI; artık Server Actions/route handler/`cookies()`/DB mümkün). Hedef barındırma **Vercel**; Faz 3 cutover'a kadar canlı site GoDaddy'de son statik deploy'da **donuk** kalır.
 - Tailwind v4 CSS-first: tema tokenları `src/app/globals.css` içinde `@theme inline` ile tanımlı — `tailwind.config` dosyası **yok**.
 - Bileşenler `src/components/` altında; varsayılan Server Component, yalnızca etkileşim gerektiğinde `"use client"`. Path alias `@/*` → `src/*`.
 - **Merkezî config `src/lib/site.ts`** (`const site`): tüm NAP/kimlik/uzman/ücret verisi buradan; gerçek değerler `[DOLDUR]` placeholder (bkz. `docs/klinikten-gereken-veriler.md`). `site.dataReady` bayrağı `true` olmadan `JsonLd` (schema.org) yapısal veri **yayınlamaz** ve site `robots` ile **noindex** kalır — placeholder NAP'i indekslenebilir veriye sızdırma.
-- **Randevu formu statik export'ta Server Action KULLANMAZ.** Form `public/randevu.php`'ye POST eder; PHP doğrular (ad/telefon/e-posta/uzman/kvkk), honeypot + e-posta başlık-enjeksiyonu koruması yapar, KVKK rızasını `randevu-kayitlari.log`'a yazar (`.htaccess` ile erişime kapalı), `info@ozsaye.com`'a e-posta gönderir ve `/randevu/tesekkurler/`'e yönlendirir. Erişilebilirlik token'ı: `text-forest-muted` (gövde metni AA), global `:focus-visible` + `.skip-link` globals.css'te.
+- **Randevu formu (geçiş dönemi):** form ŞU AN hâlâ `public/randevu.php`'ye POST ediyor — bu yalnız canlı GoDaddy (statik) sitesinde çalışır; yeni sunucu-modu uygulamasında ÇALIŞMAZ. **Faz 2**'de Server Action + DB'ye (`appointment_requests`) geçecek. PHP doğrular (ad/telefon/e-posta/uzman/kvkk), honeypot + e-posta başlık-enjeksiyonu koruması yapar, KVKK rızasını `randevu-kayitlari.log`'a yazar (`.htaccess` ile erişime kapalı), `info@ozsaye.com`'a e-posta gönderir ve `/randevu/tesekkurler/`'e yönlendirir. Erişilebilirlik token'ı: `text-forest-muted` (gövde metni AA), global `:focus-visible` + `.skip-link` globals.css'te.
 - **Chrome (Header/Footer/StickyCta) kök layout'ta** (`src/app/layout.tsx`) — pazarlama sayfalarının tümünde ortak; sayfalar kendi Header/Footer'ını render **etmez**. **İstisna: `/panel/**` (uzman paneli)** bu kabuğu almaz — `src/components/SiteChrome.tsx` (client, `usePathname()`) pathname `/panel` ile başlıyorsa Header/Footer/StickyCta'yı hiç render etmez; kök layout'un sabit-konumlu genel Header'ı panelin kendi header'ının üstüne binip tıklamaları engelliyordu. `Footer` (sunucu bileşeni) client bundle'a çekilmesin diye `SiteChrome`'a hazır node ("slot") olarak geçirilir, içeride import edilmez. Ana-sayfa-bölümü anchor'ları **kök-göreli** + `next/link` (`/#randevu` vb.), aksi halde alt sayfalardan çalışmaz + lint hatası verir. Placeholder gizleme tek noktadan: `isReady(value)` (`src/lib/site.ts`) — `[DOLDUR]`/boş değerler arayüzde gizlenir veya "yakında" fallback, JSON-LD'ye sızmaz.
 - Marka paleti (final logo renkleri; globals.css token'ları — paletten sapma): forest `#1F3B2E`, cream/ivory `#F5F2EB`, sage `#A6B79B`, soft-blush `#D8A7A5` (aksan), warm-white `#FFFFFF`, stone `#DAD7CE`. Logo varlıkları raster (PNG) ve `brand/logo/final/` altında; Header/Footer logoyu `next/image` ile (`public/logo.png`) gösterir, footer'da koyu zeminde okunması için warm-white yuvarlak çip içinde. Fontlar: Playfair Display (`font-display`, başlık + italik vurgu), Montserrat (`font-body`). Marka rehberi: `brand/marka-rehberi.png` + `docs/marka-kimligi.md`.
 - **Tasarım dili: "sakin botanik minimalizm" (sade/modern/ferah).** Boşluk birincil öğedir (`py-28 lg:py-36`, `max-w-6xl`). Yüzeyler 3 tane: warm-white (ana) · cream (alternatif ritim) · forest (vurgu: Randevu + Footer). **Renk disiplini (zorunlu):** metin yalnızca `text-forest` (başlık) + `text-forest-muted` (gövde); **opaklık-tabanlı metin rengi yasak** (`text-forest/NN`, `text-cream/NN`), metin olarak `text-sage`/`text-sage-dark` yasak; forest zeminde ikincil metin `text-sage-light`. `sage` yalnızca aksan (ince çizgi/ikon/işaret). Başlık başına en fazla 1 italik vurgu. Dekorasyon minimal — yüzen yaprak/grain/gradient ayraç **kullanma**; en fazla tek ince sage hairline veya Hero'daki tek filiz motifi. Hover tek-özellikli/sakin.
 
 ## Komutlar
-- `npm run dev` · `npm run build` · `npm run lint`. Test framework kurulu değil.
+- `npm run dev` · `npm run build` · `npm run lint`.
+- `npm test` (Vitest; Docker Postgres gerekir). DB komutları: `npm run db:generate` / `db:migrate` / `db:seed`.
+- Yerel DB: `DB_HOST_PORT=5433 docker compose up -d db` (bu makinede 5432 dolu; docker-compose varsayılanı 5432).
 
 ## Notlar
 - SEO/AIO/tasarım/erişilebilirlik incelemesi ve 4 fazlı uygulama yol haritası: `docs/seo-aio-inceleme-yol-haritasi.md`.
@@ -31,15 +33,17 @@ Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<htm
 - Meta'ya (Instagram/Facebook) gerçek otomatik yayın **henüz yok**; İş hesabı + uygulama onayı + token gerektiren dış bir engel.
 
 ### CI / Deploy (GitHub Actions)
-- `.github/workflows/ci.yml` — **PR ve main push'ta** `npm ci → lint → build`. Merge öncesi doğrulama buradan geçer.
-- `.github/workflows/deploy-godaddy.yml` — **main push'ta** statik `out/`'u GoDaddy'ye **FTP** ile yükler. FTP başarısızlıkları (ör. `530`) genelde **secret/format** kaynaklıdır (`FTP_USERNAME` çoğunlukla `kullanıcı@alanadi.com` olmalı), kod değil.
+- `.github/workflows/ci.yml` — **PR ve main push'ta** `npm ci → lint → build` (sunucu modu). Build adımı CI-özel **sahte** `SESSION_SECRET`/`DATABASE_URL` ile çalışır (gerçek gizli DEĞİL; CI hiç gerçek sunucu çalıştırmaz/oturum imzalamaz — yalnız auth modüllerinin build-zamanı fail-fast kontrolleri için sözdizimsel geçerli değer gerekir). Merge öncesi doğrulama buradan geçer.
+- `.github/workflows/deploy-godaddy.yml` — **artık push'ta ÇALIŞMIYOR** (Faz 0'da `out/` üretilmiyor); yalnız elle (`workflow_dispatch`) tetiklenir ve **Faz 3** (Vercel cutover) tamamlanınca silinecek. Eski FTP notu: başarısızlıklar (ör. `530`) genelde **secret/format** kaynaklıdır (`FTP_USERNAME` çoğunlukla `kullanıcı@alanadi.com` olmalı), kod değil.
 
-### Statik export kuralları (`output: "export"`) — DİKKAT
-- `robots.ts` ve `sitemap.ts` `export const dynamic = "force-static"` gerektirir.
-- Dinamik route'lar `generateStaticParams()` ister; tüm yollar build'de üretiliyorsa `export const dynamicParams = false`.
-- Next 16'da `params` artık **Promise** — `await params`.
-- `next/image` `unoptimized: true`. Sunucu çalışmaz: API/Server Action/cookies/redirect yok (form bu yüzden `public/randevu.php`).
-- Header/Footer hash linkleri **mutlak** (`/#...`) tutulur ki alt route'lardan (ör. `/blog`) da çalışsın.
+### Sunucu modu kuralları (Faz 0 sonrası) — DİKKAT
+- **Eski statik export kuralları ARTIK GEÇERLİ DEĞİL** (`output: "export"` kaldırıldı): `force-static`/`dynamicParams` zorunluluğu ve "sunucu çalışmaz" kısıtı yok. Artık Server Actions, route handler, `cookies()`, `redirect()` ve DB erişimi mümkün.
+- Next 16'da `params` **ve** `searchParams` artık **Promise** — `await params` / `await searchParams`.
+- Middleware dosyası **`proxy.ts`** (Next 16; `middleware.ts` değil).
+- `/panel/**` kimlik doğrulama: **jose** imzalı cookie + DB'de hash'li tek-kullanımlık **magic-token** + DAL (`verifySession`, `src/lib/auth/dal.ts`). Giriş `/panel/giris` — sitede bu sayfaya **link YOK**, yalnız doğrudan URL. Akış: istek → onay sayfası (`/panel/giris/dogrula`, GET token'ı **tüketmez**) → POST `/panel/giris/dogrula/onayla` token'ı tüketir (303).
+- `.env.local` **gerekli** (`.env.local.example`'dan kopyala): `DATABASE_URL`, `SESSION_SECRET`, `APP_URL`, (ops.) `RESEND_API_KEY`.
+- Magic-link dev'de e-posta yerine **konsola** basılır (`RESEND_API_KEY` boşken).
+- Header/Footer hash linkleri hâlâ **mutlak** (`/#...`) tutulur ki alt route'lardan (ör. `/blog`) da çalışsın.
 
 ## Gözden geçirme (review) akışı — HER ZAMAN
 Önemli bir değişiklik bitince ve **PR açmadan/merge etmeden önce**, sıfır bağlamlı
