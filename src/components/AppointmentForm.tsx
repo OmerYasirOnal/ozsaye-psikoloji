@@ -1,14 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { useActionState } from "react";
+import {
+  randevuTalebiGonder,
+  type RandevuFormState,
+} from "@/app/randevu/actions";
 
 /**
- * Randevu başvuru formu (statik site).
+ * Randevu başvuru formu.
  *
- * Statik export'ta Server Action çalışmadığı için form, klasik bir HTML POST ile
- * `public/randevu.php`'ye gönderilir; PHP doğrular, info@ozsaye.com'a e-posta
- * yollar, KVKK rızasını kaydeder ve /randevu/tesekkurler/'e yönlendirir.
- * İstemci tarafı: HTML5 `required`/tip doğrulaması; sunucu doğrulaması PHP'de.
+ * `randevuTalebiGonder` public Server Action'ına POST eder (useActionState):
+ * action honeypot + zod + IP hız limiti ile korunur, talebi DB'ye yazar,
+ * uzman(lar)a bildirim e-postası gönderir ve /randevu/tesekkurler/'e yönlendirir.
+ * İstemci tarafı: HTML5 `required`/tip doğrulaması; sunucu doğrulaması zod'da.
  */
+const initial: RandevuFormState = {};
+
 export default function AppointmentForm() {
+  const [state, formAction, pending] = useActionState(
+    randevuTalebiGonder,
+    initial,
+  );
+
   return (
     <section id="randevu" className="relative bg-forest py-28 lg:py-40">
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
@@ -68,9 +82,9 @@ export default function AppointmentForm() {
             </div>
           </div>
 
-          {/* Right: Form — public/randevu.php'ye POST */}
+          {/* Right: Form — randevuTalebiGonder Server Action'ına POST */}
           <div className="rounded-2xl bg-cream/95 p-8 shadow-2xl backdrop-blur-sm lg:p-10">
-            <form action="/randevu.php" method="post" className="space-y-5">
+            <form action={formAction} className="space-y-5">
               {/* Honeypot: görsel + ekran okuyuculardan gizli; botlar doldurur */}
               <div
                 aria-hidden="true"
@@ -234,11 +248,16 @@ export default function AppointmentForm() {
                 </p>
               </div>
 
+              {state.hata && (
+                <p className="text-sm font-semibold text-forest">{state.hata}</p>
+              )}
+
               <button
                 type="submit"
-                className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30"
+                disabled={pending}
+                className="w-full rounded-lg bg-forest px-6 py-3.5 text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark hover:shadow-lg hover:shadow-forest/30 disabled:opacity-60"
               >
-                Randevu Talebini Gönder
+                {pending ? "Gönderiliyor…" : "Randevu Talebini Gönder"}
               </button>
 
               <p className="text-center text-xs text-forest-muted">
