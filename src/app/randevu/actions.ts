@@ -35,13 +35,22 @@ export async function randevuTalebiGonder(
 
   // 2. zod doğrulama — alan sırasına göre ilk hata mesajını döndür. Şema
   //    metinleri üretim Türkçe kopyasıdır (public/randevu.php'den birebir).
+  //
+  // FormData.get() eksik alanda null döner; şema saf string bekler. null → ""
+  // normalize edilir ki tip hatası yerine alanın KENDİ Türkçe mesajı tetiklensin
+  // (tarih/mesaj için "" zaten geçerli boş değerdir).
+  const metin = (k: string): string => {
+    const v = fd.get(k);
+    return typeof v === "string" ? v : "";
+  };
   const parsed = randevuSchema.safeParse({
-    ad: fd.get("ad"),
-    telefon: fd.get("telefon"),
-    email: fd.get("email"),
-    uzman: fd.get("uzman"),
-    tarih: fd.get("tarih"),
-    mesaj: fd.get("mesaj"),
+    ad: metin("ad"),
+    telefon: metin("telefon"),
+    email: metin("email"),
+    uzman: metin("uzman"),
+    tarih: metin("tarih"),
+    mesaj: metin("mesaj"),
+    // kvkk HAM bırakılır: null yolu zaten doğru Türkçe onay mesajını üretir.
     kvkk: fd.get("kvkk"),
   });
   if (!parsed.success) {

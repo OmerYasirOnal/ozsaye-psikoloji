@@ -46,6 +46,16 @@ export async function sendAppointmentNotification(
     tarihDamgasi: string;
   },
 ): Promise<void> {
+  // Alıcı yoksa gönderilecek bir şey yok: prod yolu 422 döndürürdü, dev konsol
+  // yolu ise kimseye "başarılı" gibi görünen satır basardı. Erken dön + görünür
+  // uyarı bas ki hata dev loglarında da fark edilsin (staff tablosu boş vb.).
+  if (to.length === 0) {
+    console.error(
+      "[randevu] bildirim alıcısı yok — staff tablosunu kontrol edin",
+    );
+    return;
+  }
+
   const key = process.env.RESEND_API_KEY;
 
   const subject = `Yeni Randevu Başvurusu — ${ozet.ad}`;

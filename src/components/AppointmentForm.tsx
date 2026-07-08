@@ -249,7 +249,7 @@ export default function AppointmentForm() {
               </div>
 
               {state.hata && (
-                <p className="text-sm font-semibold text-forest">{state.hata}</p>
+                <p aria-live="polite" className="text-sm font-semibold text-forest">{state.hata}</p>
               )}
 
               <button
