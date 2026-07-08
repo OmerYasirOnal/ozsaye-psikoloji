@@ -16,7 +16,8 @@ export async function saveImage(
   originalName: string,
   contentType: string,
 ): Promise<{ url: string }> {
-  const ext = path.extname(originalName).toLowerCase() || ".bin";
+  const rawExt = path.extname(originalName).toLowerCase();
+  const ext = rawExt && rawExt !== "." ? rawExt : ".bin";
   const base =
     slugify(path.basename(originalName, path.extname(originalName))) || "gorsel";
   const name = `${Date.now()}-${randomBytes(4).toString("hex")}-${base}${ext}`;
