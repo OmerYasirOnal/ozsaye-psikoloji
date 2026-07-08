@@ -19,7 +19,7 @@ const schema = z.object({
   kategori: z.string().trim(),
   etiketler: z.string(),
   ozet: z.string().trim().max(300, "Özet en fazla 300 karakter olabilir."),
-  icerik: z.string().min(1, "İçerik boş olamaz — yazı gövdesi gerekli."),
+  icerik: z.string().trim().min(1, "İçerik boş olamaz — yazı gövdesi gerekli."),
 });
 
 // Benzersiz slug: taban DB'de zaten varsa "-2", "-3"… ekleyerek boş bir slot bul.
@@ -71,32 +71,51 @@ export async function createPost(
     };
   }
 
-  // 4) Benzersizleştir.
-  const slug = await ensureUniqueSlug(slugBase);
-
-  // 5) Ekle (taslak; yazar oturumdan; etiketler virgülden diziye).
+  // 4) Ekle (taslak; yazar oturumdan; etiketler virgülden diziye).
   const tags = etiketler
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
 
-  const inserted = await db
-    .insert(blogPosts)
-    .values({
-      slug,
-      title: baslik,
-      excerpt: ozet || null,
-      bodyMarkdown: icerik,
-      authorStaffId: session.staffId,
-      status: "draft",
-      category: kategori || "Yazı",
-      tags,
-    })
-    .returning({ id: blogPosts.id });
+  // ensureUniqueSlug SELECT'i ile INSERT arasında TOCTOU yarışı var: iki eşzamanlı
+  // gönderim aynı boş adayı görüp INSERT'te DB'nin unique slug kısıtında çarpışır;
+  // kaybeden postgres 23505 alır (yakalanmazsa jenerik hata sayfası). Sınırlı
+  // yeniden deneme: her turda adayı YENİDEN hesapla (kazananın satırı artık o slug'ı
+  // tuttuğu için ensureUniqueSlug bir sonraki soneki seçer) ve tekrar dene.
+  let id: string | undefined;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const slug = await ensureUniqueSlug(slugBase);
+    try {
+      const inserted = await db
+        .insert(blogPosts)
+        .values({
+          slug,
+          title: baslik,
+          excerpt: ozet || null,
+          bodyMarkdown: icerik,
+          authorStaffId: session.staffId,
+          status: "draft",
+          category: kategori || "Yazı",
+          tags,
+        })
+        .returning({ id: blogPosts.id });
+      id = inserted[0].id;
+      break;
+    } catch (e) {
+      // 23505 = unique_violation (postgres.js PostgresError.code). Slug yarışı —
+      // bir sonraki turda yeni aday ile dene. Diğer her hata yukarı fırlatılır.
+      if ((e as { code?: string })?.code === "23505") continue;
+      throw e;
+    }
+  }
 
-  const id = inserted[0].id;
+  if (!id) {
+    return {
+      hata: "Kayıt sırasında bir çakışma oldu — lütfen tekrar deneyin.",
+    };
+  }
 
-  // 6) Düzenleme sayfasına yönlendir. redirect() NEXT_REDIRECT fırlatır —
+  // 5) Düzenleme sayfasına yönlendir. redirect() NEXT_REDIRECT fırlatır —
   //    try/catch İÇİNE ALMA (yutulursa yönlendirme çalışmaz).
   redirect(`/panel/blog/${id}/duzenle?kaydedildi=1`);
 }
