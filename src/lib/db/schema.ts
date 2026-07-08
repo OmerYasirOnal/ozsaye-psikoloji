@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable, uuid, text, timestamp, boolean, pgEnum,
 } from "drizzle-orm/pg-core";
@@ -45,6 +46,8 @@ export const blogPosts = pgTable("blog_posts", {
   status: postStatus("status").notNull().default("draft"),
   publishedAt: timestamp("published_at", { withTimezone: true }),
   seoDescription: text("seo_description"),
+  category: text("category").notNull().default("Yazı"),
+  tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
