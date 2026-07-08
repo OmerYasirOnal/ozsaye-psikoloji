@@ -25,8 +25,11 @@ Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<htm
 - Yapılanlar + teklif/kapsam dokümanı: `docs/teklif-ve-yapilanlar.md`.
 
 ### Blog / Haberler
-- **Kanonik blog `/blog`**'tur (`content/blog/*.md` frontmatter + markdown; okuyucu `src/lib/blog.ts`). İkinci bir blog route'u (`/yazilar` vb.) **açma** — daha önce tekrar/çakışma yarattı.
-- `draft: true` frontmatter'lı yazılar yayınlanmaz. Anasayfadaki "Yazılar" bölümü (`Articles.tsx`) en güncel 3 yazıyı gösterir ve `/blog`'a bağlanır.
+- **Kanonik blog `/blog`**'tur; kaynak artık **DB (`blog_posts` tablosu)**, uzman panelinden yönetilir (`/panel/blog`; **paylaşımlı yetki** — iki uzman da tüm yazıları düzenler/yayınlar). Okuyucu `src/lib/blog.ts` (async; `marked` → `sanitize-html`). İkinci bir blog route'u (`/yazilar` vb.) **açma** — daha önce tekrar/çakışma yarattı.
+- `content/blog/*.md` dosyaları **yalnızca Faz 3 prod-tohum girdisidir** (idempotent göç script'i). **Runtime'da okunmaz.** Uyarı: cutover'a kadar panelden yapılan düzenlemeler yalnız **yerel DB**'de yaşar — md dosyaları güncellenmez, prod tohumu bu düzenlemeleri içermez.
+- Yayın durumu frontmatter `draft` yerine **`status` alanı** (`draft` / `published`); yalnız `published` sitede görünür (taslak asla sızmaz). Anasayfadaki "Yazılar" bölümü (`Articles.tsx`) en güncel 3 **yayınlı** yazıyı DB'den gösterir ve `/blog`'a bağlanır.
+- **Görseller:** dev'de `.uploads/blog/` (gitignore'lu; `/uploads/...` route'undan servis), prod'da Vercel Blob (`BLOB_READ_WRITE_TOKEN` doluysa mutlak Blob URL). Upload endpoint'i (`/panel/blog/gorsel`) oturumsuz **401**.
+- **On-demand revalidate:** yayınla/taslağa-çek/düzenle `revalidatePath` ile `/blog`, `/blog/[slug]` ve anasayfayı **yeniden deploy olmadan** canlı tazeler (Task 9 üretim E2E'de doğrulandı). **`sitemap.xml` artık `force-dynamic`** (her istekte DB'den üretilir) — yayınlanan/kaldırılan yazı sitemap'e **anında** yansır, revalidate gerekmez. (Önceki `force-static` sınırlaması — `revalidatePath("/sitemap.xml")` üretimde tazeleyemiyordu — böylece **giderildi**; üretimde kanıtlandı: yayınla→sitemap anında içeriyor, kaldır→anında düşüyor. Bkz. `src/app/sitemap.ts` + `.superpowers/sdd/task-9-report.md`.)
 
 ### Sosyal medya otomasyonu (yerel)
 - `tools/icerik-uretici/` — **Ollama (yerel LLM)** ile yayınlanan blog yazılarından Instagram/Facebook için Türkçe **taslak** (metin + marka görseli) üretir. **Otomatik yayın YOK**: taslaklar `taslaklar/` (gitignore'da) altına yazılır, elle paylaşılır. `--no-llm` yedeği ve `--watch` modu var. Kurulum: `tools/icerik-uretici/README.md`.

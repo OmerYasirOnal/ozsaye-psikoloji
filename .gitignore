@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# yerel görsel yüklemeleri (dev disk deposu; prod'da Vercel Blob kullanılır)
+/.uploads/
+
 # production
 /build
 

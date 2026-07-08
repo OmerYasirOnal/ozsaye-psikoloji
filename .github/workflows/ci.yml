@@ -21,6 +21,29 @@ concurrency:
 jobs:
   lint-build:
     runs-on: ubuntu-latest
+    # Faz 1'den itibaren blog sayfaları SSG prerender sırasında DB okur; bu
+    # yüzden CI'nın (hem test hem build) erişebileceği boş-şemalı bir Postgres
+    # gerekir. Boş blog_posts tablosu sorun değil (generateStaticParams []).
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ozsaye
+          POSTGRES_PASSWORD: ozsaye
+          POSTGRES_DB: ozsaye
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ozsaye"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # CI-özel değerler — GERÇEK gizli DEĞİL. Build/test yalnızca yerel
+      # service'e karşı çalışır; CI hiçbir zaman gerçek sunucu çalıştırmaz veya
+      # oturum imzalamaz. SESSION_SECRET auth modülünde build zamanında (modül
+      # yüklenirken) fail-fast tetiklediği için gereklidir. Üretimde gerçek
+      # değerler Vercel env'inde (Faz 3).
+      DATABASE_URL: postgres://ozsaye:ozsaye@localhost:5432/ozsaye
+      SESSION_SECRET: ci-build-zamani-gercek-olmayan-deger
+      APP_URL: http://localhost:3000
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -37,14 +60,13 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: DB migration (CI service'ine)
+        # `npm run db:migrate` DEĞİL: o script --env-file=.env.local ister ve o
+        # dosya CI'da yok. Env job-level'dan (DATABASE_URL) geliyor.
+        run: npx tsx scripts/db-migrate.ts
+
+      - name: Testler
+        run: npm test
+
       - name: Build (sunucu modu)
-        # SESSION_SECRET/DATABASE_URL burada GERÇEK gizli değil — CI hiçbir
-        # zaman gerçek sunucu çalıştırmaz veya oturum imzalamaz, yalnızca
-        # `next build`'in modül grafiğini yükleyip tipleri/route'ları
-        # doğrulaması için (auth modüllerindeki fail-fast kontroller build
-        # zamanında da tetiklenir) sözdizimsel olarak geçerli bir değer
-        # gerekiyor. Üretimde gerçek değerler Vercel env'inde (Faz 3).
         run: npm run build
-        env:
-          SESSION_SECRET: ci-build-zamani-gercek-olmayan-deger
-          DATABASE_URL: postgres://ci:ci@localhost:5432/ci

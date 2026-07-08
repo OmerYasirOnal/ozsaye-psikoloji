@@ -4,17 +4,25 @@ import { getServiceSlugs } from "@/lib/services";
 import { getAllPosts } from "@/lib/blog";
 import { absoluteUrl, site } from "@/lib/site";
 
-// Statik export için route handler statik üretilmeli.
-export const dynamic = "force-static";
+// Sitemap her istekte DB'den üretilir (force-dynamic). Panelden yayınlanan/kaldırılan
+// yazılar sitemap'e ANINDA yansır — yeniden deploy gerekmez.
+// Neden dinamik (Task 9 üretim `next start` E2E kanıtı): eski `force-static` metadata
+// route'u, panel akışının çağırdığı revalidatePath("/sitemap.xml") ile ÜRETİMDE
+// tazelenemiyordu — /blog, /blog/[slug] ve anasayfa canlı güncellenirken sitemap build
+// anındaki 3 slug'da donuyor, yeni yazılar ancak sonraki deploy'da giriyordu. Sitemap
+// trafiği önemsiz (yalnız tarayıcı/crawler) ve sorgu tek ucuz select olduğundan dinamik
+// render bedeli ihmal edilebilir; tazelik anında kanıtlanabilir olur.
+// Ayrıntı: .superpowers/sdd/task-9-report.md.
+export const dynamic = "force-dynamic";
 
 /**
  * Sitemap — indekslenmesi istenen genel sayfalar.
  * noindex sayfalar dahil edilmez: /randevu/tesekkurler (teşekkür sayfası),
  * /kvkk-aydinlatma-metni ve /gizlilik-politikasi (robots index:false).
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
   const lastBlog = posts[0]?.date ? new Date(posts[0].date) : lastModified;
 
   return [

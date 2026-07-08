@@ -8,6 +8,14 @@ export async function proxy(req: NextRequest) {
   // Giriş akışı serbest
   if (path.startsWith("/panel/giris")) return NextResponse.next();
 
+  // Görsel yükleme API'si (fetch ile çağrılır): kendi JSON 401'ini döndürür,
+  // redirect değil. Auth'u handler'daki readSessionCookie() uygular — asıl kapı
+  // orası; proxy bir HTML giriş sayfasına yönlendirirse fetch istemcisi bozulur.
+  // EXACT match (prefix değil): gelecekteki /panel/blog/gorsel* kardeş route'ları
+  // (ör. .../gorsel-sil) sessizce muaf kalmasın; yalnız bu endpoint + trailing-slash.
+  if (path === "/panel/blog/gorsel" || path === "/panel/blog/gorsel/")
+    return NextResponse.next();
+
   // /panel/** için optimistik oturum kontrolü (yalnız cookie okur)
   const session = await decryptSession(req.cookies.get(SESSION_COOKIE)?.value);
   if (!session) {
