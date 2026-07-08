@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ozsaye
+      POSTGRES_PASSWORD: ozsaye
+      POSTGRES_DB: ozsaye
+    ports:
+      # Varsayılan host portu 5432 (.env.local.example ile eşleşir). Yerel
+      # makinede 5432 doluysa DB_HOST_PORT ile geçersiz kılın, ör.:
+      #   DB_HOST_PORT=5433 docker compose up -d db
+      # ve .env.local'daki DATABASE_URL'i o porta göre güncelleyin.
+      - "${DB_HOST_PORT:-5432}:5432"
+    volumes:
+      - ozsaye_pgdata:/var/lib/postgresql/data
+
+volumes:
+  ozsaye_pgdata:

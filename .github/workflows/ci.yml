@@ -1,9 +1,11 @@
 name: CI (Lint & Build)
 
 # Pull request'lerde ve main'e push'ta projeyi doğrular: bağımlılıkları
-# kurar, lint çalıştırır ve statik build alır. Böylece bozuk/çakışan
+# kurar, lint çalıştırır ve sunucu modunda build alır (Faz 0'dan beri
+# statik export değil — bkz. next.config.ts). Böylece bozuk/çakışan
 # değişiklikler merge edilmeden önce yakalanır.
-# (Deploy ayrı bir workflow'dadır: deploy-godaddy.yml)
+# (Deploy ayrı bir workflow'dadır: deploy-godaddy.yml — Faz 3 cutover'da
+# Vercel'e geçince emekli olacak.)
 
 on:
   pull_request:
@@ -35,5 +37,14 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Statik build (out/ üretir)
+      - name: Build (sunucu modu)
+        # SESSION_SECRET/DATABASE_URL burada GERÇEK gizli değil — CI hiçbir
+        # zaman gerçek sunucu çalıştırmaz veya oturum imzalamaz, yalnızca
+        # `next build`'in modül grafiğini yükleyip tipleri/route'ları
+        # doğrulaması için (auth modüllerindeki fail-fast kontroller build
+        # zamanında da tetiklenir) sözdizimsel olarak geçerli bir değer
+        # gerekiyor. Üretimde gerçek değerler Vercel env'inde (Faz 3).
         run: npm run build
+        env:
+          SESSION_SECRET: ci-build-zamani-gercek-olmayan-deger
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci

@@ -1,5 +1,12 @@
 name: GoDaddy'ye Deploy (FTP)
 
+# DEVRE DIŞI (yalnız elle tetikleme): Statik export Faz 0'da kaldırıldı
+# (`output: "export"` gitti), bu yüzden `npm run build` artık `out/` ÜRETMİYOR
+# — otomatik push tetikleyicisi çalışsaydı her main push'unda bozulurdu.
+# Canlı GoDaddy sitesi, Faz 3 (Vercel cutover) tamamlanana kadar son statik
+# deploy'da DONMUŞ kalır (plan bu). Bu workflow Faz 3'te tamamen silinecek;
+# o zamana kadar yalnızca Actions sekmesinden elle tetiklenebilir.
+#
 # Statik siteyi build edip GoDaddy paylaşımlı hosting'e (Apache/FTP) yükler.
 # Çalışması için repo Settings > Secrets and variables > Actions altında
 # şu secret'lar tanımlanmalıdır:
@@ -11,10 +18,7 @@ name: GoDaddy'ye Deploy (FTP)
 #   yüklemek için "public_html/yeni/" gibi değiştirin.
 
 on:
-  workflow_dispatch: # Actions sekmesinden elle tetikleme
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Yalnız Actions sekmesinden elle tetikleme (push tetikleyicisi Faz 0'da kaldırıldı)
 
 jobs:
   build-and-deploy:

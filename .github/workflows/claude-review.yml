@@ -38,13 +38,15 @@ jobs:
             Request'in değişikliklerini sıfırdan, önyargısız incele.
 
             Bağlam: Next.js 16 App Router + React 19 + Tailwind v4, TypeScript,
-            `output: export` ile statik export (GoDaddy'de saf HTML). Türkçe
-            içerik. Marka kütüphanesi `scripts/lib/brand.cjs`.
+            **sunucu modu** (Faz 0'da statik export kaldırıldı; hedef Vercel).
+            `/panel` uzman paneli auth akışı dahil (jose imzalı cookie + DB'de
+            hash'li magic-token; middleware `proxy.ts`). Türkçe içerik. Marka
+            kütüphanesi `scripts/lib/brand.cjs`.
 
             Şunlara odaklan:
             - Doğruluk hataları ve kenar durumları
             - Güvenlik / gizli bilgi sızıntısı / XSS (özellikle dangerouslySetInnerHTML, dış veri)
-            - Next.js 16 statik export uyumu (force-static, generateStaticParams vb.)
+            - Next.js 16 App Router sunucu modu uyumu (Server Actions, route handler, `params`/`searchParams` Promise, `proxy.ts` middleware, `/panel` auth akışı)
             - Türkçe karakter / encoding sorunları
             - Ölü kod, kullanılmayan değişken, tutarsızlık, gereksiz tekrar
 
