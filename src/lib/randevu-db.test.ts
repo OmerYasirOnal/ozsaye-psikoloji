@@ -1,7 +1,7 @@
 import { afterAll, expect, test } from "vitest";
 import { eq } from "drizzle-orm";
 import { db, client } from "@/lib/db";
-import { appointmentRequests } from "@/lib/db/schema";
+import { appointmentRequests, staff } from "@/lib/db/schema";
 import type { RandevuGirdisi } from "@/lib/randevu";
 import {
   createAppointmentRequest,
@@ -82,11 +82,30 @@ test("getBildirimAlicilari: slug → tek adres, null → tüm staff", async () =
   expect(await getBildirimAlicilari("melek-yildiz")).toEqual([
     "melek@example.com",
   ]);
-  // null (farketmez) → tüm staff; sıra-bağımsız karşılaştırma
+  // null (farketmez) → yalnız terapist staff; sıra-bağımsız karşılaştırma
   expect([...(await getBildirimAlicilari(null))].sort()).toEqual([
     "melek@example.com",
     "sacide@example.com",
   ]);
+});
+
+test("getBildirimAlicilari(null): admin rolündeki staff hariç tutulur (yalnız terapist)", async () => {
+  // Sentetik, klinisyen olmayan admin hesabı: "farketmez" bildirimlerinde
+  // hasta verisi ALMAMALI (role='therapist' filtresinin kanıtı).
+  const adminEmail = `sentetik-admin-${Date.now()}@example.com`;
+  await db
+    .insert(staff)
+    .values({ name: "Sentetik Admin", email: adminEmail, role: "admin" });
+  try {
+    const alicilar = await getBildirimAlicilari(null);
+    expect(alicilar).not.toContain(adminEmail); // admin dışarıda
+    // Terapistler hâlâ dahil (regresyon koruması)
+    expect(alicilar).toContain("melek@example.com");
+    expect(alicilar).toContain("sacide@example.com");
+  } finally {
+    // Assertion başarısız olsa bile sentetik satırı bırakma.
+    await db.delete(staff).where(eq(staff.email, adminEmail));
+  }
 });
 
 afterAll(async () => {

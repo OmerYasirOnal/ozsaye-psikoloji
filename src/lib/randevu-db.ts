@@ -67,7 +67,10 @@ export async function isRandevuRateLimited(ip: string): Promise<boolean> {
 
 /**
  * Bildirim e-postasının gönderileceği adresler. `expertSlug` doluysa yalnız o
- * uzmanın adresi; null ("farketmez") ise TÜM staff adresleri.
+ * uzmanın adresi; null ("farketmez") ise yalnız terapist rolündeki staff
+ * adresleri (`role = 'therapist'`). Klinisyen olmayan admin hesapları hasta
+ * verisi içeren bu bildirimi ALMAZ. Slug dalında ek rol filtresi gerekmez:
+ * adı verilen uzman zaten hastanın seçtiği bir terapisttir.
  *
  * Not: `site.email` (info@ozsaye.com) şu an placeholder olduğundan alıcılara
  * bilinçli olarak EKLENMEZ; gerçek info@ adresi cutover'da (Faz 3) buraya
@@ -81,7 +84,10 @@ export async function getBildirimAlicilari(
         .select({ email: staff.email })
         .from(staff)
         .where(eq(staff.expertSlug, expertSlug))
-    : await db.select({ email: staff.email }).from(staff);
+    : await db
+        .select({ email: staff.email })
+        .from(staff)
+        .where(eq(staff.role, "therapist"));
 
   return rows.map((r) => r.email);
 }

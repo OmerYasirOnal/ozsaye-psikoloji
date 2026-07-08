@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 // Teşekkür sayfası randevu formu başarıyla gönderildiğinde gösterilir
-// (public/randevu.php başarılı POST sonrası buraya yönlendirir).
+// (Server Action `randevuTalebiGonder` başarılı gönderim sonrası buraya yönlendirir).
 // Arama motorlarında dizine eklenmemeli: noindex.
 export const metadata: Metadata = {
   title: "Teşekkürler",
