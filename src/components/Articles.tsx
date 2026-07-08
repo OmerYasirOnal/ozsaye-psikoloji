@@ -2,8 +2,8 @@ import Link from "next/link";
 import ScrollReveal from "./ScrollReveal";
 import { getAllPosts, formatDateTR } from "@/lib/blog";
 
-export default function Articles() {
-  const articles = getAllPosts().slice(0, 3);
+export default async function Articles() {
+  const articles = (await getAllPosts()).slice(0, 3);
 
   if (articles.length === 0) return null;
 

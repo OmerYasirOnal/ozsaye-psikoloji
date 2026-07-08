@@ -12,9 +12,9 @@ export const dynamic = "force-static";
  * noindex sayfalar dahil edilmez: /randevu/tesekkurler (teşekkür sayfası),
  * /kvkk-aydinlatma-metni ve /gizlilik-politikasi (robots index:false).
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
   const lastBlog = posts[0]?.date ? new Date(posts[0].date) : lastModified;
 
   return [

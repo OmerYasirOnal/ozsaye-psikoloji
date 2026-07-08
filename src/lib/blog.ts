@@ -1,9 +1,8 @@
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
+import { desc, eq } from "drizzle-orm";
 import { marked } from "marked";
-
-const BLOG_DIR = path.join(process.cwd(), "content", "blog");
+import sanitizeHtml from "sanitize-html";
+import { db } from "@/lib/db";
+import { blogPosts, staff } from "@/lib/db/schema";
 
 export type PostMeta = {
   slug: string;
@@ -34,38 +33,59 @@ function readTimeFromText(text: string): string {
   return `${Math.max(1, Math.round(words / 200))} dk`;
 }
 
-function fileToMeta(file: string): { meta: PostMeta; content: string } | null {
-  const slug = file.replace(/\.md$/, "");
-  const raw = fs.readFileSync(path.join(BLOG_DIR, file), "utf8");
-  const { data, content } = matter(raw);
-  if (data.draft === true) return null; // taslaklar yayınlanmaz
-  const meta: PostMeta = {
-    slug,
-    title: String(data.title ?? slug),
-    date: String(data.date ?? ""),
-    excerpt: String(data.excerpt ?? ""),
-    category: String(data.category ?? "Yazı"),
-    author: String(data.author ?? "Öz & Saye Psikoloji"),
-    tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-    readTime: readTimeFromText(content),
+const DEFAULT_AUTHOR = "Öz & Saye Psikoloji";
+
+type Row = typeof blogPosts.$inferSelect & { authorName: string | null };
+
+function rowToMeta(r: Row): PostMeta {
+  return {
+    slug: r.slug,
+    title: r.title,
+    date: r.publishedAt ? r.publishedAt.toISOString().slice(0, 10) : "",
+    excerpt: r.excerpt ?? "",
+    category: r.category,
+    author: r.authorName ?? DEFAULT_AUTHOR,
+    tags: r.tags ?? [],
+    readTime: readTimeFromText(r.bodyMarkdown),
   };
-  return { meta, content };
 }
 
-export function getAllPosts(): PostMeta[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
-  return fs
-    .readdirSync(BLOG_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map(fileToMeta)
-    .filter((x): x is { meta: PostMeta; content: string } => x !== null)
-    .map((x) => x.meta)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+const baseSelect = () =>
+  db
+    .select({ post: blogPosts, authorName: staff.name })
+    .from(blogPosts)
+    .leftJoin(staff, eq(blogPosts.authorStaffId, staff.id));
+
+export async function getAllPosts(): Promise<PostMeta[]> {
+  const rows = await baseSelect()
+    .where(eq(blogPosts.status, "published"))
+    .orderBy(desc(blogPosts.publishedAt));
+  return rows.map(({ post, authorName }) => rowToMeta({ ...post, authorName }));
 }
 
-export function getPostBySlug(slug: string): Post | null {
-  const res = fileToMeta(`${slug}.md`);
-  if (!res) return null;
-  const html = marked.parse(res.content, { async: false }) as string;
-  return { ...res.meta, html };
+/** marked çıktısını süz: staff girdisi güvenilir olsa da panelde stored-XSS'e
+ *  karşı savunma katmanı (allowlist; img http(s)/kök-göreli src). Saf fonksiyon,
+ *  DB'ye dokunmaz — birim testi bunu içe aktarabilir. */
+export function renderMarkdown(md: string): string {
+  const raw = marked.parse(md, { async: false }) as string;
+  return sanitizeHtml(raw, {
+    allowedTags: [...sanitizeHtml.defaults.allowedTags, "img", "h1", "h2"],
+    allowedAttributes: {
+      a: ["href", "title"],
+      img: ["src", "alt", "title", "width", "height"],
+    },
+    allowedSchemes: ["https", "http"],
+    allowedSchemesAppliedToAttributes: ["href", "src"],
+    allowProtocolRelative: false,
+  });
+}
+
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const rows = await baseSelect().where(eq(blogPosts.slug, slug)).limit(1);
+  const row = rows[0];
+  if (!row || row.post.status !== "published") return null;
+  return {
+    ...rowToMeta({ ...row.post, authorName: row.authorName }),
+    html: renderMarkdown(row.post.bodyMarkdown),
+  };
 }

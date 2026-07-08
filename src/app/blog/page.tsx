@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogIndexPage() {
-  const posts = getAllPosts();
+export default async function BlogIndexPage() {
+  const posts = await getAllPosts();
 
   return (
     <main id="icerik" className="bg-cream pt-32 pb-24 lg:pt-40">
