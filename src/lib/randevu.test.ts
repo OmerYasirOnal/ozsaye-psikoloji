@@ -88,6 +88,15 @@ describe("randevuSchema — telefon (regex ^[0-9\\s\\-+()]{10,20}$)", () => {
     ).toBe(true);
   });
 
+  test("20 karakter (üst sınır) geçerli", () => {
+    expect(
+      randevuSchema.safeParse({
+        ...gecerliGirdi(),
+        telefon: "12345678901234567890",
+      }).success,
+    ).toBe(true);
+  });
+
   test("'abc' reddedilir", () => {
     expect(ilkHata({ ...gecerliGirdi(), telefon: "abc" })).toBe(
       "Lütfen geçerli bir telefon numarası girin.",
