@@ -17,7 +17,7 @@
 
 # FAZ 3a — Cutover Hazırlığı (kod; hesap gerektirmez)
 
-### 3a-T1: Kök hata sınırı (Türkçe `error.tsx` + `global-error.tsx`)
+### Task 1: (3a-T1) Kök hata sınırı (Türkçe `error.tsx` + `global-error.tsx`)
 
 **Neden:** Bağımsız review'lar iki kez işaret etti — uygulamada hiçbir `error.tsx` yok; DB kesintisi/beklenmedik hata Next'in İngilizce jenerik hata sayfasını gösteriyor. Randevu action'ı (`createAppointmentRequest`) bilinçli olarak try/catch'siz; prod'da geçici bir DB hıçkırığı hastaya İngilizce çökme sayfası gösterir.
 
@@ -29,7 +29,7 @@
 
 ---
 
-### 3a-T2: KVKK aydınlatma + gizlilik metinlerini randevu-verisi gerçekliğine güncelle
+### Task 2: (3a-T2) KVKK aydınlatma + gizlilik metinlerini randevu-verisi gerçekliğine güncelle
 
 **Neden:** Form artık hasta kişisel verisini (ad/telefon/e-posta/mesaj + KVKK rızası) DB'ye yazıyor. Mevcut metinler (statik-PHP dönemi) bunu yansıtmıyor. Cutover'da yeni form prod'a çıkmadan önce metinler FİİLİ işlemeyi doğru anlatmalı.
 
@@ -44,7 +44,7 @@
 
 ---
 
-### 3a-T3: Birikmiş sertleştirmeler + KVKK saklama-temizlik script'i
+### Task 3: (3a-T3) Birikmiş sertleştirmeler + KVKK saklama-temizlik script'i
 
 **Files:** Modify: `src/lib/randevu.ts` (ad üst sınır), `src/app/panel/(protected)/blog/actions.ts` (blog başlık/içerik üst sınır), `src/lib/randevu-db.ts` (boş-alıcı fallback) · Create: `scripts/purge-old-requests.ts` + `src/lib/randevu-db.ts`'e `purgeOldRequests(gunSayisi)` (TDD).
 
@@ -55,7 +55,7 @@
 
 ---
 
-### 3a-T4: Vercel/Neon hazırlık dokümanı + production smoke + final
+### Task 4: (3a-T4) Vercel/Neon hazırlık dokümanı + production smoke + final
 
 **Files:** Create: `docs/vercel-deploy-rehberi.md` · Modify: `.env.local.example` (prod env yorumları).
 
