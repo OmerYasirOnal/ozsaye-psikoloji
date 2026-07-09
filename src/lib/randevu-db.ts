@@ -101,6 +101,12 @@ export async function getBildirimAlicilari(
   return getTerapistEpostalari();
 }
 
+/**
+ * KVKK saklama-süresi varsayılanı (gün). Gerçek süre klinik/hukuk netleşince
+ * `PURGE_OLD_REQUESTS_DAYS` env'i ile ayarlanır; cron route bunu taban alır.
+ */
+export const DEFAULT_PURGE_DAYS = 365;
+
 export async function purgeOldRequests(
   gunSayisi: number,
   database: DeleteExecutor = db,
