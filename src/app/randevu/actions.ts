@@ -17,7 +17,7 @@ import {
   getBildirimAlicilari,
   isRandevuRateLimited,
 } from "@/lib/randevu-db";
-import { sendAppointmentNotification } from "@/lib/email/send";
+import { sendAppointmentNotification, sendHastaOnayi } from "@/lib/email/send";
 
 export type RandevuFormState = { hata?: string };
 
@@ -93,6 +93,19 @@ export async function randevuTalebiGonder(
     });
   } catch (e) {
     console.error("[randevu] bildirim gönderilemedi:", e);
+  }
+
+  // 6b. Hastaya "talebiniz alındı" onay e-postası — KENDİ try/catch'i. Uzman
+  //     bildiriminden BAĞIMSIZ ve ONDAN SONRA: onay maili başarısız olsa bile
+  //     (a) talep DB'de kalıcıdır, (b) uzman bildirimi zaten gönderildi,
+  //     (c) akış bozulmaz ve uzman bildirimi YİNELENMEZ. KVKK: bu yalnız
+  //     talep-işleme amaçlı işlem bildirimidir (rıza formda alınıyor);
+  //     pazarlama içeriği yok. (Honeypot dalı 1. adımda döndüğünden bota mail
+  //     gitmez.)
+  try {
+    await sendHastaOnayi(girdi.email, girdi.ad);
+  } catch (e) {
+    console.error("[randevu] hasta onay e-postası gönderilemedi:", e);
   }
 
   // 7. Teşekkür sayfasına yönlendir — ASLA try/catch içinde değil

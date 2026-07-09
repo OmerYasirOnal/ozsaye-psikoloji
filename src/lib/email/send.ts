@@ -1,6 +1,10 @@
 import "server-only";
+import { KLINIK_KUTU, bildirimAlicilari, hastaOnayiMetni } from "./bildirim";
 
 const FROM = "Öz & Saye <randevu@bildirim.ozsaye.com>";
+// KLINIK_KUTU (info@ozsaye.com) SAF `./bildirim` modülünde tanımlıdır — hem
+// alıcı hesaplama (bildirimAlicilari) hem hasta onayı Reply-To'su onu kullanır;
+// oraya konması düz Vitest'te (server-only'siz) birim-test edilebilmesi içindir.
 
 export async function sendMagicLink(email: string, url: string): Promise<void> {
   const key = process.env.RESEND_API_KEY;
@@ -46,15 +50,17 @@ export async function sendAppointmentNotification(
     tarihDamgasi: string;
   },
 ): Promise<void> {
-  // Alıcı yoksa gönderilecek bir şey yok: prod yolu 422 döndürürdü, dev konsol
-  // yolu ise kimseye "başarılı" gibi görünen satır basardı. Erken dön + görünür
-  // uyarı bas ki hata dev loglarında da fark edilsin (staff tablosu boş vb.).
+  // Uzman adreslerine klinik kutusunu (info@) ekle + tekilleştir. info@ HER
+  // ZAMAN eklendiğinden alıcı listesi artık hiçbir zaman boş olmaz (prod'un
+  // eski 422'si ortadan kalkar). Ancak uzman listesinin boş gelmesi hâlâ bir
+  // yanlış-yapılandırma işaretidir → görünür uyarı bas; kopya yine de info@'ya
+  // gider, talep bildirimsiz kalmaz.
   if (to.length === 0) {
     console.error(
-      "[randevu] bildirim alıcısı yok — staff tablosunu kontrol edin",
+      "[randevu] uzman bildirim alıcısı yok — staff tablosunu kontrol edin; kopya yine info@'ya gidiyor",
     );
-    return;
   }
+  const alicilar = bildirimAlicilari(to);
 
   const key = process.env.RESEND_API_KEY;
 
@@ -76,7 +82,7 @@ export async function sendAppointmentNotification(
   // Dev: anahtar yoksa konsola bas (gerçek e-posta gerekmez)
   if (!key) {
     console.log(
-      `\n[DEV randevu-bildirim] → ${to.join(", ")}\n${subject}\n${body}\n`,
+      `\n[DEV randevu-bildirim] → ${alicilar.join(", ")}\n${subject}\n${body}\n`,
     );
     return;
   }
@@ -89,11 +95,57 @@ export async function sendAppointmentNotification(
     },
     body: JSON.stringify({
       from: FROM,
-      to,
+      to: alicilar,
       reply_to: replyTo,
       subject,
       // Düz metin: enjeksiyon yüzeyi bırakmamak için html değil text.
       text: body,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Resend hata: ${res.status} ${await res.text()}`);
+  }
+}
+
+/**
+ * Hastaya "randevu talebiniz alındı" onay e-postası. Reply-To = klinik kutusu
+ * (info@) → hastanın yanıtı paylaşımlı kutuya düşer. İçerik SAF
+ * `hastaOnayiMetni`'nden gelir: ilk ad dışında hasta verisi yankılanmaz,
+ * telefon/adres ([DOLDUR]) sızdırılmaz.
+ *
+ * KVKK: yalnız talep-işleme amaçlı işlem bildirimidir (rıza formda alınıyor);
+ * pazarlama içeriği eklenmez.
+ */
+export async function sendHastaOnayi(
+  hastaEmail: string,
+  hastaAd: string,
+): Promise<void> {
+  const key = process.env.RESEND_API_KEY;
+  const { subject, text } = hastaOnayiMetni(hastaAd);
+
+  // Dev: anahtar yoksa konsola bas (gerçek e-posta gerekmez)
+  if (!key) {
+    console.log(
+      `\n[DEV randevu-hasta-onayi] → ${hastaEmail}\n${subject}\n${text}\n`,
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM,
+      to: hastaEmail,
+      // Yanıtlar kliniğin ortak kutusuna (info@) düşsün.
+      reply_to: KLINIK_KUTU,
+      subject,
+      // Düz metin: enjeksiyon yüzeyi bırakmamak için html değil text.
+      text,
     }),
   });
 
