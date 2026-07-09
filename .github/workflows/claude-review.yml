@@ -4,12 +4,12 @@ name: Claude PR Review
 # değişiklikleri inceler ve bulgularını PR'a yorum olarak ekler.
 # scripts/review.sh ile aynı amaca hizmet eder; bu sürüm CI'da otomatik çalışır.
 #
-# DURUM (2026-07-09): Bu job şu an KIRIK — action, kimlik bilgisi
-# (ANTHROPIC_API_KEY / CLAUDE_CODE_OAUTH_TOKEN / OIDC federation env'leri)
-# tanımlı olmadığından diff'e hiç bakmadan düşüyor. PR'lardaki kırmızı
-# "review" check'i kod bulgusu DEĞİLDİR ve merge'i bloke etmez (gerçek kapı
-# lint-build). Düzeltmek için repo secret'ı gerekir; o zamana dek bağımsız
-# review oturum içi sıfır-bağlamlı subagent'la yürütülür (bkz. CLAUDE.md).
+# DURUM (2026-07-09): Bu job İŞLEVSİZ — kimlik bilgisi (ANTHROPIC_API_KEY /
+# CLAUDE_CODE_OAUTH_TOKEN / OIDC federation env'leri) tanımlı değil; action
+# sürümüne göre koşu kırmızı DÜŞEBİLİR ya da hiç inceleme yapmadan SESSİZCE
+# YEŞİL geçebilir (yeşil check "review yapıldı" demek DEĞİLDİR). Gerçek merge
+# kapısı lint-build. Düzeltmek için repo secret'ı gerekir; o zamana dek
+# bağımsız review oturum içi sıfır-bağlamlı subagent'la yürütülür (CLAUDE.md).
 
 on:
   pull_request:
