@@ -152,10 +152,10 @@ export const site: Site = {
   },
 
   email: {
-    // TODO: GERÇEK VERİ -- iletişim e-postası (ör. "info@ozsaye.com")
-    address: "[DOLDUR] info@ozsaye.com",
-    // TODO: GERÇEK VERİ -- mailto bağlantısı (ör. "mailto:info@ozsaye.com")
-    href: "[DOLDUR] mailto:info@ozsaye.com",
+    // GERÇEK VERİ (2026-07-09): kliniğin kurumsal kutusu — M365 üzerinde canlı,
+    // teslim testi yapıldı; klinik ekibi kutuyu aktif kullanıyor.
+    address: "info@ozsaye.com",
+    href: "mailto:info@ozsaye.com",
   },
 
   address: {
@@ -194,8 +194,8 @@ export const site: Site = {
   ],
 
   social: {
-    // TODO: GERÇEK VERİ -- Instagram profil tam URL'i (ör. "https://www.instagram.com/ozsayepsikoloji")
-    instagram: undefined,
+    // GERÇEK VERİ (2026-07-09): kliniğin İşletme hesabı (Meta Accounts Center'da doğrulandı).
+    instagram: "https://www.instagram.com/ozsayepsikoloji",
     // TODO: GERÇEK VERİ -- LinkedIn şirket/profil tam URL'i (ör. "https://www.linkedin.com/company/ozsaye-psikoloji")
     linkedin: undefined,
   },

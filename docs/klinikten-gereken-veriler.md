@@ -25,8 +25,8 @@ NAP tutarlılığı yerel SEO'nun temelidir: aynı isim/adres/telefon biçimi si
 - [ ] **href** — örn: `"tel:+902121234567"`
 
 ### E-posta → `site.email`
-- [ ] **address** — örn: `"iletisim@ozsayepsikoloji.com"`
-- [ ] **href** — örn: `"mailto:iletisim@ozsayepsikoloji.com"`
+- [x] **address** — `"info@ozsaye.com"` (GİRİLDİ 2026-07-09: kliniğin M365 kutusu; canlı mail teslimiyle doğrulandı)
+- [x] **href** — `"mailto:info@ozsaye.com"` (GİRİLDİ 2026-07-09)
 
 ### Adres → `site.address`
 - [ ] **streetAddress** (cadde/sokak + no) — örn: `"Atatürk Cad. No: 12 Kat: 3"`
@@ -56,7 +56,7 @@ Her gün grubu için bir nesne. `days` schema.org gün kodları kullanır: `Mo, 
 ## 2. Sosyal Medya → `site.social`
 
 Tam URL girin (yarım/handle değil). Hesap yoksa alanı `undefined` bırakın — boş string vermeyin.
-- [ ] **instagram** — örn: `"https://www.instagram.com/ozsayepsikoloji"`
+- [x] **instagram** — `"https://www.instagram.com/ozsayepsikoloji"` (GİRİLDİ 2026-07-09: kliniğin İşletme hesabı, Meta Accounts Center'da doğrulandı)
 - [ ] **linkedin** — örn: `"https://www.linkedin.com/company/ozsaye-psikoloji"`
 
 ---
