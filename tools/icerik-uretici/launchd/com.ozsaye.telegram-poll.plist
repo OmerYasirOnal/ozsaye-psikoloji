@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Öz & Saye — Telegram onay dokunuşlarını yoklayan launchd job'u (her 120 sn).
+  Kurulum/kaldırma ve yol düzenleme: tools/icerik-uretici/README.md → "launchd".
+  Yollar bu makinedeki checkout'a (/Users/omeryasironal/Projects/özsaye_psikoloji)
+  ve Homebrew node'una (/opt/homebrew/bin/node) göredir — farklıysa düzenleyin.
+  Log dizini önceden var olmalı:  mkdir -p loglar   (loglar/ .gitignore'dadır)
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ozsaye.telegram-poll</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/node</string>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/tools/icerik-uretici/telegram-bot.cjs</string>
+    <string>poll</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji</string>
+  <key>StartInterval</key><integer>120</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/telegram-poll.log</string>
+  <key>StandardErrorPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/telegram-poll.log</string>
+</dict>
+</plist>

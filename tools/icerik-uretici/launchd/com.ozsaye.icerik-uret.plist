@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Öz & Saye — günlük içerik üretimi + Telegram bildirimi (her gün 09:30).
+  uret-ve-bildir.sh: index.cjs (üret) → telegram-bot.cjs notify --hepsi (bildir).
+  Kurulum/kaldırma: tools/icerik-uretici/README.md → "launchd".
+  Yollar bu makinedeki checkout'a göredir — farklıysa düzenleyin.
+  RunAtLoad YOK (yalnız planlı 09:30; yükleme anında üretim tetiklenmesin).
+  Log dizini önceden var olmalı:  mkdir -p loglar
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ozsaye.icerik-uret</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/tools/icerik-uretici/launchd/uret-ve-bildir.sh</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>9</integer>
+    <key>Minute</key><integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/icerik-uret.log</string>
+  <key>StandardErrorPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/icerik-uret.log</string>
+</dict>
+</plist>
