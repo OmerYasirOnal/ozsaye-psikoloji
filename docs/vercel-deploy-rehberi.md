@@ -1,5 +1,14 @@
 # Vercel / Neon Cutover Teknik Rehberi
 
+> **DURUM (2026-07-09): CUTOVER TAMAMLANDI.** Bu rehberdeki adımlar uygulandı
+> ve uçtan uca doğrulandı: `ozsaye.com` Vercel'de canlı (proje
+> `ozsaye-psikoloji`), Neon `ozsaye-prod` (Frankfurt, pooled) migrate+seed
+> edildi, Resend `bildirim.ozsaye.com` (eu-west-1) verified, Blob bağlı,
+> KVKK cron canlı test edildi, MX/M365 e-postası el değmeden mail teslimi
+> cutover sonrası kanıtlandı. Belge bundan sonra **as-built referans**tır
+> (rollback bölümü dahil güncelliğini korur). Not: repo Vercel Git
+> entegrasyonuna bağlı — **main'e merge otomatik production deploy'dur.**
+
 Bu rehber Faz 3b canlıya alma runbook'unun teknik ekidir. Amaç, GoDaddy'deki
 statik kopyadan Vercel'deki sunucu modlu Next.js uygulamasına geçerken web
 trafiğini taşımak; `info@ozsaye.com` e-postasını taşıyan MX kayıtlarına

@@ -17,6 +17,9 @@ const eslintConfig = defineConfig([
     "tools/**",
     // Gitignore'lu yerel build artefaktları (eski cPanel denemesi vb.).
     "deploy/**",
+    // Claude Code oturum artefaktları: subagent worktree'leri repo kopyası
+    // içerir — lint'lenirse yüzlerce sahte hata üretir (eslint .gitignore okumaz).
+    ".claude/**",
   ]),
 ]);
 
