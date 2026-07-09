@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { isReady, site } from "@/lib/site";
 
+// KLİNİK/HUKUK İNCELEMESİ GEREKLİ, go-live öncesi.
 const HENUZ_DOLDURULMADI = "[Yayından önce doldurulacak]";
 
 export const metadata: Metadata = {
@@ -174,7 +175,12 @@ export default function KvkkAydinlatmaMetniPage() {
                 {
                   baslik: "Randevu/talep bilgileri",
                   aciklama:
-                    "Randevu formunda paylaştığınız mesaj, tercih edilen tarih/saat ve görüşme nedenine ilişkin beyanlarınız.",
+                    "Tercih ettiğiniz uzman, tercih edilen tarih/saat, randevu formunda paylaştığınız mesaj ve görüşme nedenine ilişkin beyanlarınız.",
+                },
+                {
+                  baslik: "Rıza ve işlem kayıtları",
+                  aciklama:
+                    "KVKK onay kutusu ile verdiğiniz açık rıza kaydı, onayın verildiği zaman damgası ve başvurunun yapıldığı IP adresi.",
                 },
               ].map((item) => (
                 <li key={item.baslik} className="flex items-start gap-3">
@@ -213,6 +219,13 @@ export default function KvkkAydinlatmaMetniPage() {
                 görüşme sırasında uzmanınızla paylaşmanız önerilir.
               </p>
             </div>
+
+            <p className="mt-5 text-sm leading-relaxed text-forest-muted">
+              Randevu formu gönderildiğinde başvuru bilgileriniz ve açık rıza
+              kaydınız güvenli bir veritabanında tutulur. Bu kayıtlara erişim,
+              randevu talebini değerlendirmesi gereken yetkili uzmanlar ve
+              yetkilendirilmiş panel kullanıcıları ile sınırlıdır.
+            </p>
           </section>
 
           {/* 3 — İşleme Amaçları */}
@@ -229,6 +242,8 @@ export default function KvkkAydinlatmaMetniPage() {
             <ul className="mt-5 space-y-3">
               {[
                 "Randevu talebinizin alınması, değerlendirilmesi ve sizinle iletişime geçilmesi.",
+                "Tercih ettiğiniz uzmana veya uygun uzmanlara başvurunuzla ilgili bildirim iletilmesi.",
+                "Açık rıza onayınızın zaman ve IP damgasıyla kayıt altına alınması.",
                 "Psikolojik danışmanlık ve terapi hizmetlerinin planlanması ve sunulması.",
                 "Hizmet kalitesinin geliştirilmesi ve taleplerinizin yönetilmesi.",
                 "İlgili mevzuattan doğan yükümlülüklerin yerine getirilmesi.",
@@ -273,7 +288,9 @@ export default function KvkkAydinlatmaMetniPage() {
                 <strong className="font-semibold text-forest">açık rızanız</strong>{" "}
                 ile işlenir. Açık rızanızı dilediğiniz zaman geri alma hakkına
                 sahipsiniz; geri alma, geri alma tarihine kadar yapılmış işlemleri
-                etkilemez.
+                etkilemez. Randevu formunda verdiğiniz açık rıza, ispat ve
+                başvuru yönetimi amacıyla zaman damgası ve IP adresiyle birlikte
+                kayıt altına alınır.
               </p>
             </div>
           </section>
@@ -294,14 +311,19 @@ export default function KvkkAydinlatmaMetniPage() {
             <ul className="mt-5 space-y-3">
               {[
                 {
+                  baslik: "Yetkili uzmanlar ve panel kullanıcıları",
+                  aciklama:
+                    "Randevu talebinizin değerlendirilmesi ve size dönüş yapılması için yalnızca ilgili yetkili kişiler.",
+                },
+                {
                   baslik: "E-posta hizmet sağlayıcıları",
                   aciklama:
-                    "Randevu formu bildirimlerinin iletilmesi için kullanılan e-posta servis sağlayıcısı.",
+                    "Randevu formu bildirimlerinin ilgili uzmanlara iletilmesi için kullanılan e-posta servis sağlayıcısı.",
                 },
                 {
                   baslik: "Barındırma (hosting) hizmet sağlayıcıları",
                   aciklama:
-                    "Sitenin ve form verilerinin barındırıldığı altyapı/hosting hizmeti sağlayıcısı.",
+                    "Sitenin, panelin ve randevu veritabanının barındırıldığı altyapı/hosting hizmeti sağlayıcısı.",
                 },
                 {
                   baslik: "Yetkili kamu kurum ve kuruluşları",
@@ -343,6 +365,8 @@ export default function KvkkAydinlatmaMetniPage() {
               boyunca ve ilgili mevzuatta öngörülen saklama sürelerine uygun
               olarak muhafaza edilir. Sürelerin sona ermesinin ardından
               verileriniz silinir, yok edilir veya anonim hâle getirilir.
+              Randevu formu kayıtları; başvuru bilgileri, açık rıza zamanı ve IP
+              kaydı ile birlikte aşağıda belirlenecek süre boyunca saklanır.
             </p>
             <div
               role="note"

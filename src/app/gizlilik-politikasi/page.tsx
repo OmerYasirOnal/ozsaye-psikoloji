@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { isReady, site } from "@/lib/site";
 
+// KLİNİK/HUKUK İNCELEMESİ GEREKLİ, go-live öncesi.
 export const metadata: Metadata = {
   title: "Gizlilik Politikası",
   // TODO: GERÇEK VERİ -- politika hukuk onayından geçince bu açıklamayı gözden geçirin
@@ -101,7 +102,9 @@ export default function GizlilikPolitikasiPage() {
                 "Ad ve soyad",
                 "Telefon numarası",
                 "E-posta adresi",
+                "Tercih ettiğiniz uzman ve tercih edilen tarih",
                 "Form içinde bize ilettiğiniz mesaj / talep metni",
+                "KVKK açık rıza onayı, onayın zaman damgası ve başvurunun yapıldığı IP adresi",
               ]}
             />
             <p>
@@ -119,7 +122,9 @@ export default function GizlilikPolitikasiPage() {
             <List
               items={[
                 "Randevu talebinize geri dönüş yapmak ve görüşme planlamak",
+                "Başvurunuzu tercih ettiğiniz uzmana veya uygun uzmanlara yönlendirmek",
                 "Sorularınızı yanıtlamak ve sizi süreç hakkında bilgilendirmek",
+                "KVKK açık rıza kaydınızı zaman ve IP damgasıyla saklamak",
                 "Yasal yükümlülüklerimizi yerine getirmek",
               ]}
             />
@@ -153,9 +158,11 @@ export default function GizlilikPolitikasiPage() {
             <List
               items={[
                 // TODO: GERÇEK VERİ -- kullanılan e-posta sağlayıcısını kesinleştirip "ör." ifadesini netleştirin
-                "E-posta gönderimi: Form bildirimlerini iletmek için bir e-posta servis sağlayıcısı (ör. Resend) kullanılabilir.",
+                "E-posta gönderimi: Randevu bildirimlerini ilgili uzmanlara iletmek için bir e-posta servis sağlayıcısı (ör. Resend) kullanılabilir.",
                 // TODO: GERÇEK VERİ -- barındırma sağlayıcısını kesinleştirin
-                "Barındırma (hosting): Site ve form altyapısı bir bulut barındırma sağlayıcısında (ör. Vercel) barındırılabilir.",
+                "Barındırma (hosting): Site, panel ve form altyapısı bir bulut barındırma sağlayıcısında (ör. Vercel) barındırılabilir.",
+                // TODO: GERÇEK VERİ -- veritabanı sağlayıcısını kesinleştirin
+                "Veritabanı: Randevu talebi ve açık rıza kayıtları bir veritabanı sağlayıcısında (ör. Neon/Postgres) tutulabilir.",
               ]}
             />
             <p>
@@ -170,7 +177,10 @@ export default function GizlilikPolitikasiPage() {
             <p>
               Kişisel verilerinizi yetkisiz erişime, kayba veya kötüye kullanıma
               karşı korumak için makul teknik ve idari önlemler alırız. Verilerin
-              iletimi şifreli bağlantılar (HTTPS) üzerinden gerçekleşir. Bununla
+              iletimi şifreli bağlantılar (HTTPS) üzerinden gerçekleşir. Randevu
+              talepleri ve açık rıza kayıtları, yalnızca yetkili uzmanların ve
+              yetkilendirilmiş panel kullanıcılarının erişebileceği şekilde
+              sınırlandırılmış veritabanı kayıtları olarak tutulur. Bununla
               birlikte, internet üzerinden yapılan hiçbir aktarımın yüzde yüz
               güvenli olduğunu garanti edemeyeceğimizi hatırlatırız.
             </p>
@@ -182,8 +192,10 @@ export default function GizlilikPolitikasiPage() {
               Verilerinizi yalnızca toplanma amacının gerektirdiği süre boyunca
               veya yasal saklama yükümlülükleri kapsamında{" "}
               <span className="font-semibold">[DOLDUR] saklama süresi</span>{" "}
-              boyunca saklarız. Sürenin sonunda verileriniz güvenli biçimde
-              silinir veya anonim hâle getirilir.
+              boyunca saklarız. Bu kapsamda randevu talebi, tercih edilen uzman,
+              mesaj içeriği, açık rıza zamanı ve IP kaydı da aynı saklama
+              politikası içinde değerlendirilir. Sürenin sonunda verileriniz
+              güvenli biçimde silinir veya anonim hâle getirilir.
             </p>
           </Section>
 
