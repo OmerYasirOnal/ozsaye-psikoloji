@@ -3,8 +3,9 @@ import { UZMAN_SECENEKLERI, randevuSchema } from "./randevu";
 
 // Bu şema, statik-hosting dönemindeki `public/randevu.php` doğrulayıcısının
 // birebir aynasıdır. Hata metinleri üretimde kullanıcıya-görünür Türkçe
-// kopyadır (byte-byte eşleşmeli); kurallar: ad ≥2, telefon regex, geçerli
-// e-posta, uzman ∈ enum, mesaj ≤2000, KVKK zorunlu.
+// kopyadır; ek olarak kamusal endpoint'i sınırlamak için ad üst sınırı vardır.
+// Kurallar: 2≤ad≤120, telefon regex, geçerli e-posta, uzman ∈ enum,
+// mesaj ≤2000, KVKK zorunlu.
 
 // Tümü geçerli bir taban girdi; her test yalnız ilgili alanı geçersiz kılar,
 // böylece `issues[0]` deterministik olarak o alanın hatasını verir.
@@ -72,6 +73,12 @@ describe("randevuSchema — ad", () => {
   test("boş ad reddedilir: 'Lütfen adınızı girin.'", () => {
     expect(ilkHata({ ...gecerliGirdi(), ad: "" })).toBe(
       "Lütfen adınızı girin.",
+    );
+  });
+
+  test("121 karakter ad reddedilir", () => {
+    expect(ilkHata({ ...gecerliGirdi(), ad: "a".repeat(121) })).toBe(
+      "Ad soyad en fazla 120 karakter olabilir.",
     );
   });
 });

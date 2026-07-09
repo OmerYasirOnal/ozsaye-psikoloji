@@ -25,7 +25,11 @@ export const UZMAN_SECENEKLERI: Record<string, string> = {
 const TELEFON_RE = /^[0-9\s\-+()]{10,20}$/;
 
 export const randevuSchema = z.object({
-  ad: z.string().trim().min(2, "Lütfen adınızı girin."),
+  ad: z
+    .string()
+    .trim()
+    .min(2, "Lütfen adınızı girin.")
+    .max(120, "Ad soyad en fazla 120 karakter olabilir."),
   telefon: z
     .string()
     .regex(TELEFON_RE, "Lütfen geçerli bir telefon numarası girin."),

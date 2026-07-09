@@ -1,4 +1,4 @@
-import { and, count, eq, gt } from "drizzle-orm";
+import { and, count, eq, gt, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { appointmentRequests, staff } from "@/lib/db/schema";
 import type { RandevuGirdisi } from "@/lib/randevu";
@@ -65,12 +65,20 @@ export async function isRandevuRateLimited(ip: string): Promise<boolean> {
   return (rows[0]?.n ?? 0) >= RATE_LIMIT_MAX;
 }
 
+async function getTerapistEpostalari(): Promise<string[]> {
+  const rows = await db
+    .select({ email: staff.email })
+    .from(staff)
+    .where(eq(staff.role, "therapist"));
+  return rows.map((r) => r.email);
+}
+
 /**
- * Bildirim e-postasının gönderileceği adresler. `expertSlug` doluysa yalnız o
- * uzmanın adresi; null ("farketmez") ise yalnız terapist rolündeki staff
- * adresleri (`role = 'therapist'`). Klinisyen olmayan admin hesapları hasta
- * verisi içeren bu bildirimi ALMAZ. Slug dalında ek rol filtresi gerekmez:
- * adı verilen uzman zaten hastanın seçtiği bir terapisttir.
+ * Bildirim e-postasının gönderileceği adresler. `expertSlug` doluysa önce o
+ * uzman denenir; veri kayması nedeniyle eşleşme yoksa tüm terapistlere düşer.
+ * null ("farketmez") ise doğrudan yalnız terapist rolündeki staff adresleri
+ * (`role = 'therapist'`) döner. Klinisyen olmayan admin hesapları hasta verisi
+ * içeren bu bildirimi ALMAZ.
  *
  * Not: `site.email` (info@ozsaye.com) şu an placeholder olduğundan alıcılara
  * bilinçli olarak EKLENMEZ; gerçek info@ adresi cutover'da (Faz 3) buraya
@@ -79,15 +87,29 @@ export async function isRandevuRateLimited(ip: string): Promise<boolean> {
 export async function getBildirimAlicilari(
   expertSlug: string | null,
 ): Promise<string[]> {
-  const rows = expertSlug
-    ? await db
-        .select({ email: staff.email })
-        .from(staff)
-        .where(eq(staff.expertSlug, expertSlug))
-    : await db
-        .select({ email: staff.email })
-        .from(staff)
-        .where(eq(staff.role, "therapist"));
+  if (!expertSlug) return getTerapistEpostalari();
 
-  return rows.map((r) => r.email);
+  const rows = await db
+    .select({ email: staff.email })
+    .from(staff)
+    .where(eq(staff.expertSlug, expertSlug));
+
+  if (rows.length > 0) return rows.map((r) => r.email);
+
+  // Staff seed/prod verisi kayarsa hasta talebi sessizce bildirimsiz kalmasın.
+  return getTerapistEpostalari();
+}
+
+export async function purgeOldRequests(gunSayisi: number): Promise<number> {
+  if (!Number.isFinite(gunSayisi) || gunSayisi <= 0) {
+    throw new Error("gunSayisi pozitif bir sayı olmalı.");
+  }
+
+  const cutoff = new Date(Date.now() - gunSayisi * 24 * 60 * 60 * 1000);
+  const deleted = await db
+    .delete(appointmentRequests)
+    .where(lt(appointmentRequests.createdAt, cutoff))
+    .returning({ id: appointmentRequests.id });
+
+  return deleted.length;
 }
