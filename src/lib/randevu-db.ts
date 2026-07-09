@@ -15,6 +15,7 @@ import type { RandevuGirdisi } from "@/lib/randevu";
 // (magic-token limiter deseni: count() + gt(createdAt, ...).)
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000; // 30 dk
+type DeleteExecutor = Pick<typeof db, "delete">;
 
 /**
  * Doğrulanmış girdiyi `appointment_requests`'e yazar ve yeni satırın id'sini
@@ -100,13 +101,16 @@ export async function getBildirimAlicilari(
   return getTerapistEpostalari();
 }
 
-export async function purgeOldRequests(gunSayisi: number): Promise<number> {
+export async function purgeOldRequests(
+  gunSayisi: number,
+  database: DeleteExecutor = db,
+): Promise<number> {
   if (!Number.isFinite(gunSayisi) || gunSayisi <= 0) {
     throw new Error("gunSayisi pozitif bir sayı olmalı.");
   }
 
   const cutoff = new Date(Date.now() - gunSayisi * 24 * 60 * 60 * 1000);
-  const deleted = await db
+  const deleted = await database
     .delete(appointmentRequests)
     .where(lt(appointmentRequests.createdAt, cutoff))
     .returning({ id: appointmentRequests.id });

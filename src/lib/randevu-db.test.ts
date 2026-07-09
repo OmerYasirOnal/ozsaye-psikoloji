@@ -153,54 +153,50 @@ test("purgeOldRequests: yalnız eşikten eski randevu taleplerini siler", async 
   const ts = Date.now();
   const eskiIp = `purge-old-${ts}`;
   const yeniIp = `purge-new-${ts}`;
-  const eski = await db
-    .insert(appointmentRequests)
-    .values({
-      patientName: "Eski Kayıt",
-      patientPhone: "0555 111 22 33",
-      patientEmail: `eski-${ts}@example.com`,
-      preferredNote: "test",
-      kvkkConsent: true,
-      consentAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
-      consentIp: eskiIp,
-      createdAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
-    })
-    .returning({ id: appointmentRequests.id });
-  const yeni = await db
-    .insert(appointmentRequests)
-    .values({
-      patientName: "Yeni Kayıt",
-      patientPhone: "0555 111 22 44",
-      patientEmail: `yeni-${ts}@example.com`,
-      preferredNote: "test",
-      kvkkConsent: true,
-      consentAt: new Date(),
-      consentIp: yeniIp,
-    })
-    .returning({ id: appointmentRequests.id });
+  await expect(
+    db.transaction(async (tx) => {
+      const eski = await tx
+        .insert(appointmentRequests)
+        .values({
+          patientName: "Eski Kayıt",
+          patientPhone: "0555 111 22 33",
+          patientEmail: `eski-${ts}@example.com`,
+          preferredNote: "test",
+          kvkkConsent: true,
+          consentAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
+          consentIp: eskiIp,
+          createdAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
+        })
+        .returning({ id: appointmentRequests.id });
+      const yeni = await tx
+        .insert(appointmentRequests)
+        .values({
+          patientName: "Yeni Kayıt",
+          patientPhone: "0555 111 22 44",
+          patientEmail: `yeni-${ts}@example.com`,
+          preferredNote: "test",
+          kvkkConsent: true,
+          consentAt: new Date(),
+          consentIp: yeniIp,
+        })
+        .returning({ id: appointmentRequests.id });
 
-  try {
-    expect(await purgeOldRequests(365)).toBe(1);
+      expect(await purgeOldRequests(365, tx)).toBe(1);
 
-    const eskiRows = await db
-      .select({ id: appointmentRequests.id })
-      .from(appointmentRequests)
-      .where(eq(appointmentRequests.id, eski[0].id));
-    const yeniRows = await db
-      .select({ id: appointmentRequests.id })
-      .from(appointmentRequests)
-      .where(eq(appointmentRequests.id, yeni[0].id));
+      const eskiRows = await tx
+        .select({ id: appointmentRequests.id })
+        .from(appointmentRequests)
+        .where(eq(appointmentRequests.id, eski[0].id));
+      const yeniRows = await tx
+        .select({ id: appointmentRequests.id })
+        .from(appointmentRequests)
+        .where(eq(appointmentRequests.id, yeni[0].id));
 
-    expect(eskiRows).toEqual([]);
-    expect(yeniRows).toEqual([{ id: yeni[0].id }]);
-  } finally {
-    await db
-      .delete(appointmentRequests)
-      .where(eq(appointmentRequests.id, eski[0].id));
-    await db
-      .delete(appointmentRequests)
-      .where(eq(appointmentRequests.id, yeni[0].id));
-  }
+      expect(eskiRows).toEqual([]);
+      expect(yeniRows).toEqual([{ id: yeni[0].id }]);
+      throw new Error("ROLLBACK_PURGE_TEST");
+    }),
+  ).rejects.toThrow("ROLLBACK_PURGE_TEST");
 });
 
 afterAll(async () => {

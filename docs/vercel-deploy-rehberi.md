@@ -135,6 +135,8 @@ kaydı tekrar Vercel'e çevrilir.
 
 - `.github/workflows/deploy-godaddy.yml` emekli edilir.
 - `docs/godaddy-deploy-rehberi.md` arşiv/legacy olarak işaretlenir.
-- KVKK saklama süresi klinik/hukuk tarafından netleşince Vercel Cron,
-  `scripts/purge-old-requests.ts` çalıştıracak şekilde bağlanır.
+- KVKK saklama süresi klinik/hukuk tarafından netleşince Vercel Cron için
+  `purgeOldRequests`'i çağıran, `CRON_SECRET` benzeri bir başlıkla korunan route
+  handler eklenir. Vercel Cron doğrudan repo içindeki `tsx` script'ini değil,
+  deployment üzerindeki HTTP path'ini çağırır.
 - Gerçek NAP/uzman verileri girilmeden `site.dataReady=true` yapılmaz.
