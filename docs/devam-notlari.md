@@ -30,8 +30,8 @@
 - [ ] **Fiyatların netleştirilmesi:** `teklif-ve-yapilanlar.md` içindeki rakamlar
       "öneri" olarak işaretli (kurulum 20.000 TL; aylık 4.000/7.000/12.000 TL).
       Müşteriyle son rakam belirlenince doküman güncellenecek.
-- [ ] **Instagram handle teyidi:** `@ozsayepsikoloji` varsayıldı; gerçek hesap
-      farklıysa doküman + (ileride) `Footer`/`Contact` linkleri düzeltilecek.
+- [x] **Instagram handle teyidi:** `@ozsayepsikoloji` DOĞRULANDI (2026-07-09,
+      Meta Accounts Center) ve `site.social.instagram`'a girildi — Footer linki canlı.
 
 ---
 
