@@ -146,8 +146,11 @@ kaydı tekrar Vercel'e çevrilir.
 - KVKK saklama-temizliği Vercel Cron ile otomatiktir. Route:
   `/api/cron/purge-requests` (`src/app/api/cron/purge-requests/route.ts`,
   `force-dynamic`). Cron programı `vercel.json` içinde tanımlıdır:
-  `{ "crons": [{ "path": "/api/cron/purge-requests", "schedule": "0 3 * * *" }] }`
-  — her gün 03:00 UTC. Yalnız deploy sonrası Vercel'de etkinleşir.
+  `{ "crons": [{ "path": "/api/cron/purge-requests/", "schedule": "0 3 * * *" }] }`
+  — her gün 03:00 UTC. Yalnız deploy sonrası Vercel'de etkinleşir. **Path'teki
+  sondaki `/` zorunlu:** `next.config.ts` `trailingSlash: true` olduğundan
+  slash'sız path 308 redirect'e düşer, Vercel Cron redirect izlemez → temizlik
+  hiç çalışmazdı.
   - Kimlik: Vercel Cron, `CRON_SECRET` env'i ayarlıysa çağrıya otomatik
     `Authorization: Bearer ${CRON_SECRET}` başlığı ekler; route bunu doğrular.
     `CRON_SECRET` **zorunludur** — yoksa/boşsa route 401 (fail-closed) döner ve

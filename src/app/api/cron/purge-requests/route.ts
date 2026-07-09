@@ -1,4 +1,5 @@
-import { purgeOldRequests } from "@/lib/randevu-db";
+import { timingSafeEqual } from "node:crypto";
+import { purgeOldRequests, DEFAULT_PURGE_DAYS } from "@/lib/randevu-db";
 
 /**
  * KVKK saklama-süresi temizliği — Vercel Cron uç noktası.
@@ -9,26 +10,25 @@ import { purgeOldRequests } from "@/lib/randevu-db";
  * Vercel Cron'un otomatik `Authorization: Bearer ${CRON_SECRET}` başlığıdır.
  *
  * Env okuyup istek anında DB'ye yazdığı için asla statik üretilmemeli.
+ *
+ * DİKKAT: `vercel.json`'daki cron path'i sondaki `/` ile yazılır çünkü
+ * `next.config.ts` `trailingSlash: true` kullanır — slash'sız `/api/cron/...`
+ * 308 redirect'e düşer ve Vercel Cron redirect izlemediğinden temizlik hiç
+ * çalışmaz. Path ile bu route'un kanonik URL'i birebir aynı olmalı.
  */
 export const dynamic = "force-dynamic";
 
-// Saklama eşiği env'de tanımlı değilse varsayılan (scripts/purge-old-requests.ts
-// ile aynı): 365 gün. Gerçek süre klinik/hukuk netleşince env'den ayarlanır.
-const DEFAULT_DAYS = 365;
-
 /**
- * Uzunluk-korumalı, sabit-zamanlıya yakın karşılaştırma. Erken length kısa
- * devresi yalnız uzunluğu sızdırır (gizli değeri değil) ve eşit uzunlukta
- * baytları XOR ile tam tarayarak erken-çıkış zamanlama sızıntısını önler. Secret
- * yüksek entropili (openssl rand) olduğundan bu, brute-force'a karşı yeterli.
+ * Uzunluk-korumalı sabit-zamanlı karşılaştırma. `node:crypto.timingSafeEqual`
+ * eşit uzunlukta Buffer ister (aksi halde fırlatır); bu yüzden önce uzunluğu
+ * kontrol ederiz. Erken uzunluk kısa-devresi yalnız uzunluğu sızdırır
+ * (yüksek-entropili secret için önemsiz), gizli değeri değil.
  */
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return diff === 0;
+function guvenliEsit(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
 }
 
 export async function GET(request: Request) {
@@ -42,15 +42,15 @@ export async function GET(request: Request) {
   }
 
   const authorization = request.headers.get("authorization") ?? "";
-  if (!timingSafeEqual(authorization, `Bearer ${secret}`)) {
+  if (!guvenliEsit(authorization, `Bearer ${secret}`)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // Gün kaynağı: PURGE_OLD_REQUESTS_DAYS; boş/tanımsızsa DEFAULT_DAYS.
+  // Gün kaynağı: PURGE_OLD_REQUESTS_DAYS; boş/tanımsızsa DEFAULT_PURGE_DAYS.
   // purgeOldRequests da pozitif-tamsayı guard'ı taşır; burada ön-doğrulayıp
   // yakalanmayan throw yerine temiz bir 400 döndürürüz.
   const raw = process.env.PURGE_OLD_REQUESTS_DAYS?.trim();
-  let days = DEFAULT_DAYS;
+  let days = DEFAULT_PURGE_DAYS;
   if (raw) {
     const parsed = Number(raw);
     if (!Number.isInteger(parsed) || parsed <= 0) {
