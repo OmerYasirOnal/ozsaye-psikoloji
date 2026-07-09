@@ -1,5 +1,11 @@
 # GoDaddy'ye Deploy Rehberi (Özsaye Psikoloji)
 
+> **ARŞİV / LEGACY (2026-07-09):** Bu rehber statik-export + GoDaddy FTP
+> dönemine aittir ve **artık geçerli değildir**. Site 2026-07-09 cutover'ıyla
+> **Vercel'e taşındı** (`ozsaye.com` canlı; DNS GoDaddy'de kaldı, yalnız web
+> kayıtları Vercel'i gösterir, MX/M365 e-postasına dokunulmadı). Güncel deploy:
+> `docs/vercel-deploy-rehberi.md`. Bu belge yalnız tarihsel referans için tutulur.
+
 Bu site **Next.js 16** ile yazıldı ama tamamen **statik** (tek sayfa, sunucu
 tarafı kod / veritabanı yok). Bu yüzden GoDaddy'nin WordPress/paylaşımlı
 (Apache + PHP) hostingine **Node.js gerektirmeden** yüklenebilir.

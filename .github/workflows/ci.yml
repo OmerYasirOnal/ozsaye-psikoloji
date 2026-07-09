@@ -4,8 +4,8 @@ name: CI (Lint & Build)
 # kurar, lint çalıştırır ve sunucu modunda build alır (Faz 0'dan beri
 # statik export değil — bkz. next.config.ts). Böylece bozuk/çakışan
 # değişiklikler merge edilmeden önce yakalanır.
-# (Deploy ayrı bir workflow'dadır: deploy-godaddy.yml — Faz 3 cutover'da
-# Vercel'e geçince emekli olacak.)
+# (Production deploy GitHub Actions'ta DEĞİL: repo Vercel Git
+# entegrasyonuna bağlı — main'e merge otomatik deploy tetikler.)
 
 on:
   pull_request:

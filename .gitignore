@@ -61,3 +61,6 @@ review-rapor.md.log
 
 # Sürekli review/geliştirme döngüsü çıktıları (review-loop.sh / improve-loop.sh)
 /loglar/
+
+# Claude Code oturum artefaktları (subagent worktree'leri vb.)
+/.claude/
