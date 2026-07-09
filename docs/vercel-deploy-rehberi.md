@@ -104,7 +104,7 @@ ortamı için uygundur.
 Vercel projesine `ozsaye.com` ve `www.ozsaye.com` domain'leri eklenir. Vercel'in
 gösterdiği kayıtlar GoDaddy DNS'e uygulanır:
 
-- `@` için Vercel A kaydı: genellikle `76.76.21.21`
+- `@` için Vercel panelinin domain ekranında gösterdiği güncel A kaydı
 - `www` için Vercel CNAME kaydı: Vercel'in gösterdiği hedef
 
 Değiştirilmeyecek kayıtlar:
@@ -139,4 +139,7 @@ kaydı tekrar Vercel'e çevrilir.
   `purgeOldRequests`'i çağıran, `CRON_SECRET` benzeri bir başlıkla korunan route
   handler eklenir. Vercel Cron doğrudan repo içindeki `tsx` script'ini değil,
   deployment üzerindeki HTTP path'ini çağırır.
+- Yerel veya tek seferlik temizlik için `npm run db:purge -- 365` kullanılabilir.
+  Argüman verilmezse varsayılan 365 gündür; alternatif olarak
+  `PURGE_OLD_REQUESTS_DAYS=365 npm run db:purge` kullanılabilir.
 - Gerçek NAP/uzman verileri girilmeden `site.dataReady=true` yapılmaz.

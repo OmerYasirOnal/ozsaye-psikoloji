@@ -12,6 +12,8 @@ export default function GlobalError({
   error,
 }: {
   error: Error & { digest?: string };
+  // Next bu prop'u geçirir; global fallback'te kök layout hataları için hard reload
+  // daha güvenilir olduğundan buton `window.location.reload()` kullanır.
   reset: () => void;
 }) {
   useEffect(() => {
