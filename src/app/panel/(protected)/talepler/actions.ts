@@ -5,31 +5,25 @@ import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { updateTalep } from "@/lib/talepler-db";
-import { DURUM_DEGERLERI, type RandevuDurum } from "@/lib/talepler";
+import {
+  DURUM_DEGERLERI,
+  planlananaCevir,
+  type RandevuDurum,
+} from "@/lib/talepler";
 
 export type TalepFormState = { hata?: string; ok?: boolean };
 
 // Durum + planlanan tarih + iç not TEK formda güncellenir (tek "Kaydet").
 const schema = z.object({
   id: z.uuid("Geçersiz talep kimliği."),
-  durum: z.enum(DURUM_DEGERLERI as [RandevuDurum, ...RandevuDurum[]]),
+  durum: z.enum(
+    DURUM_DEGERLERI as [RandevuDurum, ...RandevuDurum[]],
+    "Geçersiz durum değeri.",
+  ),
   // datetime-local ham değeri; boş → planlanan tarihi temizle.
   planlanan: z.string().trim(),
   icNot: z.string().trim().max(2000, "İç not en fazla 2000 karakter olabilir."),
 });
-
-/**
- * datetime-local ("YYYY-MM-DDTHH:mm", İstanbul yereli kabul edilir — UTC+3, DST
- * yok) → mutlak an. Sunucu saat diliminden bağımsız olması için offset açıkça
- * eklenir. Boş → null (temizle). Biçim bozuksa "gecersiz".
- */
-function planlananaCevir(ham: string): Date | null | "gecersiz" {
-  if (!ham) return null;
-  const s = ham.slice(0, 16);
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s)) return "gecersiz";
-  const d = new Date(`${s}:00+03:00`);
-  return Number.isNaN(d.getTime()) ? "gecersiz" : d;
-}
 
 export async function talebiGuncelle(
   _prev: TalepFormState,

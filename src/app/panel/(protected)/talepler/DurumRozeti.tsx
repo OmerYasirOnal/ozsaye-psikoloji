@@ -1,12 +1,15 @@
 import { DURUM_ETIKETLERI, type RandevuDurum } from "@/lib/talepler";
 
-// Durum rozetleri: yalnız sade marka tonları (metin legible — text-forest /
-// text-forest-muted / warm-white; sage aksan). "Yeni" dikkat çekecek şekilde
-// dolu forest; kapanmış durumlar (tamam/iptal) sakin çizgili.
+// Durum rozetleri: yalnız marka yüzeyleri (warm-white/cream/forest) + stone/
+// forest çizgi + text-forest/text-forest-muted. `sage` KULLANILMAZ — CLAUDE.md
+// "sage yalnızca aksan (ince çizgi/ikon/işaret)" kuralı dolgu-rozete izin vermez
+// (bkz. bağımsız review, PR #27). "Yeni" dikkat çekecek şekilde dolu forest;
+// ara durumlar forest-çizgili (dolu/boş yüzeyle ayrışır); kapanmış durumlar
+// (tamam/iptal) sakin stone-çizgili.
 const ROZET_SINIF: Record<RandevuDurum, string> = {
   new: "bg-forest text-warm-white",
-  contacted: "bg-sage-light text-forest",
-  scheduled: "bg-sage text-forest",
+  contacted: "border border-forest bg-warm-white text-forest",
+  scheduled: "border border-forest bg-cream text-forest",
   done: "border border-stone bg-warm-white text-forest-muted",
   cancelled: "border border-stone bg-cream text-forest-muted",
 };

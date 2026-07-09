@@ -6,6 +6,7 @@ import {
   whatsappNumarasi,
   maskeliTelefon,
   uzmanEtiketi,
+  planlananaCevir,
   type RandevuDurum,
 } from "./talepler";
 import { getTalep, listTalepler, updateTalep, talepSayilari } from "./talepler-db";
@@ -24,6 +25,24 @@ test("whatsappNumarasi: TR numara biçimlerini 90… biçimine normalize eder", 
 test("maskeliTelefon: baş 4 + son 2 rakam görünür, gerisi maskeli", () => {
   expect(maskeliTelefon("0555 123 45 67")).toBe("0555 ••• •• 67");
   expect(maskeliTelefon("123")).toBe("•••"); // 6 rakamdan kısa
+});
+
+test("planlananaCevir: boş → null, biçim bozuk → gecersiz, geçerli → doğru an", () => {
+  expect(planlananaCevir("")).toBeNull();
+  expect(planlananaCevir("yarın öğlen")).toBe("gecersiz"); // biçim değil
+  expect(planlananaCevir("2026-13-01T10:00")).toBe("gecersiz"); // 13. ay yok
+  const d = planlananaCevir("2026-03-15T14:30");
+  expect(d).toBeInstanceOf(Date);
+  // İstanbul 14:30 (UTC+3) → UTC 11:30
+  expect((d as Date).toISOString()).toBe("2026-03-15T11:30:00.000Z");
+});
+
+test("planlananaCevir: takvim-geçersiz gün (30 Şubat) sessizce taşınmaz — reddedilir", () => {
+  // Regresyon: Number.isNaN bunu yakalamaz (JS Date 30 Şubat'ı 2 Mart'a
+  // taşır); round-trip kontrolü olmadan bu talep sessizce yanlış bir güne
+  // planlanırdı.
+  expect(planlananaCevir("2026-02-30T10:00")).toBe("gecersiz");
+  expect(planlananaCevir("2026-04-31T10:00")).toBe("gecersiz"); // Nisan 30 gün çeker
 });
 
 test("uzmanEtiketi: slug → ad, null → Farketmez, bilinmeyen → slug", () => {

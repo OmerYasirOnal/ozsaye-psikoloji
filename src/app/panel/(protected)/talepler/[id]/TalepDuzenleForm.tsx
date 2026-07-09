@@ -84,7 +84,7 @@ export default function TalepDuzenleForm({
           rows={4}
           maxLength={2000}
           defaultValue={icNotInitial}
-          className="rounded-md border border-stone bg-warm-white px-4 py-3 text-forest-muted"
+          className="rounded-md border border-stone bg-warm-white px-4 py-3 text-forest"
         />
       </div>
 

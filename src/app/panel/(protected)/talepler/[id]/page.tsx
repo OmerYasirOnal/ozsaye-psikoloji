@@ -4,24 +4,9 @@ import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { getTalep } from "@/lib/talepler-db";
-import { uzmanEtiketi, whatsappNumarasi } from "@/lib/talepler";
+import { istanbulInputDegeri, uzmanEtiketi, whatsappNumarasi } from "@/lib/talepler";
 import DurumRozeti from "../DurumRozeti";
 import TalepDuzenleForm from "./TalepDuzenleForm";
-
-// Mutlak an → datetime-local değeri (İstanbul yereli, UTC+3, DST yok).
-function istanbulInputDegeri(d: Date): string {
-  const p = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Istanbul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(d);
-  const g = (t: string) => p.find((x) => x.type === t)?.value ?? "";
-  return `${g("year")}-${g("month")}-${g("day")}T${g("hour")}:${g("minute")}`;
-}
 
 // Türkçe okunur tarih-saat (İstanbul).
 function istanbulTarihSaat(d: Date): string {

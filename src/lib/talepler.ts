@@ -63,3 +63,42 @@ export function maskeliTelefon(telefon: string): string {
   if (rakamlar.length < 6) return "•••";
   return `${rakamlar.slice(0, 4)} ••• •• ${rakamlar.slice(-2)}`;
 }
+
+/**
+ * Mutlak an → `datetime-local` değeri (İstanbul yereli, UTC+3, DST yok).
+ * Hem detay sayfasının form ön-doldurmasında hem de `actions.ts`'in takvim-
+ * geçerliliği round-trip kontrolünde kullanılır — tek kaynak, iki tarafın
+ * aynı biçimlendirmeyi paylaşması için.
+ */
+export function istanbulInputDegeri(d: Date): string {
+  const p = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Istanbul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(d);
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? "";
+  return `${g("year")}-${g("month")}-${g("day")}T${g("hour")}:${g("minute")}`;
+}
+
+/**
+ * `datetime-local` ("YYYY-MM-DDTHH:mm", İstanbul yereli kabul edilir — UTC+3,
+ * DST yok) → mutlak an. Sunucu saat diliminden bağımsız olması için offset
+ * açıkça eklenir. Boş → null (temizle). Biçim bozuksa "gecersiz".
+ *
+ * Takvim-geçerliliği: `Date` geçersiz günleri (ör. 30 Şubat) sessizce bir
+ * sonraki aya taşır (`Number.isNaN` bunu YAKALAMAZ). `istanbulInputDegeri` ile
+ * round-trip karşılaştırması bu sessiz taşmayı da "gecersiz" olarak reddeder.
+ */
+export function planlananaCevir(ham: string): Date | null | "gecersiz" {
+  if (!ham) return null;
+  const s = ham.slice(0, 16);
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s)) return "gecersiz";
+  const d = new Date(`${s}:00+03:00`);
+  if (Number.isNaN(d.getTime())) return "gecersiz";
+  if (istanbulInputDegeri(d) !== s) return "gecersiz";
+  return d;
+}
