@@ -55,6 +55,9 @@ ozsaye-psikoloji-static.zip
 # Sosyal medya taslak kuyruğu (yerel, üretici çıktısı)
 /taslaklar/
 
+# Yerel marka fontları (setup-fonts.sh indirir; OFL, depoya konmaz)
+/.fonts/
+
 # Sıfır bağlamlı review raporu (geçici, üretici çıktısı)
 review-rapor.md
 review-rapor.md.log
