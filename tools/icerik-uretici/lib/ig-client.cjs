@@ -2,7 +2,7 @@
  * Instagram Graph API istemcisi — ağ sarmalayıcıları.
  *
  * `fetch` bağımlılık olarak enjekte edilebilir (varsayılan: global fetch), böylece
- * birim testleri GERÇEK AĞ olmadan sahte fetch ile koşar (bkz. ig-client.test.cjs).
+ * birim testleri GERÇEK AĞ olmadan sahte fetch ile koşar (bkz. ig-client.test.mjs).
  * URL/gövde üretimi saf `instagram.cjs`'ten gelir.
  */
 "use strict";
@@ -86,9 +86,9 @@ async function getPermalink({ mediaId, version, accessToken }, fetchImpl = fetch
   return json.permalink || null;
 }
 
-/** Uzun ömürlü token'ı yenile → {accessToken, expiresInSec, expiresAt}. */
-async function refreshLongLivedToken({ version, accessToken }, fetchImpl = fetch, now = Date.now()) {
-  const url = `${IG.refreshTokenUrl(version)}?grant_type=ig_refresh_token&access_token=${encodeURIComponent(accessToken)}`;
+/** Uzun ömürlü token'ı yenile → {accessToken, expiresInSec, expiresAt}. (Uç nokta sürümsüz.) */
+async function refreshLongLivedToken({ accessToken }, fetchImpl = fetch, now = Date.now()) {
+  const url = `${IG.refreshTokenUrl()}?grant_type=ig_refresh_token&access_token=${encodeURIComponent(accessToken)}`;
   const { res, json } = await getJson(url, fetchImpl);
   assertOk(json, res, "Token yenileme");
   return IG.parseRefreshResponse(json, now);

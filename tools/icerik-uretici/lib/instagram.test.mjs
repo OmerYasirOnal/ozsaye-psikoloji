@@ -6,7 +6,9 @@ describe("instagram: URL üreticileri", () => {
     expect(IG.igBaseUrl()).toBe("https://graph.instagram.com/v23.0");
     expect(IG.mediaContainerUrl("178", "v23.0")).toBe("https://graph.instagram.com/v23.0/178/media");
     expect(IG.mediaPublishUrl("178", "v23.0")).toBe("https://graph.instagram.com/v23.0/178/media_publish");
-    expect(IG.refreshTokenUrl("v23.0")).toBe("https://graph.instagram.com/v23.0/refresh_access_token");
+  });
+  it("token yenileme uç noktası SÜRÜMSÜZDÜR (Meta belgelerindeki biçim)", () => {
+    expect(IG.refreshTokenUrl()).toBe("https://graph.instagram.com/refresh_access_token");
   });
   it("sürüm geçersiz kılınabilir", () => {
     expect(IG.igBaseUrl("v21.0")).toBe("https://graph.instagram.com/v21.0");

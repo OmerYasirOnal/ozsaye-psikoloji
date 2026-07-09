@@ -30,8 +30,6 @@
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
-const { C, fonts, textPath, trackedPath, place, emblemAt, inkPalettes, renderPNG } =
-  require("../../scripts/lib/brand.cjs");
 const { loadEnv } = require("./lib/env.cjs");
 const { readPublishedPosts } = require("./lib/db.cjs");
 const { nextDurum, normalizeDurum } = require("./lib/durum.cjs");
@@ -64,6 +62,23 @@ const positionalAfter = (flag) => {
   return opt(flag.replace(/^--/, ""));
 };
 const FLAGS = { watch: has("--watch"), force: has("--force"), noLlm: has("--no-llm"), slug: opt("slug") };
+
+// ---------- Marka çizim kütüphanesi (TEMBEL yüklenir) ----------
+// brand.cjs modül yüklenirken fontları okur; fontlar yalnız görsel/reels üretiminde
+// gerekir. Tembel yükleme sayesinde --durum ve --onayla fontsuz makinede de çalışır.
+let C, fonts, textPath, trackedPath, place, emblemAt, inkPalettes, renderPNG;
+function ensureBrand() {
+  if (fonts) return;
+  try {
+    ({ C, fonts, textPath, trackedPath, place, emblemAt, inkPalettes, renderPNG } =
+      require("../../scripts/lib/brand.cjs"));
+  } catch (e) {
+    throw new Error(
+      `Marka fontları yüklenemedi (${e.message}). Kurulum: bash scripts/setup-fonts.sh ` +
+      `— sudo'suz: BRAND_FONT_DIR=./.fonts bash scripts/setup-fonts.sh (çalıştırırken aynı BRAND_FONT_DIR'i ver).`,
+    );
+  }
+}
 
 // ---------- Yayınlı yazıları oku (DB) ----------
 async function publishedPosts() {
@@ -173,6 +188,7 @@ function paragraph(font, text, size, cx, centerY, maxW, fill, lh = 1.2) {
 
 // ---------- Marka görseli (1080×1080) ----------
 async function generateImage(post, outPath) {
+  ensureBrand();
   const W = 1080, cx = 540, maxW = 860;
   let size = post.title.length > 42 ? 62 : 76;
   let lines = wrapText(fonts.serif, post.title, size, maxW);
@@ -200,6 +216,7 @@ async function generateImage(post, outPath) {
 
 // ---------- Reels kareleri (1080×1920) ----------
 async function renderReelsFrame(frame, outPath) {
+  ensureBrand();
   const W = 1080, H = 1920, cx = 540, maxW = 840;
   const border = `<rect x="44" y="44" width="${W - 88}" height="${H - 88}" rx="30" fill="none" stroke="${C.forest}" stroke-opacity="0.16" stroke-width="2"/>`;
   const footer =
@@ -282,7 +299,9 @@ async function generateReels(post, dir) {
 // ---------- Tek yazıyı işle ----------
 async function processPost(post, useLlm) {
   const dir = path.join(OUT_DIR, post.slug);
-  if (fs.existsSync(dir) && !FLAGS.force) return { slug: post.slug, skipped: true };
+  // meta.json EN SON yazılır → tamamlanma işareti. Yarım kalmış (hata ile
+  // kesilmiş) üretim meta.json bırakmaz ve bir sonraki koşuda yeniden denenir.
+  if (fs.existsSync(path.join(dir, "meta.json")) && !FLAGS.force) return { slug: post.slug, skipped: true };
   fs.mkdirSync(dir, { recursive: true });
 
   let captions, source;

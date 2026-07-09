@@ -5,7 +5,7 @@
  * Yalnız "onaylandi" taslaklar yayına uygundur. "Hepsini otomatik yayınla"
  * modu BİLİNÇLİ olarak YOKTUR — ruh sağlığı içeriği elle onaylanır.
  *
- * Ağ/DB/dosya erişimi YOK; birim testi doğrudan çağırır (bkz. durum.test.cjs).
+ * Ağ/DB/dosya erişimi YOK; birim testi doğrudan çağırır (bkz. durum.test.mjs).
  */
 "use strict";
 

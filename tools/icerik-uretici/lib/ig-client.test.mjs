@@ -94,9 +94,11 @@ describe("ig-client: refreshLongLivedToken", () => {
   it("yeni token ve son kullanma tarihini döndürür", async () => {
     const now = 1_000_000_000_000;
     const f = mockFetch([{ json: { access_token: "NEW", token_type: "bearer", expires_in: 5184000 } }]);
-    const r = await client.refreshLongLivedToken({ version: "v23.0", accessToken: "OLD" }, f, now);
+    const r = await client.refreshLongLivedToken({ accessToken: "OLD" }, f, now);
     expect(r.accessToken).toBe("NEW");
     expect(r.expiresAt.getTime()).toBe(now + 5184000 * 1000);
     expect(f.calls[0].url).toContain("grant_type=ig_refresh_token");
+    // Uç nokta sürümsüz (Meta belgelerindeki biçim)
+    expect(f.calls[0].url).toContain("https://graph.instagram.com/refresh_access_token?");
   });
 });

@@ -226,7 +226,9 @@ function updateEnvValue(filePath, key, value) {
   let text = fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : "";
   const re = new RegExp(`^${key}=.*$`, "m");
   const line = `${key}=${value}`;
-  if (re.test(text)) text = text.replace(re, line);
+  // Not: replacement bir fonksiyon — token "$&"/"$1" gibi dizgeler içerirse
+  // String.replace'in özel kalıp yorumunu devre dışı bırakır.
+  if (re.test(text)) text = text.replace(re, () => line);
   else text = (text && !text.endsWith("\n") ? text + "\n" : text) + line + "\n";
   fs.writeFileSync(filePath, text);
 }
@@ -237,7 +239,7 @@ async function runTokenRefresh() {
     process.exit(1);
   }
   console.log("Uzun ömürlü token yenileniyor (graph.instagram.com/refresh_access_token)…");
-  const r = await client.refreshLongLivedToken({ version: IG_API_VERSION, accessToken: IG_ACCESS_TOKEN });
+  const r = await client.refreshLongLivedToken({ accessToken: IG_ACCESS_TOKEN });
   const expiry = r.expiresAt ? r.expiresAt.toISOString() : "bilinmiyor";
   const days = r.expiresInSec ? Math.round(r.expiresInSec / 86400) : "?";
   console.log(`Yeni token alındı. Son kullanma: ${expiry} (~${days} gün).`);

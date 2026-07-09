@@ -4,7 +4,7 @@
  * "Instagram API with Instagram Login" varyantı (host: graph.instagram.com,
  * Facebook Sayfası GEREKMEZ). Bu modül yalnızca URL/gövde/başlık üretir ve
  * yanıt ayrıştırır — hiçbir ağ çağrısı YAPMAZ, dosya OKUMAZ. Böylece birim
- * testleri ffmpeg/DB/ağ olmadan koşar (bkz. instagram.test.cjs).
+ * testleri ffmpeg/DB/ağ olmadan koşar (bkz. instagram.test.mjs).
  */
 "use strict";
 
@@ -20,7 +20,8 @@ const mediaContainerUrl = (igUserId, version) => `${igBaseUrl(version)}/${igUser
 const mediaPublishUrl = (igUserId, version) => `${igBaseUrl(version)}/${igUserId}/media_publish`;
 const containerStatusUrl = (containerId, version) => `${igBaseUrl(version)}/${containerId}`;
 const permalinkUrl = (mediaId, version) => `${igBaseUrl(version)}/${mediaId}`;
-const refreshTokenUrl = (version) => `${igBaseUrl(version)}/refresh_access_token`;
+// Meta belgeleri token yenilemeyi SÜRÜMSÜZ gösterir: graph.instagram.com/refresh_access_token
+const refreshTokenUrl = () => `https://${IG_HOST}/refresh_access_token`;
 
 /**
  * Medya konteyneri POST gövdesini üretir (access_token HARİÇ — onu çağıran ekler).
