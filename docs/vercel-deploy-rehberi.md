@@ -34,6 +34,8 @@ Preview ortamına da aynı değerler, gerekirse test DB/e-posta ile girilebilir.
 | `RESEND_API_KEY` | Resend API Keys | `bildirim.ozsaye.com` domain doğrulaması tamamlandıktan sonra girilmeli. |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob store | Blog panelindeki görsel yükleme için. Boşsa prod'da yerel disk kalıcı değildir. |
 | `SEED_STAFF` | Gerçek uzman e-postaları | `Ad Soyad:email:slug` kayıtları virgülle ayrılır. |
+| `CRON_SECRET` | Yerelde üret | `openssl rand -base64 32`. Vercel Cron çağrılarını doğrulamak için **zorunlu**; boşsa `/api/cron/purge-requests` 401 (fail-closed) döner ve temizlik hiç çalışmaz. |
+| `PURGE_OLD_REQUESTS_DAYS` | Klinik/hukuk kararı | KVKK saklama süresi (gün). Boşsa varsayılan `365`. Pozitif tam sayı olmalı. |
 
 Örnek `SEED_STAFF` biçimi:
 
@@ -141,10 +143,22 @@ kaydı tekrar Vercel'e çevrilir.
 
 - `.github/workflows/deploy-godaddy.yml` emekli edilir.
 - `docs/godaddy-deploy-rehberi.md` arşiv/legacy olarak işaretlenir.
-- KVKK saklama süresi klinik/hukuk tarafından netleşince Vercel Cron için
-  `purgeOldRequests`'i çağıran, `CRON_SECRET` benzeri bir başlıkla korunan route
-  handler eklenir. Vercel Cron doğrudan repo içindeki `tsx` script'ini değil,
-  deployment üzerindeki HTTP path'ini çağırır.
+- KVKK saklama-temizliği Vercel Cron ile otomatiktir. Route:
+  `/api/cron/purge-requests` (`src/app/api/cron/purge-requests/route.ts`,
+  `force-dynamic`). Cron programı `vercel.json` içinde tanımlıdır:
+  `{ "crons": [{ "path": "/api/cron/purge-requests", "schedule": "0 3 * * *" }] }`
+  — her gün 03:00 UTC. Yalnız deploy sonrası Vercel'de etkinleşir.
+  - Kimlik: Vercel Cron, `CRON_SECRET` env'i ayarlıysa çağrıya otomatik
+    `Authorization: Bearer ${CRON_SECRET}` başlığı ekler; route bunu doğrular.
+    `CRON_SECRET` **zorunludur** — yoksa/boşsa route 401 (fail-closed) döner ve
+    silme yapmaz. (Panel oturumu DEĞİL: makine uç noktasıdır, `verifySession`
+    kullanmaz.) Silinecek gün sayısı `PURGE_OLD_REQUESTS_DAYS` env'inden gelir,
+    boşsa 365.
+  - Vercel **Hobby** planında cron günde 1 çalıştırmayla sınırlıdır; bu program
+    (günde bir, 03:00 UTC) bu sınırla uyumludur.
+  - Vercel Cron doğrudan repo içindeki `tsx` script'ini değil, deployment
+    üzerindeki HTTP path'ini çağırır. Yerel/tek seferlik temizlik için hâlâ
+    `npm run db:purge` kullanılabilir (aşağı bkz.).
 - Yerel veya tek seferlik temizlik için `npm run db:purge -- 365` kullanılabilir.
   Argüman verilmezse varsayılan 365 gündür; alternatif olarak
   `PURGE_OLD_REQUESTS_DAYS=365 npm run db:purge` kullanılabilir.
