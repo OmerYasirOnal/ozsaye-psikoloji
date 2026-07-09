@@ -27,7 +27,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream px-6">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream px-6 py-28">
       <div className="relative z-10 mx-auto max-w-2xl text-center">
         {/* Botanik imza (Hero filiz motifi) */}
         <svg

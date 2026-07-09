@@ -1,6 +1,3 @@
-import { client } from "../src/lib/db";
-import { purgeOldRequests } from "../src/lib/randevu-db";
-
 const DEFAULT_DAYS = 365;
 
 function parseGunSayisi(): number {
@@ -16,10 +13,23 @@ function parseGunSayisi(): number {
   return value;
 }
 
+function requireDatabaseUrl(): void {
+  if (!process.env.DATABASE_URL) {
+    throw new Error(
+      "DATABASE_URL ortam değişkeni ayarlanmalı — yanlış veritabanında silme yapılmasını önler.",
+    );
+  }
+}
+
 (async () => {
+  let client: { end: () => Promise<void> } | undefined;
   try {
     const gunSayisi = parseGunSayisi();
-    const count = await purgeOldRequests(gunSayisi);
+    requireDatabaseUrl();
+    const dbModule = await import("../src/lib/db");
+    const randevuDb = await import("../src/lib/randevu-db");
+    client = dbModule.client;
+    const count = await randevuDb.purgeOldRequests(gunSayisi);
     console.log(`${count} eski randevu talebi silindi (${gunSayisi} gün eşiği).`);
   } catch (error) {
     console.error(
@@ -28,6 +38,6 @@ function parseGunSayisi(): number {
     );
     process.exitCode = 1;
   } finally {
-    await client.end();
+    await client?.end();
   }
 })();
