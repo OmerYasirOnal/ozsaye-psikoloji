@@ -168,6 +168,8 @@ async function notify() {
   requireTokenAndChat();
   const slug = positionalSlug();
   const yeniden = has("--yeniden");
+  // Not: çıplak `notify` zaten TÜM 'taslak' durumundakileri gönderir; `--hepsi`
+  // bunun belgelenmiş AÇIK takma adıdır (okunabilirlik için kabul edilir, davranış aynı).
   const drafts = scanDrafts();
   const targets = TG.selectDraftsToNotify(drafts, { slug, yeniden });
   if (!targets.length) {
@@ -178,10 +180,21 @@ async function notify() {
     );
     return;
   }
+  // Tek taslağın hatası (ağ, Telegram 4xx, dosya) DİĞERLERİNİ engellemesin:
+  // başarısız taslak 'taslak' durumunda kalır ve sonraki koşuda yeniden denenir.
+  let ok = 0;
+  let hata = 0;
   for (const d of targets) {
-    await notifyOne(d);
+    try {
+      await notifyOne(d);
+      ok++;
+    } catch (e) {
+      hata++;
+      console.error(`✗ bildirilemedi (${d.slug}): ${e.message} — durum değişmedi, sonraki koşuda yeniden denenir.`);
+    }
   }
-  console.log(`\nToplam ${targets.length} taslak bildirildi. Telefondan ✅/❌ ile karara bağla; poll yayınlar.`);
+  console.log(`\nToplam ${ok} taslak bildirildi${hata ? `, ${hata} başarısız` : ""}. Telefondan ✅/❌ ile karara bağla; poll yayınlar.`);
+  if (ok === 0 && hata > 0) process.exit(1); // hiçbir şey gidemedi → launchd loguna kırmızı düş
 }
 
 // ---------- poll ----------
@@ -216,6 +229,8 @@ async function poll() {
     cwd: ROOT,
     readMeta,
     writeMeta,
+    // Kısaltılmış callback slug'ını gerçek klasöre çözmek için (64-bayt sınırı).
+    listSlugs: () => scanDrafts().map((d) => d.slug),
     log: (m) => console.log(`✓ ${m}`),
     warn: (m) => console.warn(`poll: ${m}`),
     error: (m) => console.error(`poll: ${m}`),

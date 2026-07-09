@@ -19,6 +19,9 @@ const { normalizeDurum, nextDurum, DURUM } = require("./durum.cjs");
 
 const TG_API = "https://api.telegram.org";
 const CAPTION_LIMIT = 1024; // Telegram sendPhoto caption üst sınırı
+// Telegram callback_data sınırı 64 BAYTTIR; aşılırsa BUTTON_DATA_INVALID (400)
+// döner ve butonlu mesajın TAMAMI gönderilemez. Bkz. fitSlugForCallback.
+const CALLBACK_DATA_LIMIT = 64;
 
 // ---------------------------------------------------------------------------
 // Ağ katmanı (enjekte edilebilir fetch)
@@ -110,14 +113,45 @@ function sendVideo({ chatId, videoBuffer, filename = "reels.mp4", caption }, opt
 // ---------------------------------------------------------------------------
 
 /**
+ * Slug'ı callback_data 64-bayt bütçesine sığdır (gerekirse kısalt).
+ * En uzun kalıp: "yayinla:" (8) + slug + ":gorsel" (7) → slug bütçesi 49 bayt.
+ * Slug'lar slugify ürünü ASCII'dir ([a-z0-9-]) ama bayt-ölçümü yine de
+ * Buffer.byteLength ile yapılır (savunmacı). Kısaltılan slug'ı poll tarafı
+ * `resolveSlug` ile (tam → TEK önek eşleşmesi) gerçek klasöre geri çözer.
+ */
+function fitSlugForCallback(slug) {
+  const budget = CALLBACK_DATA_LIMIT - "yayinla:".length - ":gorsel".length;
+  let s = String(slug ?? "");
+  while (s.length > 0 && Buffer.byteLength(s, "utf8") > budget) s = s.slice(0, -1);
+  return s;
+}
+
+/**
+ * Callback'ten gelen (muhtemelen kısaltılmış) slug'ı mevcut taslak slug'larına
+ * çöz: önce TAM eşleşme; yoksa TEK önek eşleşmesi. 0 veya birden çok aday →
+ * null (belirsizken ASLA yayınlama).
+ * `slugs` null/undefined ise (çözüm listesi enjekte edilmemiş) kimlik döner.
+ */
+function resolveSlug(candidate, slugs) {
+  const c = String(candidate ?? "");
+  if (!c) return null;
+  if (slugs == null) return c;
+  const list = Array.isArray(slugs) ? slugs : [];
+  if (list.includes(c)) return c;
+  const matches = list.filter((s) => typeof s === "string" && s.startsWith(c));
+  return matches.length === 1 ? matches[0] : null;
+}
+
+/**
  * Onay inline klavyesi. `hasReels` ise "Görsel+Reels" butonu eklenir.
- * NOT: callback_data ≤ 64 bayt olmalı (Telegram sınırı). Blog slug'ları kısa
- * (URL-safe, `[a-z0-9-]`) olduğundan `yayinla:<slug>:ikisi` pratikte sığar.
+ * callback_data ≤ 64 bayt (Telegram sınırı) garanti edilir: uzun slug
+ * kısaltılır (fitSlugForCallback) ve poll tarafında resolveSlug geri çözer.
  */
 function buildApprovalKeyboard(slug, { hasReels = false } = {}) {
-  const row1 = [{ text: "✅ Yayınla", callback_data: `yayinla:${slug}:gorsel` }];
-  if (hasReels) row1.push({ text: "🎬 Görsel+Reels", callback_data: `yayinla:${slug}:ikisi` });
-  const row2 = [{ text: "❌ Atla", callback_data: `atla:${slug}` }];
+  const s = fitSlugForCallback(slug);
+  const row1 = [{ text: "✅ Yayınla", callback_data: `yayinla:${s}:gorsel` }];
+  if (hasReels) row1.push({ text: "🎬 Görsel+Reels", callback_data: `yayinla:${s}:ikisi` });
+  const row2 = [{ text: "❌ Atla", callback_data: `atla:${s}` }];
   return { inline_keyboard: [row1, row2] };
 }
 
@@ -192,17 +226,25 @@ function buildCaption({ baslik, instagramText, slug, limit = 300 } = {}) {
 // Orkestrasyon — callback → durum geçişi → yayın (bağımlılıklar ENJEKTE edilir)
 // ---------------------------------------------------------------------------
 
+/** Log için süreç çıktısının son ~400 karakteri (tek satıra indirger). */
+function outTail(s, max = 400) {
+  const t = String(s ?? "").trim().replace(/\s+/g, " ");
+  return t.length > max ? "…" + t.slice(-max) : t;
+}
+
 /**
- * Bir callback_query'yi uçtan uca işler: yetki → durum geçişi → (yayınla ise)
- * publisher spawn → butonları kaldır / geri-al. TÜM yan etkiler enjekte edilir
- * (spawn, fetch, meta oku/yaz) → ağsız ve spawn-mock'lu test edilir.
+ * Bir callback_query'yi uçtan uca işler: yetki → slug çözümü → durum geçişi →
+ * (yayınla ise) publisher spawn + SONUÇ DOĞRULAMA → butonları kaldır / geri-al.
+ * TÜM yan etkiler enjekte edilir (spawn, fetch, meta oku/yaz) → ağsız ve
+ * spawn-mock'lu test edilir.
  *
  * @param {object} cq  Telegram callback_query
  * @param {object} deps
  *   allowedChatId, token, fetchImpl,
- *   spawn(publisherPath, args, opts) → { status },  // senkron (spawnSync sarmalı)
+ *   spawn(publisherPath, args, opts) → { status, stdout?, stderr? }, // senkron (spawnSync sarmalı)
  *   publisherPath, cwd,
  *   readMeta(slug) → meta|null, writeMeta(slug, meta),
+ *   listSlugs?() → string[]  (kısaltılmış callback slug'ını çözmek için),
  *   log?, warn?, error?
  * @returns {Promise<{outcome:string, durum?:string, permalink?:string|null}>}
  */
@@ -210,7 +252,7 @@ async function applyCallback(cq, deps = {}) {
   const {
     allowedChatId, token, fetchImpl,
     spawn, publisherPath, cwd,
-    readMeta, writeMeta,
+    readMeta, writeMeta, listSlugs,
     log = () => {}, warn = () => {}, error = () => {},
   } = deps;
   const net = { token, fetchImpl };
@@ -226,40 +268,51 @@ async function applyCallback(cq, deps = {}) {
     return { outcome: "unauthorized" };
   }
 
+  // callback_data'daki slug kısaltılmış olabilir (64-bayt sınırı) → gerçek slug'a çöz.
+  const slug = d.action ? resolveSlug(d.slug, listSlugs ? listSlugs() : null) : null;
+
   if (d.action === "atla") {
-    const meta = readMeta(d.slug);
+    const meta = slug ? readMeta(slug) : null;
     if (!meta) { await ack("Taslak bulunamadı"); return { outcome: "notfound" }; }
     const t = nextDurum(meta.durum, "reddet");
-    if (t.ok) { meta.durum = t.durum; writeMeta(d.slug, meta); }
+    if (t.ok) { meta.durum = t.durum; writeMeta(slug, meta); }
     await clearButtons();
     await ack(t.ok ? "Atlandı ❌" : `Zaten: ${normalizeDurum(meta.durum)}`);
     return { outcome: "atla", durum: t.ok ? t.durum : normalizeDurum(meta.durum) };
   }
 
   if (d.action === "yayinla") {
-    const meta = readMeta(d.slug);
+    const meta = slug ? readMeta(slug) : null;
     if (!meta) { await ack("Taslak bulunamadı"); return { outcome: "notfound" }; }
     const t = nextDurum(meta.durum, "onayla");
     if (!t.ok) { await ack(`Zaten: ${normalizeDurum(meta.durum)}`); return { outcome: "skip", durum: normalizeDurum(meta.durum) }; }
     meta.durum = t.durum; // onaylandi — publisher yalnız 'onaylandi' yayınlar
-    writeMeta(d.slug, meta);
+    writeMeta(slug, meta);
     // Yayın uzun sürer → spinner'ı ÖNCE kapat.
     await ack("Yayınlanıyor…");
-    const r = spawn(publisherPath, ["--yayinla", "--tur", d.tur, "--slug", d.slug], { cwd });
-    if (r && r.status === 0) {
-      const after = readMeta(d.slug) || meta; // publisher durum→paylasildi + paylasim.permalink yazar
+    const r = spawn(publisherPath, ["--yayinla", "--tur", d.tur, "--slug", slug], { cwd });
+    // Başarı = exit 0 TEK BAŞINA YETMEZ: publisher plan-dışı kalan taslakta da
+    // 0 döner (ör. gorsel.png yoksa "atlandı" der). Gerçek kanıt meta.json'da
+    // durum'un 'paylasildi' olmasıdır (publisher yayın sonrası yazar).
+    const after = (slug && readMeta(slug)) || meta;
+    const published = r && r.status === 0 && normalizeDurum(after.durum) === DURUM.PAYLASILDI;
+    if (published) {
       const link = (after.paylasim && after.paylasim.permalink) || null;
       await clearButtons();
-      await tgSafe("sendMessage", { chat_id: d.chatId, text: `✅ Yayınlandı: ${d.slug}${link ? `\n${link}` : ""}` }, net);
-      log(`yayınlandı: ${d.slug} (${d.tur})`);
+      await tgSafe("sendMessage", { chat_id: d.chatId, text: `✅ Yayınlandı: ${slug}${link ? `\n${link}` : ""}` }, net);
+      log(`yayınlandı: ${slug} (${d.tur})`);
       return { outcome: "published", permalink: link };
     }
-    // Hata → durumu 'bildirildi'ye geri al (yeniden denenebilir); PII'siz mesaj.
-    const back = readMeta(d.slug) || meta;
+    // Hata → durumu 'bildirildi'ye geri al (yeniden denenebilir). Telegram'a
+    // PII'siz kısa mesaj; TEŞHİS ayrıntısı (publisher çıktısı) yalnız yerel loga.
+    const back = (slug && readMeta(slug)) || meta;
     back.durum = DURUM.BILDIRILDI;
-    writeMeta(d.slug, back);
-    await tgSafe("sendMessage", { chat_id: d.chatId, text: `⚠️ Yayın başarısız oldu (${d.slug}). Butona tekrar basabilirsin.` }, net);
-    error(`yayın hatası (${d.slug}): publisher status ${r && r.status}`);
+    writeMeta(slug, back);
+    await tgSafe("sendMessage", { chat_id: d.chatId, text: `⚠️ Yayın başarısız oldu (${slug}). Butona tekrar basabilirsin.` }, net);
+    const parts = [`yayın hatası (${slug}): publisher status ${r && r.status}, durum '${normalizeDurum(after.durum)}'`];
+    if (r && outTail(r.stderr)) parts.push(`stderr: ${outTail(r.stderr)}`);
+    if (r && outTail(r.stdout)) parts.push(`stdout: ${outTail(r.stdout)}`);
+    error(parts.join(" | "));
     return { outcome: "failed", durum: DURUM.BILDIRILDI };
   }
 
@@ -297,6 +350,7 @@ function setOffset(filePath, updateId) {
 module.exports = {
   TG_API,
   CAPTION_LIMIT,
+  CALLBACK_DATA_LIMIT,
   // ağ
   tg,
   tgSafe,
@@ -309,6 +363,8 @@ module.exports = {
   sendPhoto,
   sendVideo,
   // saf
+  fitSlugForCallback,
+  resolveSlug,
   buildApprovalKeyboard,
   parseCallbackData,
   decideCallback,

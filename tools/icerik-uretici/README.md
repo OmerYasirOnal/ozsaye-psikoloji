@@ -122,7 +122,9 @@ node tools/icerik-uretici/telegram-bot.cjs poll          # onay dokunuşlarını
 ```
 
 `notify`, bildirdiği taslağın durumunu `bildirildi` yapar → tekrar bildirmez
-(`--yeniden` zorlar). `poll` idempotenttir: işlenen `update_id`'ler
+(`--yeniden` zorlar). Bir taslağın gönderimi başarısız olursa **diğerleri
+engellenmez**; başarısız olan `taslak` durumunda kalır ve sonraki koşuda
+yeniden denenir. `poll` idempotenttir: işlenen `update_id`'ler
 `taslaklar/.tg-offset` dosyasında tutulur, aynı dokunuş iki kez işlenmez.
 
 ### BotFather kurulumu (bir kez; ~3 dk)
@@ -152,7 +154,15 @@ bu sorun yoktur.)
   bulup butona bassa bile `answerCallbackQuery("Yetkisiz")` ile reddedilir ve
   loglanır (bkz. `decideCallback` → `authorized`).
 - Yayın hatasında durum `bildirildi`ye **geri alınır** ve Telegram'a **PII'siz**
-  ("token/URL/ayrıntı yok") kısa bir uyarı gider; tekrar denenebilir.
+  ("token/URL/ayrıntı yok") kısa bir uyarı gider; tekrar denenebilir. Teşhis
+  ayrıntısı (publisher stdout/stderr kuyruğu) yalnız **yerel loga** yazılır.
+- **Sahte başarıya karşı doğrulama:** publisher `exit 0` dönse bile yayın ancak
+  `meta.json`'daki durum gerçekten `paylasildi` olduysa başarı sayılır
+  (publisher, plan-dışı kalan taslakta da 0 dönebilir — ör. `gorsel.png` yoksa).
+- **Uzun slug'lar:** Telegram `callback_data` sınırı **64 bayttır** (aşan buton
+  mesajın TAMAMINI 400 ile düşürür). Uzun slug butonda otomatik kısaltılır,
+  `poll` tarafında **tek önek eşleşmesiyle** gerçek klasöre geri çözülür;
+  eşleşme belirsizse **asla yayınlanmaz** ("Taslak bulunamadı").
 - `TG_BOT_TOKEN`/`TG_CHAT_ID` yoksa komutlar **hızlı ve net Türkçe hata** ile
   durur (`exit 1`) — kör çalışmaz.
 
