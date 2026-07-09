@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file=.env.local scripts/db-migrate.ts",
-    "db:seed": "tsx --env-file=.env.local scripts/seed-staff.ts"
+    "db:seed": "tsx --env-file=.env.local scripts/seed-staff.ts",
+    "db:purge": "tsx --env-file=.env.local scripts/purge-old-requests.ts"
   },
   "dependencies": {
     "@tiptap/extension-image": "^3.27.3",

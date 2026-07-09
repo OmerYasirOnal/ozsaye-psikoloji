@@ -16,12 +16,20 @@ export type FormState = { hata?: string };
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const schema = z.object({
-  baslik: z.string().trim().min(3, "Başlık en az 3 karakter olmalı."),
+  baslik: z
+    .string()
+    .trim()
+    .min(3, "Başlık en az 3 karakter olmalı.")
+    .max(200, "Başlık en fazla 200 karakter olabilir."),
   slug: z.string().trim(),
   kategori: z.string().trim(),
   etiketler: z.string(),
   ozet: z.string().trim().max(300, "Özet en fazla 300 karakter olabilir."),
-  icerik: z.string().trim().min(1, "İçerik boş olamaz — yazı gövdesi gerekli."),
+  icerik: z
+    .string()
+    .trim()
+    .min(1, "İçerik boş olamaz — yazı gövdesi gerekli.")
+    .max(50000, "İçerik en fazla 50.000 karakter olabilir."),
 });
 
 // Benzersiz slug: taban DB'de zaten varsa "-2", "-3"… ekleyerek boş bir slot bul.
