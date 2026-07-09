@@ -29,7 +29,7 @@ const schema = z.object({
     .string()
     .trim()
     .min(1, "İçerik boş olamaz — yazı gövdesi gerekli.")
-    .max(50000, "İçerik en fazla 50000 karakter olabilir."),
+    .max(50000, "İçerik en fazla 50.000 karakter olabilir."),
 });
 
 // Benzersiz slug: taban DB'de zaten varsa "-2", "-3"… ekleyerek boş bir slot bul.

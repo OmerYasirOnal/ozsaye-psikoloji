@@ -9,17 +9,17 @@ import Link from "next/link";
  * hatası (ör. randevu action'ında geçici bir DB kesintisi) yakalanınca bu
  * sakin, Türkçe, marka-uyumlu sayfa gösterilir.
  *
- * Not: `reset()` hata durumunu temizleyip segmenti yeniden render eder. Kalıcı
- * bir sorunda kullanıcı asla kilitlenmesin diye ayrıca "Ana sayfaya dön" linki
- * garanti bir çıkış sağlar. (Next 16.2 `unstable_retry()` yeniden veri çekimi de
- * yapar; kararlı isimli `reset` tercih edildi.)
+ * Not: `unstable_retry()` segmenti yeniden veri çekip (re-fetch) yeniden render
+ * eder — geçici DB hatasından kurtarır; Next 16.2'nin önerdiği yol. (`reset`
+ * yalnız re-render eder, re-fetch etmez.) Kalıcı bir sorunda kullanıcı asla
+ * kilitlenmesin diye ayrıca "Ana sayfaya dön" linki garanti bir çıkış sağlar.
  */
 export default function Error({
   error,
-  reset,
+  unstable_retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  unstable_retry: () => void;
 }) {
   useEffect(() => {
     // Yalnızca hata nesnesini kaydet (hasta verisi/PII içermez); teşhis için.
@@ -27,7 +27,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream px-6 py-28">
+    <main className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-cream px-6 py-28">
       <div className="relative z-10 mx-auto max-w-2xl text-center">
         {/* Botanik imza (Hero filiz motifi) */}
         <svg
@@ -57,14 +57,20 @@ export default function Error({
 
         <p className="mx-auto mt-7 max-w-md font-body text-lg leading-relaxed text-forest-muted">
           Üzgünüz, beklenmedik bir sorunla karşılaştık. Bu genellikle geçici bir
-          durumdur — lütfen birazdan tekrar deneyin. Sürerse bize doğrudan
-          ulaşabilirsiniz.
+          durumdur — lütfen birazdan tekrar deneyin. Sürerse doğrudan{" "}
+          <Link
+            href="/#iletisim"
+            className="font-medium text-forest underline decoration-sage underline-offset-4 transition-colors hover:text-forest-muted"
+          >
+            bize ulaşabilirsiniz
+          </Link>
+          .
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={() => unstable_retry()}
             className="group inline-flex items-center gap-2 rounded-full bg-forest px-8 py-3.5 font-body text-sm font-semibold tracking-wide text-cream transition-colors duration-300 hover:bg-forest-dark"
           >
             <svg

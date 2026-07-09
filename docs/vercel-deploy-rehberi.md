@@ -41,9 +41,15 @@ Preview ortamına da aynı değerler, gerekirse test DB/e-posta ile girilebilir.
 SEED_STAFF=Psk. Dan. Melek Yıldız:melek@ozsaye.com:melek-yildiz,Kl. Psk. Sacide Şahin:sacide@ozsaye.com:sacide-sahin
 ```
 
-`DATABASE_URL` için Neon pooled bağlantı kullanıldığında mevcut `postgres.js`
-ayarlarıyla ek kod değişikliği gerekmez; uygulama `src/lib/db/index.ts`
-üzerinden bağlantıyı tekilleştirir.
+`DATABASE_URL` için Neon pooled bağlantı kullanıldığında bağlantı *sayısı*
+açısından ek kod değişikliği gerekmez; uygulama `src/lib/db/index.ts` üzerinden
+bağlantıyı tekilleştirir.
+
+> **Not (prepared statements):** `postgres.js` varsayılan olarak prepared
+> statement kullanır; Neon'un `-pooler` (PgBouncer, transaction modu) bunları
+> reddedebilir. Faz 3b smoke'ta prepared-statement davranışını doğrula; hata
+> alırsan `src/lib/db/index.ts`'te `postgres(url, { prepare: false })` ile bağlan
+> (veya Neon'un session-pooler'ını kullan).
 
 ## Neon Kurulumu
 

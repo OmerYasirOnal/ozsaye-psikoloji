@@ -105,8 +105,8 @@ export async function purgeOldRequests(
   gunSayisi: number,
   database: DeleteExecutor = db,
 ): Promise<number> {
-  if (!Number.isFinite(gunSayisi) || gunSayisi <= 0) {
-    throw new Error("gunSayisi pozitif bir sayı olmalı.");
+  if (!Number.isInteger(gunSayisi) || gunSayisi <= 0) {
+    throw new Error("gunSayisi pozitif bir tam sayı olmalı.");
   }
 
   const cutoff = new Date(Date.now() - gunSayisi * 24 * 60 * 60 * 1000);

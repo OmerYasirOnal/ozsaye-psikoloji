@@ -12,9 +12,6 @@ export default function GlobalError({
   error,
 }: {
   error: Error & { digest?: string };
-  // Next bu prop'u geçirir; global fallback'te kök layout hataları için hard reload
-  // daha güvenilir olduğundan buton `window.location.reload()` kullanır.
-  reset: () => void;
 }) {
   useEffect(() => {
     // Yalnızca hata nesnesini kaydet (PII içermez); teşhis için.
@@ -65,6 +62,8 @@ export default function GlobalError({
             Üzgünüz, beklenmedik bir sorun oluştu. Lütfen sayfayı yenileyip
             tekrar deneyin.
           </p>
+          {/* Kök layout patladığından segment re-fetch (unstable_retry) güvenilmez;
+              tam sayfa yeniden yükleme (re-fetch dahil) en güvenli kurtarma. */}
           <button
             type="button"
             onClick={() => window.location.reload()}

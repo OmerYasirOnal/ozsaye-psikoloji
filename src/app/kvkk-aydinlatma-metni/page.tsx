@@ -324,7 +324,12 @@ export default function KvkkAydinlatmaMetniPage() {
                 {
                   baslik: "Barındırma (hosting) hizmet sağlayıcıları",
                   aciklama:
-                    "Sitenin, panelin ve randevu veritabanının barındırıldığı altyapı/hosting hizmeti sağlayıcısı.",
+                    "Sitenin ve panelin barındırıldığı bulut altyapı/hosting hizmeti sağlayıcısı.",
+                },
+                {
+                  baslik: "Veritabanı hizmet sağlayıcıları",
+                  aciklama:
+                    "Randevu talebi ve açık rıza kayıtlarının tutulduğu veritabanı hizmeti sağlayıcısı.",
                 },
                 {
                   baslik: "Yetkili kamu kurum ve kuruluşları",
