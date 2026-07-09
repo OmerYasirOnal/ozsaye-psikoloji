@@ -4,9 +4,12 @@ name: Claude PR Review
 # değişiklikleri inceler ve bulgularını PR'a yorum olarak ekler.
 # scripts/review.sh ile aynı amaca hizmet eder; bu sürüm CI'da otomatik çalışır.
 #
-# Kimlik doğrulama: depoya kurulu Claude GitHub App (OIDC) üzerinden yapılır;
-# ayrı bir API anahtarı secret'ı gerekmez. (İlk ekleyen PR'da GitHub güvenlik
-# gereği bir kez "atlanır"; main'e merge edildikten sonra çalışır.)
+# DURUM (2026-07-09): Bu job şu an KIRIK — action, kimlik bilgisi
+# (ANTHROPIC_API_KEY / CLAUDE_CODE_OAUTH_TOKEN / OIDC federation env'leri)
+# tanımlı olmadığından diff'e hiç bakmadan düşüyor. PR'lardaki kırmızı
+# "review" check'i kod bulgusu DEĞİLDİR ve merge'i bloke etmez (gerçek kapı
+# lint-build). Düzeltmek için repo secret'ı gerekir; o zamana dek bağımsız
+# review oturum içi sıfır-bağlamlı subagent'la yürütülür (bkz. CLAUDE.md).
 
 on:
   pull_request:
