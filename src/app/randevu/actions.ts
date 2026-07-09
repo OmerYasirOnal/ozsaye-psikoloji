@@ -74,38 +74,40 @@ export async function randevuTalebiGonder(
   // 5. Talebi DB'ye yaz.
   await createAppointmentRequest(girdi, ip);
 
-  // 6. Uzman(lar)a bildirim — try/catch İÇİNDE. E-posta başarısız olsa bile
-  //    talep DB'de kalıcıdır; hastaya asla başarısızmış gibi görünmemeli.
-  //    `tarih`/`mesaj` HAM geçilir (belirtilmedi/(mesaj girilmedi) fallback'leri
-  //    sendAppointmentNotification içinde uygulanır).
-  try {
-    const expertSlug = girdi.uzman === "farketmez" ? null : girdi.uzman;
-    const alicilar = await getBildirimAlicilari(expertSlug);
-    await sendAppointmentNotification(alicilar, girdi.email, {
-      ad: girdi.ad,
-      telefon: girdi.telefon,
-      email: girdi.email,
-      uzmanEtiketi: UZMAN_SECENEKLERI[girdi.uzman],
-      tarih: girdi.tarih ?? "",
-      mesaj: girdi.mesaj ?? "",
-      ip,
-      tarihDamgasi: new Date().toISOString(),
-    });
-  } catch (e) {
-    console.error("[randevu] bildirim gönderilemedi:", e);
+  // 6. Bildirimler — uzman bildirimi + hastaya "talebiniz alındı" onayı.
+  //    BİRBİRİNDEN BAĞIMSIZ ve PARALEL (Promise.allSettled: biri düşse diğeri
+  //    etkilenmez, hiçbir red fırlatılmaz → redirect gecikmeden çalışır).
+  //    E-posta başarısız olsa bile talep DB'de kalıcıdır; hastaya asla
+  //    başarısızmış gibi görünmemeli. `tarih`/`mesaj` HAM geçilir
+  //    (fallback'ler sendAppointmentNotification içinde). KVKK: hasta onayı
+  //    yalnız talep-işleme amaçlı işlem bildirimidir (rıza formda alınıyor);
+  //    pazarlama içeriği yok. (Honeypot dalı 1. adımda döndüğünden bota hiçbir
+  //    mail gitmez.)
+  const [uzmanSonuc, hastaSonuc] = await Promise.allSettled([
+    (async () => {
+      const expertSlug = girdi.uzman === "farketmez" ? null : girdi.uzman;
+      const alicilar = await getBildirimAlicilari(expertSlug);
+      await sendAppointmentNotification(alicilar, girdi.email, {
+        ad: girdi.ad,
+        telefon: girdi.telefon,
+        email: girdi.email,
+        uzmanEtiketi: UZMAN_SECENEKLERI[girdi.uzman],
+        tarih: girdi.tarih ?? "",
+        mesaj: girdi.mesaj ?? "",
+        ip,
+        tarihDamgasi: new Date().toISOString(),
+      });
+    })(),
+    sendHastaOnayi(girdi.email, girdi.ad),
+  ]);
+  if (uzmanSonuc.status === "rejected") {
+    console.error("[randevu] bildirim gönderilemedi:", uzmanSonuc.reason);
   }
-
-  // 6b. Hastaya "talebiniz alındı" onay e-postası — KENDİ try/catch'i. Uzman
-  //     bildiriminden BAĞIMSIZ ve ONDAN SONRA: onay maili başarısız olsa bile
-  //     (a) talep DB'de kalıcıdır, (b) uzman bildirimi zaten gönderildi,
-  //     (c) akış bozulmaz ve uzman bildirimi YİNELENMEZ. KVKK: bu yalnız
-  //     talep-işleme amaçlı işlem bildirimidir (rıza formda alınıyor);
-  //     pazarlama içeriği yok. (Honeypot dalı 1. adımda döndüğünden bota mail
-  //     gitmez.)
-  try {
-    await sendHastaOnayi(girdi.email, girdi.ad);
-  } catch (e) {
-    console.error("[randevu] hasta onay e-postası gönderilemedi:", e);
+  if (hastaSonuc.status === "rejected") {
+    console.error(
+      "[randevu] hasta onay e-postası gönderilemedi:",
+      hastaSonuc.reason,
+    );
   }
 
   // 7. Teşekkür sayfasına yönlendir — ASLA try/catch içinde değil

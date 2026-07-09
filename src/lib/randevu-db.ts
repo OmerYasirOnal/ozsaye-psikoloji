@@ -81,9 +81,11 @@ async function getTerapistEpostalari(): Promise<string[]> {
  * (`role = 'therapist'`) döner. Klinisyen olmayan admin hesapları hasta verisi
  * içeren bu bildirimi ALMAZ.
  *
- * Not: `site.email` (info@ozsaye.com) şu an placeholder olduğundan alıcılara
- * bilinçli olarak EKLENMEZ; gerçek info@ adresi cutover'da (Faz 3) buraya
- * eklenebilir.
+ * Not: kliniğin ortak kutusu (info@ozsaye.com) buraya DEĞİL, gönderim
+ * katmanına eklenir (bkz. `src/lib/email/bildirim.ts` → `bildirimAlicilari`):
+ * bu fonksiyon rol-kapsamlı kalır (admin'ler hasta PII'si almaz), info@ ise
+ * veri sorumlusunun kendi kutusu olarak send.ts'te kopya alır (2026-07-09'da
+ * canlı teslim testiyle doğrulandı).
  */
 export async function getBildirimAlicilari(
   expertSlug: string | null,
