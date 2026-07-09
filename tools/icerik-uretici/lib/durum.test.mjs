@@ -13,6 +13,10 @@ describe("durum: normalizeDurum", () => {
     expect(normalizeDurum("paylaşıldı")).toBe(DURUM.PAYLASILDI);
   });
   it("bilinmeyeni taslak sayar", () => expect(normalizeDurum(undefined)).toBe(DURUM.TASLAK));
+  it("bildirildi ve reddedildi'yi tanır (Telegram akışı)", () => {
+    expect(normalizeDurum("bildirildi")).toBe(DURUM.BILDIRILDI);
+    expect(normalizeDurum("reddedildi")).toBe(DURUM.REDDEDILDI);
+  });
 });
 
 describe("durum: nextDurum geçişleri", () => {
@@ -29,6 +33,28 @@ describe("durum: nextDurum geçişleri", () => {
     expect(nextDurum("taslak", "yayinla").ok).toBe(false);
   });
   it("bilinmeyen işlem reddedilir", () => expect(nextDurum("taslak", "sil").ok).toBe(false));
+
+  // --- Telegram onay akışı: taslak → bildirildi → onaylandi / reddedildi ---
+  it("bildir: taslak → bildirildi", () => {
+    expect(nextDurum("taslak", "bildir")).toEqual({ ok: true, durum: DURUM.BILDIRILDI });
+  });
+  it("bildir: zaten onaylandi/paylasildi yeniden bildirilmez", () => {
+    expect(nextDurum("onaylandi", "bildir").ok).toBe(false);
+    expect(nextDurum("paylasildi", "bildir").ok).toBe(false);
+  });
+  it("onayla: bildirildi → onaylandi (Telegram ✅)", () => {
+    expect(nextDurum("bildirildi", "onayla")).toEqual({ ok: true, durum: DURUM.ONAYLANDI });
+  });
+  it("reddet: bildirildi → reddedildi (Telegram ❌)", () => {
+    expect(nextDurum("bildirildi", "reddet")).toEqual({ ok: true, durum: DURUM.REDDEDILDI });
+  });
+  it("reddet: paylasildi reddedilemez", () => {
+    expect(nextDurum("paylasildi", "reddet").ok).toBe(false);
+  });
+  it("reddedildi yayına uygun DEĞİL", () => {
+    expect(isEligibleForPublish("reddedildi")).toBe(false);
+    expect(isEligibleForPublish("bildirildi")).toBe(false);
+  });
 });
 
 describe("durum: isEligibleForPublish", () => {

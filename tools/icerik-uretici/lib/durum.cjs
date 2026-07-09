@@ -1,7 +1,11 @@
 /**
  * Taslak durum makinesi + yayın planlayıcı — SAF (pure) yardımcılar.
  *
- * Durum akışı (insan onay kapısı): taslak → onaylandi → paylasildi.
+ * Durum akışı (insan onay kapısı):
+ *   taslak → bildirildi → onaylandi → paylasildi
+ *                      ↘ reddedildi
+ * "bildirildi": taslak Telegram'a onay için gönderildi (tekrar-notify önlenir).
+ * "reddedildi": Telegram'dan ❌ Atla ile elenmiş (yayınlanmaz).
  * Yalnız "onaylandi" taslaklar yayına uygundur. "Hepsini otomatik yayınla"
  * modu BİLİNÇLİ olarak YOKTUR — ruh sağlığı içeriği elle onaylanır.
  *
@@ -11,7 +15,9 @@
 
 const DURUM = Object.freeze({
   TASLAK: "taslak",
+  BILDIRILDI: "bildirildi",
   ONAYLANDI: "onaylandi",
+  REDDEDILDI: "reddedildi",
   PAYLASILDI: "paylasildi",
 });
 
@@ -20,22 +26,41 @@ function normalizeDurum(d) {
   const s = String(d ?? "").toLowerCase().trim();
   if (s.startsWith("onay")) return DURUM.ONAYLANDI;
   if (s.startsWith("paylas") || s.startsWith("paylaş")) return DURUM.PAYLASILDI;
+  if (s.startsWith("bildir")) return DURUM.BILDIRILDI;
+  if (s.startsWith("red")) return DURUM.REDDEDILDI; // "reddedildi"
   return DURUM.TASLAK; // "taslak", "taslak — onay bekliyor", bilinmeyen → taslak
 }
 
 /**
  * Bir durum geçişi uygular.
  * @param {string} current  mevcut durum
- * @param {"onayla"|"yayinla"} action
+ * @param {"bildir"|"onayla"|"reddet"|"yayinla"} action
  * @returns {{ok:boolean, durum:string, error?:string}}
  */
 function nextDurum(current, action) {
   const c = normalizeDurum(current);
+  if (action === "bildir") {
+    // Telegram'a onay için gönder. Zaten onaylanmış/paylaşılmışı yeniden bildirme.
+    if (c === DURUM.ONAYLANDI) {
+      return { ok: false, durum: c, error: "Bu taslak zaten onaylandı; yeniden bildirilmez." };
+    }
+    if (c === DURUM.PAYLASILDI) {
+      return { ok: false, durum: c, error: "Bu taslak zaten paylaşıldı; yeniden bildirilmez." };
+    }
+    return { ok: true, durum: DURUM.BILDIRILDI };
+  }
   if (action === "onayla") {
     if (c === DURUM.PAYLASILDI) {
       return { ok: false, durum: c, error: "Bu taslak zaten paylaşıldı; yeniden onaylanamaz." };
     }
     return { ok: true, durum: DURUM.ONAYLANDI };
+  }
+  if (action === "reddet") {
+    // ❌ Atla — paylaşılmış taslak geri alınamaz.
+    if (c === DURUM.PAYLASILDI) {
+      return { ok: false, durum: c, error: "Bu taslak zaten paylaşıldı; reddedilemez." };
+    }
+    return { ok: true, durum: DURUM.REDDEDILDI };
   }
   if (action === "yayinla") {
     if (c !== DURUM.ONAYLANDI) {

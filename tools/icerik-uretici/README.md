@@ -27,8 +27,17 @@ taslaklar/<slug>/
    node instagram-yayinla.cjs --yayinla  (GERÇEK yayın; durum: "paylasildi")
 ```
 
-Durum makinesi: `taslak` → `onaylandi` → `paylasildi`. Yalnız `onaylandi`
-taslaklar yayınlanabilir.
+Durum makinesi:
+
+```
+taslak → bildirildi → onaylandi → paylasildi
+                   ↘ reddedildi
+```
+
+Yalnız `onaylandi` taslaklar yayınlanabilir. `bildirildi` = Telegram'a onay için
+gönderildi (tekrar-bildirim önlenir); `reddedildi` = ❌ Atla ile elenmiş.
+Onay **elle** (terminalden `--onayla`) **veya** telefondan Telegram butonuyla
+verilebilir — bkz. "Telegram onay botu".
 
 ## Kurulum (kendi bilgisayarın / mini-PC)
 
@@ -75,6 +84,115 @@ node tools/icerik-uretici/instagram-yayinla.cjs --slug=<slug> --yayinla   # yaln
 ```
 `--tur`: `gorsel` (vars.) · `reels` · `ikisi`. `--adet N`: bu çağrıda en çok N
 taslak (vars. 1 — hız güvenliği). Reels başlığı = `instagram.txt`.
+
+## Telegram onay botu (telefondan onayla → otomatik yayınla)
+
+Taslakları bilgisayara oturmadan, **telefondan** onaylayıp yayınlamak için
+Telegram köprüsü. Mimari, kanıtlanmış bir kardeş projedeki desenin (promptane)
+Node portudur: stdlib yerine global `fetch` + enjekte edilebilir ağ katmanı.
+
+### Yeni akış
+
+```
+index.cjs (üret)
+     │
+telegram-bot.cjs notify        →  Telegram'a: görsel + başlık + [✅ Yayınla] [🎬 Görsel+Reels] [❌ Atla]
+     │                              (+ reels.mp4 varsa önizleme videosu)
+telefondan bir butona dokun
+     │
+telegram-bot.cjs poll  (launchd 120 sn'de bir)
+     │
+✅ → durum onaylandi → instagram-yayinla.cjs --yayinla --slug <slug> --tur <tur> → "✅ Yayınlandı: <permalink>"
+❌ → durum reddedildi (yayınlanmaz)
+```
+
+Butona basmak, `instagram-yayinla.cjs`'i **onaylanmış tek taslak** için çalıştırır;
+otomatik toplu yayın yoktur (insan kapısı korunur).
+
+### Alt komutlar
+
+```bash
+node tools/icerik-uretici/telegram-bot.cjs whoami        # bota son yazan chat id'sini yazdır (kurulum)
+node tools/icerik-uretici/telegram-bot.cjs send "mesaj"  # düz metin gönder
+node tools/icerik-uretici/telegram-bot.cjs notify        # durumu 'taslak' olanları onaya gönder
+node tools/icerik-uretici/telegram-bot.cjs notify <slug> # yalnız o taslağı gönder
+node tools/icerik-uretici/telegram-bot.cjs notify --hepsi # tüm 'taslak' durumundakiler
+node tools/icerik-uretici/telegram-bot.cjs notify <slug> --yeniden  # bildirilmişi tekrar gönder
+node tools/icerik-uretici/telegram-bot.cjs poll          # onay dokunuşlarını işle (launchd tetikler)
+```
+
+`notify`, bildirdiği taslağın durumunu `bildirildi` yapar → tekrar bildirmez
+(`--yeniden` zorlar). `poll` idempotenttir: işlenen `update_id`'ler
+`taslaklar/.tg-offset` dosyasında tutulur, aynı dokunuş iki kez işlenmez.
+
+### BotFather kurulumu (bir kez; ~3 dk)
+
+1. Telegram'da **@BotFather** → `/newbot` → ad + kullanıcı adı ver → verilen
+   **token**'ı al → `tools/icerik-uretici/.env.local` içine `TG_BOT_TOKEN=` yaz.
+2. Yeni botuna Telegram'dan bir mesaj yaz (`/start`), sonra:
+   ```bash
+   node tools/icerik-uretici/telegram-bot.cjs whoami   # chat id'ni yazdırır
+   ```
+   Çıkan sayıyı `.env.local`'e `TG_CHAT_ID=` olarak yaz.
+   - **Grup kullanıyorsan**: grup chat id'si **NEGATİFtir** (ör. `-1001234567890`);
+     botu gruba ekle, gruba bir mesaj at, sonra `whoami`.
+
+**Bot privacy ayarı (doğrulanmış davranış):** inline buton onayları
+`callback_query` güncellemesi olarak gelir ve **bot privacy ayarından
+ETKİLENMEZ** — callback'ler botun sahibine **her zaman** iletilir. Privacy modu
+(BotFather `/setprivacy`) yalnızca **gruplarda botun hangi düz mesajları
+göreceğini** kısıtlar; onay butonlarımızı etkilemez, dolayısıyla değiştirmene
+gerek yok. (Tek istisna: bir **grupta** `whoami`'nin mesajını görebilmesi için
+ya bota reply at ya da o tek seferlik kurulumda privacy'yi kapat; 1:1 sohbette
+bu sorun yoktur.)
+
+### Güvenlik modeli
+
+- **Yalnız `TG_CHAT_ID` chat'inden gelen callback iş yapar.** Başka biri botu
+  bulup butona bassa bile `answerCallbackQuery("Yetkisiz")` ile reddedilir ve
+  loglanır (bkz. `decideCallback` → `authorized`).
+- Yayın hatasında durum `bildirildi`ye **geri alınır** ve Telegram'a **PII'siz**
+  ("token/URL/ayrıntı yok") kısa bir uyarı gider; tekrar denenebilir.
+- `TG_BOT_TOKEN`/`TG_CHAT_ID` yoksa komutlar **hızlı ve net Türkçe hata** ile
+  durur (`exit 1`) — kör çalışmaz.
+
+### launchd ile otomasyon (macOS)
+
+İki job (`tools/icerik-uretici/launchd/`):
+
+| plist | ne yapar | tetik |
+| --- | --- | --- |
+| `com.ozsaye.telegram-poll.plist` | `poll` — onay dokunuşlarını işler | her 120 sn + yükleme |
+| `com.ozsaye.icerik-uret.plist` | `uret-ve-bildir.sh`: üret → `notify --hepsi` | her gün 09:30 |
+
+Kurulum:
+
+```bash
+# 0) Log dizinini oluştur (loglar/ .gitignore'dadır):
+mkdir -p loglar
+
+# 1) plist'lerdeki yolları KENDİ checkout'una göre kontrol et. Varsayılan:
+#    /Users/omeryasironal/Projects/özsaye_psikoloji  ve  /opt/homebrew/bin/node
+#    Farklıysa iki plist'te + gerekiyorsa uret-ve-bildir.sh'te düzenle.
+#    (launchd PATH'i dardır; bu yüzden node'un TAM yolu gömülüdür — `which node`.)
+
+# 2) Kopyala ve yükle:
+cp tools/icerik-uretici/launchd/com.ozsaye.telegram-poll.plist ~/Library/LaunchAgents/
+cp tools/icerik-uretici/launchd/com.ozsaye.icerik-uret.plist   ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.ozsaye.telegram-poll.plist
+launchctl load ~/Library/LaunchAgents/com.ozsaye.icerik-uret.plist
+
+# Durumu gör / logu izle:
+launchctl list | grep ozsaye
+tail -f loglar/telegram-poll.log
+
+# Kaldırma:
+launchctl unload ~/Library/LaunchAgents/com.ozsaye.telegram-poll.plist
+launchctl unload ~/Library/LaunchAgents/com.ozsaye.icerik-uret.plist
+```
+
+> Not: `poll`, yalnız DB/token gerektiren gerçek yayını **buton onayıyla**
+> tetikler; kendi başına içerik üretmez. Üretim + bildirim ayrı job'dur (09:30).
 
 ## Instagram token (bir kez; ~15 dk)
 
@@ -129,6 +247,8 @@ node tools/icerik-uretici/instagram-yayinla.cjs --token-yenile --yaz  # .env.loc
 | `OLLAMA_URL` / `OLLAMA_MODEL` | hayır | Yerel LLM (vars. `http://localhost:11434` / `llama3.1`) |
 | `SITE_URL` | hayır | Bağlantı alan adı (vars. `https://ozsaye.com`) |
 | `FFMPEG_PATH` | hayır | `ffmpeg` PATH'te değilse yolu |
+| `TG_BOT_TOKEN` | Telegram botu | BotFather token'ı (`whoami`/`send`/`notify`/`poll`) |
+| `TG_CHAT_ID` | Telegram botu | İzinli chat id (`send`/`notify`/`poll`; güvenlik kapısı) |
 
 ## Notlar
 
@@ -138,4 +258,8 @@ node tools/icerik-uretici/instagram-yayinla.cjs --token-yenile --yaz  # .env.loc
   klinik tanı/iddia içermeyen ses tonu istenir (bkz. sistem promptu, `index.cjs`).
 - `taslaklar/` `.gitignore`'dadır (yerel onay kuyruğu; depoya gönderilmez).
 - Saf mantık `lib/*.cjs` altında ve Vitest ile test edilir (ağ/DB/ffmpeg/Ollama
-  gerektirmez): `lib/instagram.cjs`, `lib/ig-client.cjs`, `lib/durum.cjs`, `lib/reels.cjs`.
+  gerektirmez): `lib/instagram.cjs`, `lib/ig-client.cjs`, `lib/durum.cjs`,
+  `lib/reels.cjs`, `lib/telegram.cjs` (ağ katmanı enjekte edilen `fetch` ile,
+  `applyCallback` orkestrasyonu enjekte edilen `spawn` ile test edilir).
+- Telegram botu: `taslaklar/.tg-offset` (getUpdates offset'i) ve `loglar/*.log`
+  (launchd) `.gitignore`'dadır.
