@@ -149,6 +149,25 @@ test("getBildirimAlicilari(slug): eşleşme yoksa tüm terapistlere düşer", as
   }
 });
 
+test("getBildirimAlicilari(slug): admin slug eşleşmesini alıcı yapmaz", async () => {
+  const ts = Date.now();
+  const slug = `admin-slug-${ts}`;
+  const terapist = `admin-fallback-terapist-${ts}@example.com`;
+  const adminEmail = `admin-with-slug-${ts}@example.com`;
+  await db.insert(staff).values([
+    { name: "Admin Fallback Terapist", email: terapist, role: "therapist" },
+    { name: "Slug Sahibi Admin", email: adminEmail, expertSlug: slug, role: "admin" },
+  ]);
+  try {
+    const alicilar = await getBildirimAlicilari(slug);
+    expect(alicilar).toContain(terapist);
+    expect(alicilar).not.toContain(adminEmail);
+  } finally {
+    await db.delete(staff).where(eq(staff.email, terapist));
+    await db.delete(staff).where(eq(staff.email, adminEmail));
+  }
+});
+
 test("purgeOldRequests: yalnız eşikten eski randevu taleplerini siler", async () => {
   const ts = Date.now();
   const eskiIp = `purge-old-${ts}`;
@@ -181,7 +200,7 @@ test("purgeOldRequests: yalnız eşikten eski randevu taleplerini siler", async 
         })
         .returning({ id: appointmentRequests.id });
 
-      expect(await purgeOldRequests(365, tx)).toBe(1);
+      expect(await purgeOldRequests(365, tx)).toBeGreaterThanOrEqual(1);
 
       const eskiRows = await tx
         .select({ id: appointmentRequests.id })

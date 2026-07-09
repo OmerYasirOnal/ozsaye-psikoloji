@@ -10,7 +10,6 @@ import { useEffect } from "react";
  */
 export default function GlobalError({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
@@ -66,7 +65,7 @@ export default function GlobalError({
           </p>
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={() => window.location.reload()}
             style={{
               display: "inline-block",
               padding: "0.875rem 2rem",

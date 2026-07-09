@@ -125,6 +125,7 @@ export default function GizlilikPolitikasiPage() {
                 "Başvurunuzu tercih ettiğiniz uzmana veya uygun uzmanlara yönlendirmek",
                 "Sorularınızı yanıtlamak ve sizi süreç hakkında bilgilendirmek",
                 "KVKK açık rıza kaydınızı zaman ve IP damgasıyla saklamak",
+                "Hizmet güvenliğini sağlamak ve kötüye kullanımı önlemek için IP bazlı istek sınırlaması uygulamak",
                 "Yasal yükümlülüklerimizi yerine getirmek",
               ]}
             />

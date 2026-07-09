@@ -93,7 +93,7 @@ export async function getBildirimAlicilari(
   const rows = await db
     .select({ email: staff.email })
     .from(staff)
-    .where(eq(staff.expertSlug, expertSlug));
+    .where(and(eq(staff.expertSlug, expertSlug), eq(staff.role, "therapist")));
 
   if (rows.length > 0) return rows.map((r) => r.email);
 

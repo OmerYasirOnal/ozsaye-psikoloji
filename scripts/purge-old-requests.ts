@@ -21,6 +21,12 @@ function parseGunSayisi(): number {
     const gunSayisi = parseGunSayisi();
     const count = await purgeOldRequests(gunSayisi);
     console.log(`${count} eski randevu talebi silindi (${gunSayisi} gün eşiği).`);
+  } catch (error) {
+    console.error(
+      "Eski randevu talepleri temizlenemedi:",
+      error instanceof Error ? error.message : error,
+    );
+    process.exitCode = 1;
   } finally {
     await client.end();
   }

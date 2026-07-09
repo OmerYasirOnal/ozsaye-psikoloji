@@ -244,6 +244,7 @@ export default function KvkkAydinlatmaMetniPage() {
                 "Randevu talebinizin alınması, değerlendirilmesi ve sizinle iletişime geçilmesi.",
                 "Tercih ettiğiniz uzmana veya uygun uzmanlara başvurunuzla ilgili bildirim iletilmesi.",
                 "Açık rıza onayınızın zaman ve IP damgasıyla kayıt altına alınması.",
+                "Hizmet güvenliğinin sağlanması ve kötüye kullanımın önlenmesi için IP bazlı istek sınırlaması uygulanması.",
                 "Psikolojik danışmanlık ve terapi hizmetlerinin planlanması ve sunulması.",
                 "Hizmet kalitesinin geliştirilmesi ve taleplerinizin yönetilmesi.",
                 "İlgili mevzuattan doğan yükümlülüklerin yerine getirilmesi.",
