@@ -76,6 +76,40 @@ export function birlesikProfil(
 }
 
 /**
+ * Profil fotoğrafı URL'inin YALNIZCA kendi yükleme pipeline'ımızın
+ * (`saveImage`, src/lib/storage.ts) üretebileceği bir kaynağa işaret edip
+ * etmediğini doğrular. İki geçerli çıktı biçimi vardır:
+ *   - dev/yerel : `/uploads/…` (yerel dosya servis route'u)
+ *   - prod/Blob : `https://<store>.public.blob.vercel-storage.com/…`
+ *
+ * NEDEN: Bu action'ı doğrudan çağıran kimliği doğrulanmış bir personel, aksi
+ * halde HERHANGİ bir dış URL'i public profil fotoğrafı yapabilir — upload
+ * endpoint'inin magic-byte/tip/4MB doğrulamalarını ATLAYARAK. Bu, `/ekip`
+ * sayfalarına ve `Person.image` JSON-LD'sine keyfi üçüncü-taraf içerik sokar
+ * ve ziyaretçi IP'sini saldırganın seçtiği host'a sızdırır. Kaynağı yükleme
+ * sistemine sınırlayarak bu atlatma kapatılır.
+ *
+ * Blob host'u `new URL(...)` ile ayrıştırılıp `hostname.endsWith(...)` ile
+ * denetlenir — tüm dize üzerinde naif `startsWith` DEĞİL: alt-alan hileleri
+ * (ör. `https://evil.com/.public.blob.vercel-storage.com/…`) böylece elenir.
+ * Boş dize ("" = fotoğrafı kaldır) burada DEĞİL, çağrı yerinde ele alınır.
+ */
+export function izinliFotoUrl(url: string): boolean {
+  // dev/yerel: yerel yükleme dizininden servis edilen göreli yol.
+  if (url.startsWith("/uploads/")) return true;
+  // prod: yalnız https + Vercel Blob public store alt-alanı.
+  try {
+    const u = new URL(url);
+    return (
+      u.protocol === "https:" &&
+      u.hostname.endsWith(".public.blob.vercel-storage.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Yetki kuralı: admin her profili düzenler; therapist yalnız kendi
  * (staff.expertSlug === slug) profilini. expertSlug null therapist hiçbirini.
  */

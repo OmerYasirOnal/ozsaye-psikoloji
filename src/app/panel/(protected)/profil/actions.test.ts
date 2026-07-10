@@ -247,6 +247,21 @@ test("(7) foto ayarla: imageUrl yazılır, diğer alanlar korunur, 3 revalidate"
   expect(tazele).toHaveBeenNthCalledWith(3, "/");
 });
 
+test("(9) foto — dış URL reddi: yükleme sistemi dışı adres Türkçe hata, upsert/revalidate YOK", async () => {
+  // Kendi slug'ına yetkili terapist bile olsa, url doğrulaması yetki
+  // kontrolünden ÖNCE çalışır → keyfi dış URL upsert'e ulaşamaz.
+  const sonuc = await profilFotoAyarla(
+    {},
+    fdFoto("melek-yildiz", "https://evil.com/x.png"),
+  );
+
+  expect(sonuc).toEqual({
+    hata: "Fotoğraf adresi yükleme sisteminden gelmelidir.",
+  });
+  expect(kaydet).not.toHaveBeenCalled();
+  expect(tazele).not.toHaveBeenCalled();
+});
+
 test("(8) foto kaldır: boş url → imageUrl null, diğer alanlar korunur", async () => {
   oku.mockResolvedValue(
     bosIcerik({ bio: "Mevcut biyografi", imageUrl: "/uploads/blog/eski.png" }),

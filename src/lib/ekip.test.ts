@@ -3,6 +3,7 @@ import {
   satirlardanListe,
   listedenSatirlar,
   birlesikProfil,
+  izinliFotoUrl,
   profiliDuzenleyebilir,
   type ProfilIcerik,
   type ProfilKimligi,
@@ -71,6 +72,38 @@ test("birlesikProfil: içerik dolu ise içerik yansır, kimlik taşınır", () =
   expect(p.university).toBe("Boğaziçi Üniversitesi");
   expect(p.degrees).toEqual(["Lisans"]);
   expect(p.imageUrl).toBe("/uzmanlar/melek-yildiz.jpg");
+});
+
+// --- izinliFotoUrl: yalnız yükleme pipeline'ının ürettiği kaynaklar ---
+
+test("izinliFotoUrl: yerel yükleme yolunu (/uploads/…) kabul eder", () => {
+  expect(izinliFotoUrl("/uploads/blog/x.png")).toBe(true);
+});
+
+test("izinliFotoUrl: Vercel Blob public host'unu kabul eder", () => {
+  expect(
+    izinliFotoUrl("https://abc123.public.blob.vercel-storage.com/blog/x.png"),
+  ).toBe(true);
+});
+
+test("izinliFotoUrl: keyfi dış URL'i reddeder", () => {
+  expect(izinliFotoUrl("https://evil.com/x.png")).toBe(false);
+});
+
+test("izinliFotoUrl: alt-alan hilesini (host değil path'te blob eki) reddeder", () => {
+  expect(
+    izinliFotoUrl("https://evil.com/a.public.blob.vercel-storage.com/x.png"),
+  ).toBe(false);
+});
+
+test("izinliFotoUrl: http (https değil) Blob host'unu reddeder", () => {
+  expect(
+    izinliFotoUrl("http://abc.public.blob.vercel-storage.com/x"),
+  ).toBe(false);
+});
+
+test("izinliFotoUrl: javascript: şemasını reddeder", () => {
+  expect(izinliFotoUrl("javascript:alert(1)")).toBe(false);
 });
 
 // --- profiliDuzenleyebilir: yetki kuralı ---

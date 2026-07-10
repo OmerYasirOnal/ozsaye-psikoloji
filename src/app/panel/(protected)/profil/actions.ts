@@ -5,7 +5,11 @@ import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { site } from "@/lib/site";
-import { profiliDuzenleyebilir, satirlardanListe } from "@/lib/ekip";
+import {
+  izinliFotoUrl,
+  profiliDuzenleyebilir,
+  satirlardanListe,
+} from "@/lib/ekip";
 import type { ProfilIcerik } from "@/lib/ekip";
 import { getProfilIcerik, upsertProfilIcerik } from "@/lib/profil-db";
 
@@ -66,7 +70,10 @@ const BOS_ICERIK: ProfilIcerik = {
 };
 
 // Yalnız `imageUrl`'i yöneten dar şema: slug + url (boş = kaldır → null; dolu
-// ise `/` veya `http` ile başlamalı — endpoint'ten dönen dahili/mutlak URL).
+// ise YALNIZCA kendi yükleme pipeline'ımızın (`saveImage`) üretebileceği bir
+// kaynak — `izinliFotoUrl` bunu doğrular. "`/` veya `http` ile başlar" gibi
+// gevşek bir kontrol, upload endpoint'inin magic-byte/tip/4MB doğrulamalarını
+// atlayarak keyfi dış URL girişine izin verirdi (bkz. izinliFotoUrl NEDEN).
 const fotoSchema = z.object({
   slug: z.enum(
     site.experts.map((e) => e.slug) as [string, ...string[]],
@@ -77,8 +84,8 @@ const fotoSchema = z.object({
     .trim()
     .max(500, "Görsel bağlantısı en fazla 500 karakter olabilir.")
     .refine(
-      (v) => v === "" || v.startsWith("/") || v.startsWith("http"),
-      "Görsel bağlantısı geçersiz.",
+      (v) => v === "" || izinliFotoUrl(v),
+      "Fotoğraf adresi yükleme sisteminden gelmelidir.",
     ),
 });
 
