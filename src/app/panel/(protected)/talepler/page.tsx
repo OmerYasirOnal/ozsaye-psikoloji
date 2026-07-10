@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
-import { listTalepler } from "@/lib/talepler-db";
+import { listPlanliTakvim, listTalepler } from "@/lib/talepler-db";
 import {
   DURUM_DEGERLERI,
   DURUM_ETIKETLERI,
@@ -11,16 +11,18 @@ import {
   uzmanEtiketi,
   type RandevuDurum,
 } from "@/lib/talepler";
+import { ayAraligi, ayParametresi } from "@/lib/takvim";
 import { formatDateTR } from "@/lib/blog";
 import { ServiceIcon } from "@/components/ServiceIcon";
 import DurumRozeti from "./DurumRozeti";
+import TakvimGorunumu from "./TakvimGorunumu";
 
 export const metadata: Metadata = { title: "Randevu Talepleri" };
 
 export default async function TaleplerListe({
   searchParams,
 }: {
-  searchParams: Promise<{ durum?: string }>;
+  searchParams: Promise<{ durum?: string; ay?: string }>;
 }) {
   const session = await verifySession();
   const staff = await getStaffByEmail(session.email);
@@ -28,10 +30,16 @@ export default async function TaleplerListe({
   const isAdmin = staff?.role === "admin";
 
   // ?durum= filtresi — yalnız geçerli enum değeri kabul edilir, aksi halde tümü.
-  const { durum } = await searchParams;
+  const { durum, ay: ayHam } = await searchParams;
   const aktifDurum = DURUM_DEGERLERI.find((d) => d === durum);
 
-  const talepler = await listTalepler(slug, isAdmin, aktifDurum);
+  // Takvim: ?ay= varsa açık; geçersiz değer içinde bulunulan aya düşer.
+  const ay = ayParametresi(ayHam);
+  const { baslangic, bitis } = ayAraligi(ay);
+  const [talepler, planliRandevular] = await Promise.all([
+    listTalepler(slug, isAdmin, aktifDurum),
+    listPlanliTakvim(slug, isAdmin, baslangic, bitis),
+  ]);
 
   // Filtre çipi bağlantısı (aktif çip forest dolu, diğerleri çizgili).
   const cip = (etiket: string, hedefDurum?: RandevuDurum) => {
@@ -59,6 +67,13 @@ export default async function TaleplerListe({
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl text-forest">Randevu Talepleri</h1>
       </div>
+
+      <TakvimGorunumu
+        ay={ay}
+        acik={ayHam !== undefined}
+        aktifDurum={aktifDurum}
+        randevular={planliRandevular}
+      />
 
       {slug === null && !isAdmin && (
         <p className="mb-6 text-forest-muted text-sm">
