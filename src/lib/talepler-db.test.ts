@@ -9,7 +9,13 @@ import {
   planlananaCevir,
   type RandevuDurum,
 } from "./talepler";
-import { getTalep, listTalepler, updateTalep, talepSayilari } from "./talepler-db";
+import {
+  getTalep,
+  listTalepler,
+  listPlanliTakvim,
+  updateTalep,
+  talepSayilari,
+} from "./talepler-db";
 
 // ── Saf yardımcılar (DB'siz) ────────────────────────────────────────────────
 
@@ -57,6 +63,7 @@ test("uzmanEtiketi: slug → ad, null → Farketmez, bilinmeyen → slug", () =>
 async function ekleTalep(v: {
   slug: string | null;
   durum?: RandevuDurum;
+  scheduledAt?: Date;
 }): Promise<string> {
   const [row] = await db
     .insert(appointmentRequests)
@@ -67,6 +74,7 @@ async function ekleTalep(v: {
       expertSlug: v.slug,
       preferredNote: "test",
       status: v.durum ?? "new",
+      scheduledAt: v.scheduledAt ?? null,
     })
     .returning({ id: appointmentRequests.id });
   return row.id;
@@ -244,6 +252,36 @@ test("talepSayilari: durum başına kapsamlı sayı (delta ile; seed'e bağıms�
     expect(sonraAdmin.contacted - onceAdmin.contacted).toBe(1);
   } finally {
     for (const id of [idNew1, idNew2, idFark, idBaska]) {
+      await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));
+    }
+  }
+});
+
+test("listPlanliTakvim: yalnız scheduled + aralık içi + kapsam", async () => {
+  const ts = Date.now();
+  const slugA = `tak-a-${ts}`;
+  const slugB = `tak-b-${ts}`;
+  const icinde = new Date("2026-07-15T11:00:00Z"); // 15 Tem İstanbul
+  const disinda = new Date("2026-08-02T11:00:00Z");
+  const idPlanli = await ekleTalep({ slug: slugA, durum: "scheduled", scheduledAt: icinde });
+  const idFarkPlanli = await ekleTalep({ slug: null, durum: "scheduled", scheduledAt: icinde });
+  const idBaskaUzman = await ekleTalep({ slug: slugB, durum: "scheduled", scheduledAt: icinde });
+  const idAralikDisi = await ekleTalep({ slug: slugA, durum: "scheduled", scheduledAt: disinda });
+  const idPlansiz = await ekleTalep({ slug: slugA, durum: "new" }); // scheduledAt null
+  try {
+    const bas = new Date("2026-06-30T21:00:00Z"); // 1 Tem 00:00 İstanbul
+    const bit = new Date("2026-07-31T21:00:00Z");
+    const idler = (await listPlanliTakvim(slugA, false, bas, bit)).map((r) => r.id);
+    expect(idler).toContain(idPlanli);
+    expect(idler).toContain(idFarkPlanli); // farketmez havuzu kapsamda
+    expect(idler).not.toContain(idBaskaUzman); // IDOR
+    expect(idler).not.toContain(idAralikDisi);
+    expect(idler).not.toContain(idPlansiz);
+    // Admin: başka uzmanınki de görünür
+    const adminIdler = (await listPlanliTakvim(null, true, bas, bit)).map((r) => r.id);
+    expect(adminIdler).toContain(idBaskaUzman);
+  } finally {
+    for (const id of [idPlanli, idFarkPlanli, idBaskaUzman, idAralikDisi, idPlansiz]) {
       await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));
     }
   }
