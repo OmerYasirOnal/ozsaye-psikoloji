@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import ScrollReveal from "./ScrollReveal";
 import { getAllPosts, formatDateTR } from "@/lib/blog";
@@ -54,19 +55,30 @@ export default async function Articles() {
               >
                 {/* Image placeholder */}
                 <div className="relative h-48 overflow-hidden bg-sage/10">
-                  <div className="flex h-full items-center justify-center">
-                    <svg
-                      className="h-12 w-12 text-sage-light transition-transform duration-300 group-hover:scale-110"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                    </svg>
-                  </div>
+                  {article.coverImageUrl ? (
+                    <Image
+                      src={article.coverImageUrl}
+                      alt=""
+                      width={600}
+                      height={315}
+                      unoptimized
+                      className="aspect-[1200/630] h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <svg
+                        className="h-12 w-12 text-sage-light transition-transform duration-300 group-hover:scale-110"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                      </svg>
+                    </div>
+                  )}
                   {/* Category badge */}
                   <span className="absolute left-4 top-4 rounded-full bg-forest/90 px-3 py-1 text-[10px] font-semibold tracking-wider text-cream uppercase">
                     {article.category}

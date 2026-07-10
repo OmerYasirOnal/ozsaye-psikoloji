@@ -43,12 +43,14 @@ export default async function ProfilDuzenle({
   return (
     <section className="space-y-6">
       <div>
-        <Link
-          href="/panel/profil"
-          className="text-forest-muted text-sm underline"
-        >
-          ← Profillere dön
-        </Link>
+        {staff.role === "admin" && (
+          <Link
+            href="/panel/profil"
+            className="text-forest-muted text-sm underline"
+          >
+            ← Profillere dön
+          </Link>
+        )}
         <h1 className="mt-3 font-display text-2xl text-forest">
           {uzman.name}
         </h1>
