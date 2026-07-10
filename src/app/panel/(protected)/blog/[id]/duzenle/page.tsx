@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -5,6 +6,8 @@ import { verifySession } from "@/lib/auth/dal";
 import { getPostByIdAdmin } from "@/lib/blog-admin";
 import PostForm from "../../PostForm";
 import { updatePost, setPostStatus } from "../../actions";
+
+export const metadata: Metadata = { title: "Yazıyı Düzenle" };
 
 export default async function YaziDuzenlePage({
   params,

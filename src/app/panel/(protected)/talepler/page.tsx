@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
@@ -5,12 +6,16 @@ import { listTalepler } from "@/lib/talepler-db";
 import {
   DURUM_DEGERLERI,
   DURUM_ETIKETLERI,
+  RANDEVU_AKSAN_SINIFI,
   maskeliTelefon,
   uzmanEtiketi,
   type RandevuDurum,
 } from "@/lib/talepler";
 import { formatDateTR } from "@/lib/blog";
+import { ServiceIcon } from "@/components/ServiceIcon";
 import DurumRozeti from "./DurumRozeti";
+
+export const metadata: Metadata = { title: "Randevu Talepleri" };
 
 export default async function TaleplerListe({
   searchParams,
@@ -79,13 +84,19 @@ export default async function TaleplerListe({
             <li key={t.id}>
               <Link
                 href={`/panel/talepler/${t.id}`}
-                className="flex items-center justify-between gap-4 rounded-lg border border-stone bg-warm-white px-5 py-4"
+                className={`flex items-center justify-between gap-4 rounded-lg border border-stone border-l-4 ${RANDEVU_AKSAN_SINIFI[t.status]} bg-warm-white px-5 py-4`}
               >
-                <div className="min-w-0">
-                  <p className="text-forest font-medium">{t.patientName}</p>
-                  <p className="text-forest-muted text-sm">
-                    {maskeliTelefon(t.patientPhone)} · {uzmanEtiketi(t.expertSlug)}
-                  </p>
+                <div className="flex min-w-0 items-center gap-3">
+                  <ServiceIcon
+                    name="user"
+                    className="h-5 w-5 shrink-0 text-sage"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-forest font-medium">{t.patientName}</p>
+                    <p className="text-forest-muted text-sm">
+                      {maskeliTelefon(t.patientPhone)} · {uzmanEtiketi(t.expertSlug)}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-4">
                   <span className="text-forest-muted text-sm">

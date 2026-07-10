@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { ServiceIcon } from "@/components/ServiceIcon";
 import { verifySession } from "@/lib/auth/dal";
 import { listPostsAdmin } from "@/lib/blog-admin";
 import { formatDateTR } from "@/lib/blog";
+
+export const metadata: Metadata = { title: "Blog Yazıları" };
 
 export default async function PanelBlogListesi() {
   await verifySession(); // DAL cache'li — layout zaten çağırdı, bedava
@@ -28,15 +33,33 @@ export default async function PanelBlogListesi() {
           {posts.map((post) => (
             <li
               key={post.id}
-              className="flex items-center justify-between rounded-lg border border-stone bg-warm-white px-5 py-4"
+              className={`flex items-center justify-between gap-4 rounded-lg border border-stone border-l-4 ${
+                post.status === "published" ? "border-l-forest" : "border-l-stone"
+              } bg-warm-white px-5 py-4`}
             >
-              <div>
-                <p className="text-forest font-medium">{post.title}</p>
-                <p className="text-forest-muted text-sm">
-                  {post.category} · {formatDateTR(post.updatedAt.toISOString())}
-                </p>
+              <div className="flex min-w-0 items-center gap-4">
+                {post.coverImageUrl ? (
+                  <Image
+                    src={post.coverImageUrl}
+                    alt=""
+                    width={56}
+                    height={56}
+                    unoptimized
+                    className="h-14 w-14 shrink-0 rounded-md object-cover"
+                  />
+                ) : (
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-cream">
+                    <ServiceIcon name="document" className="h-6 w-6 text-sage" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-forest font-medium">{post.title}</p>
+                  <p className="text-forest-muted text-sm">
+                    {post.category} · {formatDateTR(post.updatedAt.toISOString())}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex shrink-0 items-center gap-4">
                 {post.status === "published" ? (
                   <span className="rounded-full bg-forest px-3 py-1 text-xs text-warm-white">
                     yayında

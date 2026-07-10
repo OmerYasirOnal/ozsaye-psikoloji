@@ -1,6 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { verifySession } from "@/lib/auth/dal";
+import { ServiceIcon } from "@/components/ServiceIcon";
 import { logout } from "./actions";
+
+export const metadata: Metadata = {
+  title: { template: "%s · Panel", default: "Panel" },
+  robots: { index: false, follow: false },
+};
 
 export default async function PanelLayout({
   children,
@@ -27,19 +34,25 @@ export default async function PanelLayout({
           </div>
         </div>
         <nav className="mt-3 flex gap-5 text-sm">
-          <Link href="/panel" className="text-forest-muted hover:text-forest">
+          <Link
+            href="/panel"
+            className="flex items-center gap-1.5 text-forest-muted hover:text-forest"
+          >
+            <ServiceIcon name="grid" className="h-4 w-4 text-sage" />
             Gösterge
           </Link>
           <Link
             href="/panel/talepler"
-            className="text-forest-muted hover:text-forest"
+            className="flex items-center gap-1.5 text-forest-muted hover:text-forest"
           >
+            <ServiceIcon name="user" className="h-4 w-4 text-sage" />
             Talepler
           </Link>
           <Link
             href="/panel/blog"
-            className="text-forest-muted hover:text-forest"
+            className="flex items-center gap-1.5 text-forest-muted hover:text-forest"
           >
+            <ServiceIcon name="document" className="h-4 w-4 text-sage" />
             Blog
           </Link>
         </nav>

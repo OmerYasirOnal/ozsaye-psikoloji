@@ -15,6 +15,7 @@ export async function listPostsAdmin() {
       title: blogPosts.title,
       status: blogPosts.status,
       category: blogPosts.category,
+      coverImageUrl: blogPosts.coverImageUrl,
       updatedAt: blogPosts.updatedAt,
       publishedAt: blogPosts.publishedAt,
     })

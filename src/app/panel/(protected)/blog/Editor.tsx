@@ -68,8 +68,7 @@ export default function Editor({ initialMarkdown, onChange }: Props) {
     content: initialMarkdown, // tiptap-markdown içerik olarak markdown'ı ayrıştırır
     editorProps: {
       attributes: {
-        class:
-          "article-prose min-h-[20rem] rounded-md rounded-t-none border border-stone bg-warm-white p-4 focus:outline-none",
+        class: "article-prose min-h-[20rem] bg-warm-white p-4 focus:outline-none",
       },
     },
     onUpdate: ({ editor }) => {
@@ -95,7 +94,7 @@ export default function Editor({ initialMarkdown, onChange }: Props) {
 
   if (!editor) {
     return (
-      <div className="min-h-[20rem] rounded-md border border-stone bg-warm-white p-4 text-forest-muted">
+      <div className="min-h-[20rem] rounded-lg border border-stone bg-warm-white p-4 text-forest-muted shadow-sm">
         Editör yükleniyor…
       </div>
     );
@@ -147,8 +146,8 @@ export default function Editor({ initialMarkdown, onChange }: Props) {
   }
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center gap-1 rounded-md rounded-b-none border border-stone bg-warm-white p-2">
+    <div className="overflow-hidden rounded-lg border border-stone shadow-sm">
+      <div className="flex flex-wrap items-center gap-1 border-b border-stone bg-cream p-2">
         <ToolbarButton
           label="Kalın"
           active={active?.bold}
@@ -237,7 +236,9 @@ export default function Editor({ initialMarkdown, onChange }: Props) {
       <EditorContent editor={editor} />
 
       {uploadError && (
-        <p className="mt-2 text-sm font-semibold text-forest">{uploadError}</p>
+        <p className="px-4 pb-3 text-sm font-semibold text-forest">
+          {uploadError}
+        </p>
       )}
     </div>
   );
