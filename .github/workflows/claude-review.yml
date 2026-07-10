@@ -4,12 +4,14 @@ name: Claude PR Review
 # değişiklikleri inceler ve bulgularını PR'a yorum olarak ekler.
 # scripts/review.sh ile aynı amaca hizmet eder; bu sürüm CI'da otomatik çalışır.
 #
-# DURUM (2026-07-09): Bu job İŞLEVSİZ — kimlik bilgisi (ANTHROPIC_API_KEY /
-# CLAUDE_CODE_OAUTH_TOKEN / OIDC federation env'leri) tanımlı değil; action
-# sürümüne göre koşu kırmızı DÜŞEBİLİR ya da hiç inceleme yapmadan SESSİZCE
-# YEŞİL geçebilir (yeşil check "review yapıldı" demek DEĞİLDİR). Gerçek merge
-# kapısı lint-build. Düzeltmek için repo secret'ı gerekir; o zamana dek
-# bağımsız review oturum içi sıfır-bağlamlı subagent'la yürütülür (CLAUDE.md).
+# DURUM (2026-07-10): Kimlik bilgisi (ANTHROPIC_API_KEY veya
+# CLAUDE_CODE_OAUTH_TOKEN repo secret'ı) tanımlı DEĞİLSE job artık kırmızı
+# düşmez — ilk adım secret yokluğunu tespit edip incelemeyi AÇIKLAMALI olarak
+# atlar (job yeşil biter ama step summary "atlandı" der; yeşil ≠ review
+# yapıldı). Secret eklendiği anda inceleme kendiliğinden çalışmaya başlar
+# (secret'lar aşağıda action'a bağlı). O zamana dek gerçek bağımsız review,
+# oturum içi sıfır-bağlamlı subagent'la yürütülür (bkz. global CLAUDE.md
+# kuralı); gerçek merge kapısı her zaman lint-build'dir.
 
 on:
   pull_request:
@@ -27,14 +29,42 @@ jobs:
     # Fork'lardan gelen PR'larda çalıştırma (App erişimi olmaz)
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
+      # secrets bağlamı job/step `if:` ifadelerinde kullanılamaz — varlık
+      # kontrolü env üzerinden bir run adımında yapılır (GitHub Actions kısıtı).
+      - name: Kimlik bilgisi kontrolü
+        id: kimlik
+        env:
+          API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -n "$API_KEY" ] || [ -n "$OAUTH_TOKEN" ]; then
+            echo "var=true" >> "$GITHUB_OUTPUT"
+            echo "Kimlik bilgisi bulundu — inceleme çalışacak."
+          else
+            echo "var=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Claude PR Review atlandı"
+              echo ""
+              echo "Repo secret'ı yok (\`ANTHROPIC_API_KEY\` veya \`CLAUDE_CODE_OAUTH_TOKEN\`)."
+              echo "Bu YEŞİL check bir inceleme yapıldığı anlamına GELMEZ — bağımsız"
+              echo "review oturum içi sıfır-bağlamlı subagent'la yürütülür (CLAUDE.md)."
+              echo "Otomatik incelemeyi açmak için: Settings → Secrets → Actions'a"
+              echo "secret'lardan birini ekleyin; başka değişiklik gerekmez."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Checkout
+        if: steps.kimlik.outputs.var == 'true'
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Claude review
+        if: steps.kimlik.outputs.var == 'true'
         uses: anthropics/claude-code-action@v1
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: "--max-turns 20"
           prompt: |
             Sen kıdemli, titiz ve BAĞIMSIZ bir kod gözden geçiricisin. Bu Pull
