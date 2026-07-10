@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { site } from "@/lib/site";
 
-// Statik export için route handler statik üretilmeli.
+// Manifest istek başına değişmez — sunucu modunda da statik üretilsin.
 export const dynamic = "force-static";
 
 /**
