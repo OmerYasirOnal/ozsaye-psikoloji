@@ -8,6 +8,7 @@ import { getTalep, updateTalep } from "@/lib/talepler-db";
 import {
   DURUM_DEGERLERI,
   istanbulTarihSaat,
+  izinliGecis,
   planlananaCevir,
   type RandevuDurum,
 } from "@/lib/talepler";
@@ -113,5 +114,63 @@ export async function talebiGuncelle(
     }
   }
 
+  return { ok: true };
+}
+
+// Tek tık durum ilerletme (stepper hızlı aksiyonları). Yalnız-durum yazar:
+// scheduledAt/internalNote'a DOKUNMAZ (updateTalep kısmi güncelleme sözleşmesi).
+const ilerletSchema = z.object({
+  id: z.uuid("Geçersiz talep kimliği."),
+  hedef: z.enum(
+    DURUM_DEGERLERI as [RandevuDurum, ...RandevuDurum[]],
+    "Geçersiz durum değeri.",
+  ),
+});
+
+export async function talebiDurumIlerlet(
+  _prev: TalepFormState,
+  formData: FormData,
+): Promise<TalepFormState> {
+  // 1) Kimlik doğrulama HER ZAMAN ilk sırada.
+  const session = await verifySession();
+  const staff = await getStaffByEmail(session.email);
+  if (!staff) return { hata: "Personel kaydı bulunamadı." };
+
+  // 2) Doğrulama.
+  const parsed = ilerletSchema.safeParse({
+    id: formData.get("id"),
+    hedef: formData.get("hedef"),
+  });
+  if (!parsed.success) {
+    const first = parsed.error.issues[0];
+    return { hata: first?.message ?? "İstek geçersiz." };
+  }
+  const { id, hedef } = parsed.data;
+
+  // 3) Mevcut durum (kapsam-korumalı) + beyaz-liste kontrolü. "Planlandı"
+  //    burada YOK (tarih ister); done/cancelled'dan çıkış formun select'inde.
+  const isAdmin = staff.role === "admin";
+  const onceki = await getTalep(id, staff.expertSlug, isAdmin);
+  if (!onceki) {
+    return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
+  }
+  if (!izinliGecis(onceki.status, hedef)) {
+    return {
+      hata: "Bu durum geçişine buradan izin verilmiyor — aşağıdaki formu kullanın.",
+    };
+  }
+
+  // 4) KAPSAM-korumalı yalnız-durum güncellemesi.
+  const guncel = await updateTalep(id, staff.expertSlug, isAdmin, {
+    status: hedef,
+  });
+  if (!guncel) {
+    return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
+  }
+
+  // 5) Panel yüzeylerini tazele.
+  revalidatePath("/panel/talepler");
+  revalidatePath(`/panel/talepler/${id}`);
+  revalidatePath("/panel");
   return { ok: true };
 }
