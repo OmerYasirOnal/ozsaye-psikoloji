@@ -61,10 +61,11 @@ Türkçe psikoloji kliniği tanıtım sitesi; tüm arayüz metni Türkçe (`<htm
 Amaç, çalışan oturumun kör noktalarını yakalamaktır. `review-rapor.md` geçici
 çıktıdır (repoya commit'lenmez; `.gitignore`'da).
 
-CI'daki `.github/workflows/claude-review.yml` job'u **işlevsiz** (2026-07-09):
-kimlik bilgisi (`ANTHROPIC_API_KEY`/`CLAUDE_CODE_OAUTH_TOKEN`/OIDC) tanımlı değil;
-action sürümüne göre koşu kırmızı düşebilir YA DA hiç inceleme yapmadan sessizce
-yeşil geçebilir — **yeşil "review" check'i review yapıldığı anlamına GELMEZ.**
-Merge'i hiçbir durumda bloke etmez (branch protection yok; gerçek kapı
-`lint-build`). Düzeltmek repo secret'ı gerektirir. Bağımsız review bu yüzden
-oturum içinden (sıfır-bağlamlı subagent) yürütülür.
+CI'daki `.github/workflows/claude-review.yml` job'u (2026-07-10'dan beri):
+repo secret'ı (`ANTHROPIC_API_KEY` veya `CLAUDE_CODE_OAUTH_TOKEN`) tanımlı
+DEĞİLKEN incelemeyi **açıklamalı atlar** — job ~6 sn'de yeşil biter, step
+summary "atlandı" der. **Yeşil "review" check'i bu yüzden hâlâ review
+yapıldığı anlamına GELMEZ** (secret eklenene dek). Secret eklenirse inceleme
+kendiliğinden çalışmaya başlar (workflow'a bağlı). Merge'i hiçbir durumda
+bloke etmez (branch protection yok; gerçek kapı `lint-build`). Bağımsız
+review bu yüzden oturum içinden (sıfır-bağlamlı subagent) yürütülür.
