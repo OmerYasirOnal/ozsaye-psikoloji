@@ -63,3 +63,34 @@ export function hastaOnayiMetni(ad: string): { subject: string; text: string } {
 
   return { subject, text };
 }
+
+/**
+ * Hastaya gönderilen "randevunuz planlandı" bilgilendirme e-postasının SAF metni
+ * (konu + düz gövde). Uzman panelden bir talebi "Planlandı" durumuna + tarihe
+ * aldığında (tarih değişince yeniden) tetiklenir. Selamlamada yalnız İLK AD
+ * kullanılır; başka hasta verisi, UZMAN ADI/TELEFON/ADRES ve site placeholder'ı
+ * ([DOLDUR]) bilinçli olarak EKLENMEZ (sızıntı yasak). `tarihSaatTR` çağıran
+ * tarafça İstanbul yereli okunur biçimde (`istanbulTarihSaat`) verilir.
+ *
+ * KVKK: yalnız talep-işleme amaçlı işlem bildirimidir (rıza formda alınır);
+ * pazarlama içeriği yok.
+ */
+export function hastaPlanlandiMetni(
+  ad: string,
+  tarihSaatTR: string,
+): { subject: string; text: string } {
+  const ilkAd = ad.trim().split(/\s+/)[0] ?? "";
+  const selam = ilkAd !== "" ? `Merhaba ${ilkAd},` : "Merhaba,";
+
+  const subject = "Randevunuz planlandı — Öz & Saye Psikoloji";
+  const text =
+    `${selam}\n\n` +
+    "Randevunuz planlanmıştır.\n\n" +
+    `Tarih ve saat: ${tarihSaatTR}\n\n` +
+    "Bir değişiklik gerekirse bu e-postayı yanıtlayarak bize " +
+    "bildirebilirsiniz.\n\n" +
+    "Sağlıklı günler dileriz.\n" +
+    "Öz & Saye Psikoloji";
+
+  return { subject, text };
+}

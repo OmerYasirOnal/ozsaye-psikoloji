@@ -1,5 +1,10 @@
 import "server-only";
-import { KLINIK_KUTU, bildirimAlicilari, hastaOnayiMetni } from "./bildirim";
+import {
+  KLINIK_KUTU,
+  bildirimAlicilari,
+  hastaOnayiMetni,
+  hastaPlanlandiMetni,
+} from "./bildirim";
 
 const FROM = "Öz & Saye <randevu@bildirim.ozsaye.com>";
 // KLINIK_KUTU (info@ozsaye.com) SAF `./bildirim` modülünde tanımlıdır — hem
@@ -128,6 +133,55 @@ export async function sendHastaOnayi(
   if (!key) {
     console.log(
       `\n[DEV randevu-hasta-onayi] → ${hastaEmail}\n${subject}\n${text}\n`,
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM,
+      to: hastaEmail,
+      // Yanıtlar kliniğin ortak kutusuna (info@) düşsün.
+      reply_to: KLINIK_KUTU,
+      subject,
+      // Düz metin: enjeksiyon yüzeyi bırakmamak için html değil text.
+      text,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Resend hata: ${res.status} ${await res.text()}`);
+  }
+}
+
+/**
+ * Hastaya "randevunuz planlandı" bilgilendirme e-postası — uzman panelden bir
+ * talebi "Planlandı" durumuna + tarihe aldığında gönderilir (tarih değişince
+ * yeniden). `sendHastaOnayi` aynası: Reply-To = klinik kutusu (info@), düz metin,
+ * dev'de RESEND_API_KEY boşken konsol yedeği. İçerik SAF `hastaPlanlandiMetni`'nden
+ * gelir: yalnız ilk ad + verilen tarih-saat; uzman adı/telefon/adres yankılanmaz,
+ * [DOLDUR] sızdırılmaz.
+ *
+ * KVKK: yalnız talep-işleme amaçlı işlem bildirimidir (rıza formda alınır);
+ * pazarlama içeriği yok.
+ */
+export async function sendHastaPlanlandi(
+  hastaEmail: string,
+  hastaAd: string,
+  tarihSaatTR: string,
+): Promise<void> {
+  const key = process.env.RESEND_API_KEY;
+  const { subject, text } = hastaPlanlandiMetni(hastaAd, tarihSaatTR);
+
+  // Dev: anahtar yoksa konsola bas (gerçek e-posta gerekmez)
+  if (!key) {
+    console.log(
+      `\n[DEV randevu-planlandi] → ${hastaEmail}\n${subject}\n${text}\n`,
     );
     return;
   }

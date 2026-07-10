@@ -32,9 +32,14 @@ export default function TalepDuzenleForm({
           {state.hata}
         </p>
       )}
-      {state.ok && (
+      {state.ok && !state.uyari && (
         <p className="text-forest-muted" role="status">
           Kaydedildi.
+        </p>
+      )}
+      {state.uyari && (
+        <p className="text-forest" role="status">
+          {state.uyari}
         </p>
       )}
 

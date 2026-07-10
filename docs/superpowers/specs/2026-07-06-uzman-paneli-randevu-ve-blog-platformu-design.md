@@ -20,7 +20,7 @@ Klinik "profesyonel örnek" olarak `butunculpsikoloji.com` ve `diyetisyenhale.co
 ## 2. Kapsam DIŞI (v1 — YAGNI)
 - **Hasta hesapları / hasta portalı YOK.** 2 terapist için gereksiz; hasta hesapsız randevu talep eder.
 - **Canlı takvim / anlık slot rezervasyonu YOK.** Talep + onay modeli; sonradan yükseltmeye açık tasarlanır.
-- **Randevu yönetim ekranları (`/panel/talepler` liste/detay/durum/iç not/hızlı iletişim) v1'de YOK.** Kullanıcı kararı (2026-07-07): şimdilik önceliksiz. v1'de form yalnızca DB'ye kaydeder + uzmana e-posta bildirimi gönderir; talepleri panelden görüp durumunu yönetme ekranı **v1.1'e ertelendi**. Veri modeli (§5) buna hazır bırakılır ki ekran sonradan kolayca eklensin.
+- **Randevu yönetim ekranları (`/panel/talepler` liste/detay/durum/iç not/hızlı iletişim) v1'de YOK.** Kullanıcı kararı (2026-07-07): şimdilik önceliksiz. v1'de form yalnızca DB'ye kaydeder + uzmana e-posta bildirimi gönderir; talepleri panelden görüp durumunu yönetme ekranı **v1.1'e ertelendi**. Veri modeli (§5) buna hazır bırakılır ki ekran sonradan kolayca eklensin. **Güncelleme (2026-07-09):** bu ekranlar **Faz 4'te yayınlandı** — `/panel/talepler` liste/detay + durum/iç not/planlanan tarih + hızlı iletişim (WhatsApp/ara/e-posta) ve göstergedeki durum-bazlı talep sayıları artık canlı.
 - **Online ödeme YOK.**
 - **Otomatik SMS / WhatsApp YOK.** v1'de e-posta bildirimi + panelde manuel "WhatsApp'tan yaz" linki (bu da v1.1 randevu ekranıyla birlikte gelir).
 - Uzmanların kendi `/ekip` profilini panelden düzenlemesi → v1.1'e opsiyonel (placeholder veri sorununu da çözebilir).
@@ -73,11 +73,11 @@ Auth.js için gereken `users/accounts/sessions/verification_tokens` tabloları D
 ## 7. Uzman paneli (`/panel`, auth arkasında)
 - **Next 16 `proxy.ts`** (eski adıyla middleware) ile `/panel/**` korunur; oturum yoksa `/panel/giris`'e.
 - **Giriş** (`/panel/giris`): e-posta gir → magic-link → tıkla → oturum. Yalnız `staff` e-postaları. Oturum uzun ömürlü (30 gün). **Sitede hiçbir yerde bu sayfaya link/buton yok** (bkz. §3 "Panel girişi") — doğrudan URL ile girilir.
-- **Gösterge** (`/panel`): v1'de basit karşılama; ileri metrikler (yeni talep sayısı vb.) v1.1 randevu ekranlarıyla birlikte gelir.
+- **Gösterge** (`/panel`): v1'de basit karşılama; ileri metrikler (yeni talep sayısı vb.) v1.1 randevu ekranlarıyla birlikte gelir. **Güncelleme (2026-07-09):** durum-bazlı talep sayıları göstergesi **Faz 4'te yayınlandı**.
 - **Blog listesi** (`/panel/blog`): taslak/yayında yazılar (tüm uzmanların — paylaşımlı yetki); yeni yazı.
 - **Yeni/düzenle** (`/panel/blog/yeni`, `/panel/blog/[id]/duzenle`): başlık, özet, WYSIWYG içerik (görsel yükleme → Vercel Blob), kapak görseli, slug (başlıktan otomatik + elle düzeltilebilir), taslak kaydet / yayınla. Yayınla → `/blog`'da görünür (ISR revalidate). Herhangi bir `staff` herhangi bir yazıyı düzenleyebilir.
 - Panel UI marka token'larıyla (forest/forest-muted/cream/sage aksan) ama yoğunluk/kullanılabilirlik için sade ve işlevsel.
-- **v1.1 (ertelendi, bu spec'in kapsamı dışında — bkz. §2):** `/panel/talepler` durum-filtreli liste (uzman kendi taleplerini + "farketmez" havuzunu görür), `/panel/talepler/[id]` detay (durum değiştir, iç not, planlanan tarih, hızlı iletişim: WhatsApp/ara/e-posta), gösterge panelinde talep sayıları.
+- **v1.1 (ertelendi, bu spec'in kapsamı dışında — bkz. §2):** `/panel/talepler` durum-filtreli liste (uzman kendi taleplerini + "farketmez" havuzunu görür), `/panel/talepler/[id]` detay (durum değiştir, iç not, planlanan tarih, hızlı iletişim: WhatsApp/ara/e-posta), gösterge panelinde talep sayıları. **Güncelleme (2026-07-09):** bu ekranların tamamı **Faz 4'te yayınlandı** (durum-filtreli liste + detay + iç not + planlanan tarih + hızlı iletişim + gösterge sayıları); IDOR koruması veri katmanında (`kapsamKosulu`, `src/lib/talepler-db.ts`).
 
 ## 8. Blog geçişi
 - `content/blog/*.md` yazıları tek seferlik, idempotent script (`scripts/migrate-blog-to-db.ts`) ile `blog_posts`'a taşınır; **slug, tarih, draft durumu korunur** (SEO/URL kırılmaz).
@@ -89,7 +89,7 @@ Auth.js için gereken `users/accounts/sessions/verification_tokens` tabloları D
 ## 9. Bildirimler (v1)
 - **Resend**, gönderen alt alan `bildirim.ozsaye.com` (SPF/DKIM burada; kök alanın GoDaddy mail'ine dokunmaz).
 - Yeni talep → uzmana/kliniğe e-posta (hasta adı/iletişim/not içerir). Bu, v1'de talebi öğrenmenin **tek yolu** (panel talep ekranı yok — bkz. §2/§7).
-- **v1.1 (ertelendi):** "Planlandı" durumu → hastaya bilgilendirme e-postası (panelden uzman tetikler — bu ekran henüz yok).
+- **Güncelleme (2026-07-10):** "Planlandı" durumu → hastaya bilgilendirme e-postası **eklendi**. Uzman panelden bir talebi `scheduled` + tarih yapınca hastaya nazik Türkçe bilgilendirme gider (yalnız İLK AD + tarih-saat; uzman adı/telefon/adres yok); tarih sonradan değişirse hasta YENİ tarihle yeniden bilgilendirilir, yalnız iç not düzenlemesi mail üretmez. Gönderim `sendHastaPlanlandi` (Reply-To=info@), SAF metin `hastaPlanlandiMetni`; mail düşse bile DB güncellemesi ayakta kalır (uzmana sakin uyarı). KVKK: talep-işleme amaçlı işlem bildirimi.
 - **Sonra (v1 dışı):** Netgsm/İleti Merkezi SMS veya WhatsApp Business — maliyet + onay gerektirir.
 
 ## 10. KVKK / güvenlik
@@ -134,6 +134,6 @@ Kullanıcı kararıyla (2026-07-07) sıralama, blog paneli öne alınacak + rand
 
 - **Faz 0 — Altyapı:** static export kaldır; Postgres (yerelde Docker, üretimde Neon) + Drizzle; jose+cookie+DB-token auth iskeleti; `staff` seed; magic-link giriş + `/panel` guard + DAL. **Plan yazıldı:** `docs/superpowers/plans/2026-07-06-faz0-altyapi-ve-uzman-girisi.md`.
 - **Faz 1 — Blog paneli (öncelik):** `content/blog/*.md` → `blog_posts` migration; `blog.ts` DB'den okuma; panel WYSIWYG editör (paylaşımlı yetki) + Blob görsel yükleme + taslak/yayın + ISR.
-- **Faz 2 — Randevu (sade):** form → Server Action → `appointment_requests`'e yaz + Resend bildirimi. **`/panel/talepler` ekranları bu fazda YOK** (v1.1'e ertelendi — bkz. §2/§7).
+- **Faz 2 — Randevu (sade):** form → Server Action → `appointment_requests`'e yaz + Resend bildirimi. **`/panel/talepler` ekranları bu fazda YOK** (v1.1'e ertelendi — bkz. §2/§7). **Güncelleme:** talep ekranları sonradan **Faz 4'te (2026-07-09)** eklendi.
 - **Faz 3 — Cutover + KVKK:** Vercel+Neon+Resend provizyon; gerçek uzman e-postalarıyla seed; DNS repoint (MX korunur); PHP/FTP emekli; KVKK/gizlilik metin güncelle; uçtan uca doğrulama.
-- **v1.1 (ayrı, sonraki bir spec/plan döngüsü):** `/panel/talepler` liste/detay/durum/iç not/hızlı iletişim ekranları; ihtiyaç netleşince (klinik gerçek kullanım geri bildirimiyle) ele alınır.
+- **v1.1 → Faz 4 (uygulandı):** `/panel/talepler` liste/detay/durum/iç not/hızlı iletişim ekranları **2026-07-09'da yayınlandı**; hastaya "Planlandı" bilgilendirme e-postası **2026-07-10'da eklendi** (§9). Kalan opsiyonel v1.1 maddesi: uzmanların kendi `/ekip` profilini panelden düzenlemesi (§2 — hâlâ açık/opsiyonel).

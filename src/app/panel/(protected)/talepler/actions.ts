@@ -4,14 +4,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
-import { updateTalep } from "@/lib/talepler-db";
+import { getTalep, updateTalep } from "@/lib/talepler-db";
 import {
   DURUM_DEGERLERI,
+  istanbulTarihSaat,
   planlananaCevir,
   type RandevuDurum,
 } from "@/lib/talepler";
+import { sendHastaPlanlandi } from "@/lib/email/send";
 
-export type TalepFormState = { hata?: string; ok?: boolean };
+export type TalepFormState = { hata?: string; ok?: boolean; uyari?: string };
 
 // Durum + planlanan tarih + iç not TEK formda güncellenir (tek "Kaydet").
 const schema = z.object({
@@ -54,7 +56,16 @@ export async function talebiGuncelle(
     };
   }
 
-  // 3) KAPSAM-korumalı güncelleme (IDOR: başka uzmanın talebi güncellenemez —
+  // 3) Güncelleme ÖNCESİ satır (kapsam-korumalı; null ise mevcut bulunamadı/
+  //    yetki yok). Hastaya "planlandı" bildirimi kararı bu ESKİ satıra dayanır
+  //    (durum/tarih gerçekten değişti mi?) ve hasta ad/e-postası buradan alınır
+  //    (bu güncellemede değişmezler).
+  const onceki = await getTalep(id, staff.expertSlug);
+  if (!onceki) {
+    return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
+  }
+
+  // 4) KAPSAM-korumalı güncelleme (IDOR: başka uzmanın talebi güncellenemez —
   //    yetki WHERE'de; kapsam dışıysa updateTalep null döner).
   const guncel = await updateTalep(id, staff.expertSlug, {
     status: durum,
@@ -65,9 +76,40 @@ export async function talebiGuncelle(
     return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
   }
 
-  // 4) İlgili panel yüzeylerini tazele.
+  // 5) İlgili panel yüzeylerini tazele.
   revalidatePath("/panel/talepler");
   revalidatePath(`/panel/talepler/${id}`);
   revalidatePath("/panel");
+
+  // 6) "Planlandı" + tarih → hastaya bilgilendirme e-postası, YALNIZ gerçek bir
+  //    DEĞİŞİKLİKTE: yeni durum scheduled + tarih dolu VE (önceki durum scheduled
+  //    değildi VEYA planlanan tarih değişti). Tarih değişince hasta YENİ tarihle
+  //    yeniden bilgilendirilir; yalnız iç not düzenlemesi mail üretmez.
+  const planliBildirim =
+    durum === "scheduled" &&
+    scheduledAt !== null &&
+    (onceki.status !== "scheduled" ||
+      onceki.scheduledAt?.getTime() !== scheduledAt.getTime());
+
+  // Mail KENDİ try/catch'inde: düşse bile DB güncellemesi ayakta kalır; uzmana
+  // sakin bir uyarı döner (talep yine kaydedildi). `&& scheduledAt` yalnız TS
+  // daraltması içindir — planliBildirim zaten tarihin dolu olduğunu garanti eder.
+  if (planliBildirim && scheduledAt) {
+    try {
+      await sendHastaPlanlandi(
+        onceki.patientEmail,
+        onceki.patientName,
+        istanbulTarihSaat(scheduledAt),
+      );
+    } catch (e) {
+      console.error("[panel] hastaya planlandı bildirimi gönderilemedi:", e);
+      return {
+        ok: true,
+        uyari:
+          "Talep güncellendi ancak hastaya bilgilendirme e-postası gönderilemedi.",
+      };
+    }
+  }
+
   return { ok: true };
 }

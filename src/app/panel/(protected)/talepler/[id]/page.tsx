@@ -4,18 +4,14 @@ import { z } from "zod";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { getTalep } from "@/lib/talepler-db";
-import { istanbulInputDegeri, uzmanEtiketi, whatsappNumarasi } from "@/lib/talepler";
+import {
+  istanbulInputDegeri,
+  istanbulTarihSaat,
+  uzmanEtiketi,
+  whatsappNumarasi,
+} from "@/lib/talepler";
 import DurumRozeti from "../DurumRozeti";
 import TalepDuzenleForm from "./TalepDuzenleForm";
-
-// Türkçe okunur tarih-saat (İstanbul).
-function istanbulTarihSaat(d: Date): string {
-  return new Intl.DateTimeFormat("tr-TR", {
-    timeZone: "Europe/Istanbul",
-    dateStyle: "long",
-    timeStyle: "short",
-  }).format(d);
-}
 
 export default async function TalepDetay({
   params,
