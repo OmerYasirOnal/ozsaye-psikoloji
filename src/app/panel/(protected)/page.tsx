@@ -10,7 +10,11 @@ import {
 } from "@/lib/talepler";
 import { ServiceIcon } from "@/components/ServiceIcon";
 
-export const metadata: Metadata = { title: "Gösterge" };
+// Not: layout'un title.template'i yalnız ÇOCUK segmentlere uygulanır; bu sayfa
+// layout ile AYNI segmentte olduğundan şablonu kendisi alamaz (kök şablona
+// düşer: "… | Öz & Saye Psikoloji"). `absolute` tüm şablonları atlayıp diğer
+// panel sayfalarıyla tutarlı "… · Panel" başlığını doğrudan verir.
+export const metadata: Metadata = { title: { absolute: "Gösterge · Panel" } };
 
 export default async function PanelHome() {
   const session = await verifySession();
