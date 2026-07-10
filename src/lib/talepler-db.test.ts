@@ -81,16 +81,36 @@ test("getTalep: kapsam (IDOR) — uzman yalnız kendi + farketmez taleplerini g�
   const idB = await ekleTalep({ slug: slugB });
   try {
     // A kendi talebini + farketmez havuzunu görür
-    expect((await getTalep(idA, slugA))?.id).toBe(idA);
-    expect((await getTalep(idFark, slugA))?.id).toBe(idFark);
+    expect((await getTalep(idA, slugA, false))?.id).toBe(idA);
+    expect((await getTalep(idFark, slugA, false))?.id).toBe(idFark);
     // A, B'nin talebini GÖREMEZ (id tahmini işe yaramaz) — IDOR koruması
-    expect(await getTalep(idB, slugA)).toBeNull();
-    expect(await getTalep(idA, slugB)).toBeNull();
+    expect(await getTalep(idB, slugA, false)).toBeNull();
+    expect(await getTalep(idA, slugB, false)).toBeNull();
     // slug'sız staff yalnız farketmez görür
-    expect((await getTalep(idFark, null))?.id).toBe(idFark);
-    expect(await getTalep(idA, null)).toBeNull();
+    expect((await getTalep(idFark, null, false))?.id).toBe(idFark);
+    expect(await getTalep(idA, null, false)).toBeNull();
   } finally {
     for (const id of [idA, idFark, idB]) {
+      await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));
+    }
+  }
+});
+
+test("getTalep: isAdmin true — kapsam bypass, uzmana atanmış her talep görülür", async () => {
+  const ts = Date.now();
+  const slugA = `admin-talep-a-${ts}`;
+  const slugB = `admin-talep-b-${ts}`;
+  const idA = await ekleTalep({ slug: slugA });
+  const idB = await ekleTalep({ slug: slugB });
+  const idFark = await ekleTalep({ slug: null });
+  try {
+    // expertSlug=null + isAdmin=true geçilse bile (info@ gibi genel bir hesap)
+    // HER talep görülür — expertSlug parametresi admin'de dikkate alınmaz.
+    expect((await getTalep(idA, null, true))?.id).toBe(idA);
+    expect((await getTalep(idB, null, true))?.id).toBe(idB);
+    expect((await getTalep(idFark, null, true))?.id).toBe(idFark);
+  } finally {
+    for (const id of [idA, idB, idFark]) {
       await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));
     }
   }
@@ -104,20 +124,28 @@ test("listTalepler: kapsam + durum filtresi (containment; seed'e bağımsız)", 
   const idFark = await ekleTalep({ slug: null, durum: "contacted" });
   const idB = await ekleTalep({ slug: slugB, durum: "new" });
   try {
-    const idler = (await listTalepler(slugA)).map((t) => t.id);
+    const idler = (await listTalepler(slugA, false)).map((t) => t.id);
     expect(idler).toContain(idA); // kendi
     expect(idler).toContain(idFark); // farketmez havuzu
     expect(idler).not.toContain(idB); // başka uzman — IDOR
 
-    const yeniIdler = (await listTalepler(slugA, "new")).map((t) => t.id);
+    const yeniIdler = (await listTalepler(slugA, false, "new")).map(
+      (t) => t.id,
+    );
     expect(yeniIdler).toContain(idA);
     expect(yeniIdler).not.toContain(idFark); // "contacted" filtre dışında
     expect(yeniIdler).not.toContain(idB);
 
-    const farkIdler = (await listTalepler(null)).map((t) => t.id);
+    const farkIdler = (await listTalepler(null, false)).map((t) => t.id);
     expect(farkIdler).toContain(idFark);
     expect(farkIdler).not.toContain(idA);
     expect(farkIdler).not.toContain(idB);
+
+    // isAdmin true: expertSlug ne olursa olsun (burada null geçiliyor) HEPSİ.
+    const adminIdler = (await listTalepler(null, true)).map((t) => t.id);
+    expect(adminIdler).toContain(idA);
+    expect(adminIdler).toContain(idFark);
+    expect(adminIdler).toContain(idB);
   } finally {
     for (const id of [idA, idFark, idB]) {
       await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));
@@ -151,6 +179,7 @@ test("updateTalep: yalnız kapsam içindeki satırı günceller (IDOR); updatedA
       const guncel = await updateTalep(
         a.id,
         slugA,
+        false,
         { status: "contacted", internalNote: "arandı, mesaj bırakıldı" },
         tx,
       );
@@ -162,13 +191,31 @@ test("updateTalep: yalnız kapsam içindeki satırı günceller (IDOR); updatedA
       }
 
       // Kapsam dışı (B) güncelleme null döner ve satırı DEĞİŞTİRMEZ
-      const yetkisiz = await updateTalep(a.id, slugB, { status: "cancelled" }, tx);
+      const yetkisiz = await updateTalep(
+        a.id,
+        slugB,
+        false,
+        { status: "cancelled" },
+        tx,
+      );
       expect(yetkisiz).toBeNull();
       const [tekrar] = await tx
         .select({ status: appointmentRequests.status })
         .from(appointmentRequests)
         .where(eq(appointmentRequests.id, a.id));
       expect(tekrar.status).toBe("contacted"); // B'nin denemesi etkisiz
+
+      // isAdmin true: slugB (kapsam dışı) geçilse bile güncelleme BAŞARILI —
+      // admin herhangi bir talebi id ile günceller.
+      const adminGuncel = await updateTalep(
+        a.id,
+        slugB,
+        true,
+        { status: "scheduled" },
+        tx,
+      );
+      expect(adminGuncel).not.toBeNull();
+      expect(adminGuncel?.status).toBe("scheduled");
 
       throw new Error("ROLLBACK_UPDATE_TEST");
     }),
@@ -178,17 +225,23 @@ test("updateTalep: yalnız kapsam içindeki satırı günceller (IDOR); updatedA
 test("talepSayilari: durum başına kapsamlı sayı (delta ile; seed'e bağımsız)", async () => {
   const ts = Date.now();
   const slugA = `say-a-${ts}`;
-  const once = await talepSayilari(slugA);
+  const once = await talepSayilari(slugA, false);
+  const onceAdmin = await talepSayilari(slugA, true); // admin'de expertSlug göz ardı edilir
   const idNew1 = await ekleTalep({ slug: slugA, durum: "new" });
   const idNew2 = await ekleTalep({ slug: slugA, durum: "new" });
   const idFark = await ekleTalep({ slug: null, durum: "contacted" });
-  const idBaska = await ekleTalep({ slug: `say-b-${ts}`, durum: "new" }); // kapsam dışı
+  const idBaska = await ekleTalep({ slug: `say-b-${ts}`, durum: "new" }); // kapsam dışı (yalnız non-admin için)
   try {
-    const sonra = await talepSayilari(slugA);
+    const sonra = await talepSayilari(slugA, false);
     // slugA'nın 2 yeni talebi — başka uzmanın (idBaska) "new" talebi delta'ya girmez
     expect(sonra.new - once.new).toBe(2);
     // farketmez havuzu kapsamda: contacted +1
     expect(sonra.contacted - once.contacted).toBe(1);
+
+    // isAdmin true: idBaska da dahil — 3 yeni "new" (idNew1, idNew2, idBaska).
+    const sonraAdmin = await talepSayilari(slugA, true);
+    expect(sonraAdmin.new - onceAdmin.new).toBe(3);
+    expect(sonraAdmin.contacted - onceAdmin.contacted).toBe(1);
   } finally {
     for (const id of [idNew1, idNew2, idFark, idBaska]) {
       await db.delete(appointmentRequests).where(eq(appointmentRequests.id, id));

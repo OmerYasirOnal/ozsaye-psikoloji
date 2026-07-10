@@ -28,8 +28,13 @@ export default async function TalepDetay({
   // Bozuk id (UUID değil) ham Postgres cast hatası (500) yerine 404.
   if (!z.uuid().safeParse(id).success) notFound();
 
-  // KAPSAM-korumalı okuma (IDOR): başka uzmana atanmış talep → null → 404.
-  const talep = await getTalep(id, staff?.expertSlug ?? null);
+  // KAPSAM-korumalı okuma (IDOR): başka uzmana atanmış talep → null → 404
+  // (admin hariç — o herhangi bir talebi görebilir).
+  const talep = await getTalep(
+    id,
+    staff?.expertSlug ?? null,
+    staff?.role === "admin",
+  );
   if (!talep) notFound();
 
   const wa = whatsappNumarasi(talep.patientPhone);
