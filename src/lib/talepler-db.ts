@@ -1,4 +1,4 @@
-import { and, count, desc, eq, isNull, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, isNull, lt, or, type SQL } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { appointmentRequests, requestStatus } from "@/lib/db/schema";
 import { DURUM_DEGERLERI, type RandevuDurum } from "@/lib/talepler";
@@ -71,6 +71,7 @@ export async function listTalepler(
       patientName: appointmentRequests.patientName,
       patientPhone: appointmentRequests.patientPhone,
       expertSlug: appointmentRequests.expertSlug,
+      preferredNote: appointmentRequests.preferredNote,
       status: appointmentRequests.status,
       scheduledAt: appointmentRequests.scheduledAt,
     })
@@ -157,4 +158,34 @@ export async function talepSayilari(
   ) as Record<RandevuDurum, number>;
   for (const r of rows) sayilar[r.status] = Number(r.n);
   return sayilar;
+}
+
+/**
+ * Ajanda takvimi: verilen [baslangic, bitis) aralığındaki PLANLANMIŞ
+ * randevular, kapsam-korumalı (IDOR: kapsamKosulu aynen), tarih artan.
+ * Hafif kolon seti — takvim hücresi yalnız ad + saat + link ister.
+ */
+export async function listPlanliTakvim(
+  expertSlug: string | null,
+  isAdmin: boolean,
+  baslangic: Date,
+  bitis: Date,
+) {
+  return db
+    .select({
+      id: appointmentRequests.id,
+      patientName: appointmentRequests.patientName,
+      scheduledAt: appointmentRequests.scheduledAt,
+      expertSlug: appointmentRequests.expertSlug,
+    })
+    .from(appointmentRequests)
+    .where(
+      and(
+        kapsamKosulu(expertSlug, isAdmin),
+        eq(appointmentRequests.status, "scheduled"),
+        gte(appointmentRequests.scheduledAt, baslangic),
+        lt(appointmentRequests.scheduledAt, bitis),
+      ),
+    )
+    .orderBy(asc(appointmentRequests.scheduledAt));
 }
