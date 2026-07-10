@@ -32,7 +32,7 @@ describe("UZMAN_SECENEKLERI", () => {
     expect(UZMAN_SECENEKLERI).toEqual({
       "melek-yildiz": "Psk. Dan. Melek Yıldız",
       "sacide-sahin": "Kl. Psk. Sacide Şahin",
-      farketmez: "Farketmez",
+      farketmez: "Fark etmez",
     });
   });
 });

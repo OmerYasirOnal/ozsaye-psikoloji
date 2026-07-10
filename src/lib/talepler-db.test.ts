@@ -51,8 +51,8 @@ test("planlananaCevir: takvim-geçersiz gün (30 Şubat) sessizce taşınmaz —
   expect(planlananaCevir("2026-04-31T10:00")).toBe("gecersiz"); // Nisan 30 gün çeker
 });
 
-test("uzmanEtiketi: slug → ad, null → Farketmez, bilinmeyen → slug", () => {
-  expect(uzmanEtiketi(null)).toBe("Farketmez");
+test("uzmanEtiketi: slug → ad, null → Fark etmez, bilinmeyen → slug", () => {
+  expect(uzmanEtiketi(null)).toBe("Fark etmez");
   expect(uzmanEtiketi("melek-yildiz")).toBe("Psk. Dan. Melek Yıldız");
   expect(uzmanEtiketi("bilinmeyen-slug")).toBe("bilinmeyen-slug");
 });

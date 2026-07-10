@@ -16,7 +16,7 @@ import { z } from "zod";
 export const UZMAN_SECENEKLERI: Record<string, string> = {
   "melek-yildiz": "Psk. Dan. Melek Yıldız",
   "sacide-sahin": "Kl. Psk. Sacide Şahin",
-  farketmez: "Farketmez",
+  farketmez: "Fark etmez",
 };
 
 // PHP'deki /^[0-9\s\-\+\(\)]{10,20}$/ ile aynı dili tanır: rakam, boşluk,

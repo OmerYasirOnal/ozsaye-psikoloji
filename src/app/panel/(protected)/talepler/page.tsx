@@ -87,7 +87,7 @@ export default async function TaleplerListe({
 
       {slug === null && !isAdmin && (
         <p className="mb-6 text-forest-muted text-sm">
-          Size özel bir uzman ataması bulunmadığından yalnızca &ldquo;Farketmez&rdquo;
+          Size özel bir uzman ataması bulunmadığından yalnızca &ldquo;Fark etmez&rdquo;
           havuzundaki talepler gösteriliyor.
         </p>
       )}

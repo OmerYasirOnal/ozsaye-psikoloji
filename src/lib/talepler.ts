@@ -37,9 +37,9 @@ export const RANDEVU_AKSAN_SINIFI: Record<RandevuDurum, string> = {
   cancelled: "border-l-stone",
 };
 
-/** expertSlug -> uzman görünen adı; null ("farketmez") → "Farketmez". */
+/** expertSlug -> uzman görünen adı; null ("farketmez") → "Fark etmez". */
 export function uzmanEtiketi(slug: string | null): string {
-  if (!slug) return "Farketmez";
+  if (!slug) return "Fark etmez";
   return UZMAN_SECENEKLERI[slug] ?? slug;
 }
 

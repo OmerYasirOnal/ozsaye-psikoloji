@@ -176,7 +176,7 @@ export default function AppointmentForm() {
                     </option>
                     <option value="melek-yildiz">Psk. Dan. Melek Yıldız</option>
                     <option value="sacide-sahin">Kl. Psk. Sacide Şahin</option>
-                    <option value="farketmez">Farketmez</option>
+                    <option value="farketmez">Fark etmez</option>
                   </select>
                 </div>
                 <div>
