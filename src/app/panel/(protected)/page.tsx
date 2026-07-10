@@ -7,8 +7,12 @@ import { DURUM_DEGERLERI, DURUM_ETIKETLERI } from "@/lib/talepler";
 export default async function PanelHome() {
   const session = await verifySession();
   const staff = await getStaffByEmail(session.email);
-  // Kapsamlı sayılar (uzman kendi + "farketmez" havuzu; slug'sız staff → yalnız havuz).
-  const sayilar = await talepSayilari(staff?.expertSlug ?? null);
+  // Kapsamlı sayılar (uzman kendi + "farketmez" havuzu; slug'sız staff → yalnız
+  // havuz; admin → tüm talepler).
+  const sayilar = await talepSayilari(
+    staff?.expertSlug ?? null,
+    staff?.role === "admin",
+  );
 
   return (
     <section>

@@ -20,12 +20,13 @@ export default async function TaleplerListe({
   const session = await verifySession();
   const staff = await getStaffByEmail(session.email);
   const slug = staff?.expertSlug ?? null;
+  const isAdmin = staff?.role === "admin";
 
   // ?durum= filtresi — yalnız geçerli enum değeri kabul edilir, aksi halde tümü.
   const { durum } = await searchParams;
   const aktifDurum = DURUM_DEGERLERI.find((d) => d === durum);
 
-  const talepler = await listTalepler(slug, aktifDurum);
+  const talepler = await listTalepler(slug, isAdmin, aktifDurum);
 
   // Filtre çipi bağlantısı (aktif çip forest dolu, diğerleri çizgili).
   const cip = (etiket: string, hedefDurum?: RandevuDurum) => {
@@ -54,7 +55,7 @@ export default async function TaleplerListe({
         <h1 className="font-display text-2xl text-forest">Randevu Talepleri</h1>
       </div>
 
-      {slug === null && (
+      {slug === null && !isAdmin && (
         <p className="mb-6 text-forest-muted text-sm">
           Size özel bir uzman ataması bulunmadığından yalnızca &ldquo;Farketmez&rdquo;
           havuzundaki talepler gösteriliyor.

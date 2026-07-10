@@ -56,18 +56,20 @@ export async function talebiGuncelle(
     };
   }
 
-  // 3) Güncelleme ÖNCESİ satır (kapsam-korumalı; null ise mevcut bulunamadı/
-  //    yetki yok). Hastaya "planlandı" bildirimi kararı bu ESKİ satıra dayanır
-  //    (durum/tarih gerçekten değişti mi?) ve hasta ad/e-postası buradan alınır
-  //    (bu güncellemede değişmezler).
-  const onceki = await getTalep(id, staff.expertSlug);
+  // 3) Güncelleme ÖNCESİ satır (kapsam-korumalı; admin istisnası kapsamKosulu
+  //    içinde; null ise bulunamadı/yetki yok). Hastaya "planlandı" bildirimi
+  //    kararı bu ESKİ satıra dayanır (durum/tarih gerçekten değişti mi?) ve
+  //    hasta ad/e-postası buradan alınır (bu güncellemede değişmezler).
+  const isAdmin = staff.role === "admin";
+  const onceki = await getTalep(id, staff.expertSlug, isAdmin);
   if (!onceki) {
     return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
   }
 
   // 4) KAPSAM-korumalı güncelleme (IDOR: başka uzmanın talebi güncellenemez —
-  //    yetki WHERE'de; kapsam dışıysa updateTalep null döner).
-  const guncel = await updateTalep(id, staff.expertSlug, {
+  //    yetki WHERE'de; kapsam dışıysa updateTalep null döner; admin istisnası
+  //    kapsamKosulu içinde).
+  const guncel = await updateTalep(id, staff.expertSlug, isAdmin, {
     status: durum,
     scheduledAt,
     internalNote: icNot || null,

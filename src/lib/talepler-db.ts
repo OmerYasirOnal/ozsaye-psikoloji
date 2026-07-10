@@ -32,10 +32,18 @@ void _durumUyum;
  * KAPSAM (yetki/IDOR) yüklemi: bir uzman yalnız KENDİ atanmış taleplerini
  * (`expert_slug = expertSlug`) + "farketmez" havuzunu (`expert_slug IS NULL`)
  * görebilir/güncelleyebilir. expertSlug null ise (uzman-slug'ı olmayan staff)
- * yalnız farketmez havuzu. Bu yüklem hem okuma hem yazma sorgularında kullanılır
- * — başka uzmanın talebini id tahmin ederek görmek/değiştirmek engellenir.
+ * yalnız farketmez havuzu. `isAdmin` true ise (ör. info@ genel kutusu) hiçbir
+ * kısıtlama uygulanmaz — `undefined` döner; bu, aşağıdaki tüm çağıranlarda
+ * zaten kullanılan "filtre yok" idiom'udur (`.where(undefined)` / `and(...,
+ * undefined)` WHERE'i o yüklemsiz bırakır). Bu yüklem hem okuma hem yazma
+ * sorgularında kullanılır — başka uzmanın talebini id tahmin ederek
+ * görmek/değiştirmek engellenir.
  */
-function kapsamKosulu(expertSlug: string | null): SQL | undefined {
+function kapsamKosulu(
+  expertSlug: string | null,
+  isAdmin: boolean,
+): SQL | undefined {
+  if (isAdmin) return undefined;
   return expertSlug
     ? or(
         eq(appointmentRequests.expertSlug, expertSlug),
@@ -50,9 +58,10 @@ type UpdateExecutor = Pick<typeof db, "update">;
 /** Liste için hafif kolon seti; kapsam + (ops.) durum filtresi, en yeni üstte. */
 export async function listTalepler(
   expertSlug: string | null,
+  isAdmin: boolean,
   durum?: RandevuDurum,
 ) {
-  const kosullar = [kapsamKosulu(expertSlug)];
+  const kosullar = [kapsamKosulu(expertSlug, isAdmin)];
   if (durum) kosullar.push(eq(appointmentRequests.status, durum));
 
   return db
@@ -78,11 +87,14 @@ export async function listTalepler(
 export async function getTalep(
   id: string,
   expertSlug: string | null,
+  isAdmin: boolean,
 ): Promise<typeof appointmentRequests.$inferSelect | null> {
   const rows = await db
     .select()
     .from(appointmentRequests)
-    .where(and(eq(appointmentRequests.id, id), kapsamKosulu(expertSlug)))
+    .where(
+      and(eq(appointmentRequests.id, id), kapsamKosulu(expertSlug, isAdmin)),
+    )
     .limit(1);
   return rows[0] ?? null;
 }
@@ -99,6 +111,7 @@ export async function getTalep(
 export async function updateTalep(
   id: string,
   expertSlug: string | null,
+  isAdmin: boolean,
   degisiklik: {
     status?: RandevuDurum;
     scheduledAt?: Date | null;
@@ -118,7 +131,9 @@ export async function updateTalep(
   const rows = await database
     .update(appointmentRequests)
     .set(guncelleme)
-    .where(and(eq(appointmentRequests.id, id), kapsamKosulu(expertSlug)))
+    .where(
+      and(eq(appointmentRequests.id, id), kapsamKosulu(expertSlug, isAdmin)),
+    )
     .returning();
   return rows[0] ?? null;
 }
@@ -129,11 +144,12 @@ export async function updateTalep(
  */
 export async function talepSayilari(
   expertSlug: string | null,
+  isAdmin: boolean,
 ): Promise<Record<RandevuDurum, number>> {
   const rows = await db
     .select({ status: appointmentRequests.status, n: count() })
     .from(appointmentRequests)
-    .where(kapsamKosulu(expertSlug))
+    .where(kapsamKosulu(expertSlug, isAdmin))
     .groupBy(appointmentRequests.status);
 
   const sayilar = Object.fromEntries(
