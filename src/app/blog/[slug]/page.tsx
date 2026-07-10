@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug, formatDateTR } from "@/lib/blog";
+import { jsonLdSerialize } from "@/lib/json-ld";
 import { site, absoluteUrl } from "@/lib/site";
 
 const siteUrl = site.url;
@@ -167,7 +168,7 @@ export default async function BlogPostPage({
       </main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
       />
     </>
   );

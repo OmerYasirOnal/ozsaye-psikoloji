@@ -1,4 +1,5 @@
 import { birlesikProfil } from "@/lib/ekip";
+import { jsonLdSerialize } from "@/lib/json-ld";
 import { getTumProfiller } from "@/lib/profil-db";
 import { absoluteUrl, site } from "@/lib/site";
 
@@ -128,9 +129,10 @@ export default async function JsonLd() {
   return (
     <script
       type="application/ld+json"
-      // JSON.stringify çıktısı güvenli (HTML enjeksiyonu için </script> dizisi
-      // üretmez); yine de site config'ten gelen sabit veriden oluşur.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      // Person içeriği panelden (expert_profiles) gelir; jsonLdSerialize "<"
+      // karakterini kaçırarak "</script>" ile script bağlamından kaçışı
+      // (stored XSS) engeller.
+      dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
     />
   );
 }

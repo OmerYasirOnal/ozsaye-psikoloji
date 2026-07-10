@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { birlesikProfil } from "@/lib/ekip";
+import { jsonLdSerialize } from "@/lib/json-ld";
 import { getProfilIcerik } from "@/lib/profil-db";
 import { site } from "@/lib/site";
 
@@ -99,7 +100,7 @@ export default async function ExpertDetailPage({
       {personJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSerialize(personJsonLd) }}
         />
       )}
 
