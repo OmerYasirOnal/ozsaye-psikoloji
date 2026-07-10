@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug, formatDateTR } from "@/lib/blog";
-import { site } from "@/lib/site";
+import { jsonLdSerialize } from "@/lib/json-ld";
+import { site, absoluteUrl } from "@/lib/site";
 
 const siteUrl = site.url;
 
@@ -67,7 +69,11 @@ export default async function BlogPostPage({
     dateModified: post.date,
     keywords: post.tags.join(", "),
     articleSection: post.category,
-    image: `${siteUrl}/og.png`,
+    image: post.coverImageUrl
+      ? post.coverImageUrl.startsWith("/")
+        ? absoluteUrl(post.coverImageUrl)
+        : post.coverImageUrl
+      : `${siteUrl}/og.png`,
     author: { "@type": "Organization", name: post.author, url: siteUrl },
     publisher: {
       "@type": "Organization",
@@ -108,6 +114,17 @@ export default async function BlogPostPage({
               <span>{post.author}</span>
             </div>
           </header>
+
+          {post.coverImageUrl && (
+            <Image
+              src={post.coverImageUrl}
+              alt=""
+              width={1200}
+              height={630}
+              unoptimized
+              className="mt-8 aspect-[1200/630] w-full rounded-2xl object-cover"
+            />
+          )}
 
           <div
             className="article-prose mt-10"
@@ -151,7 +168,7 @@ export default async function BlogPostPage({
       </main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
       />
     </>
   );

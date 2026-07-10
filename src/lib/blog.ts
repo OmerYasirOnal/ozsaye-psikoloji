@@ -13,6 +13,7 @@ export type PostMeta = {
   author: string;
   tags: string[];
   readTime: string; // ör. "5 dk"
+  coverImageUrl: string | null;
 };
 
 export type Post = PostMeta & { html: string };
@@ -47,6 +48,7 @@ function rowToMeta(r: Row): PostMeta {
     author: r.authorName ?? DEFAULT_AUTHOR,
     tags: r.tags ?? [],
     readTime: readTimeFromText(r.bodyMarkdown),
+    coverImageUrl: r.coverImageUrl,
   };
 }
 

@@ -24,7 +24,12 @@ export interface OpeningHour {
   label: string;
 }
 
-/** Tek bir uzmanın künye/profil bilgileri. */
+/**
+ * Tek bir uzmanın SABİT kimliği. İçerik (bio, künye, dereceler, sertifikalar,
+ * üyelik, üniversite, alanlar, sameAs, görsel) artık burada DEĞİL: panelden
+ * (Profilim) girilip `expert_profiles` tablosunda tutulur. Birleştirme
+ * `@/lib/ekip` (`birlesikProfil`) ile yapılır.
+ */
 export interface Expert {
   /** URL/anchor için sabit slug, ör. "melek-yildiz". */
   slug: string;
@@ -34,24 +39,6 @@ export interface Expert {
   title: string;
   /** Kısa unvan/ön-ek, ör. "Psk. Dan.". */
   shortTitle: string;
-  /** Ad + unvan + temel künye tek satırda, kart/başlık için. */
-  credentialsLine: string;
-  /** Diploma/derece satırları. */
-  degrees: string[];
-  /** Mezun olunan üniversite. */
-  university: string;
-  /** Sertifika/eğitim listesi. */
-  certifications: string[];
-  /** Üyelik (oda/dernek vb.). */
-  membership: string;
-  /** Görsel public yolu, ör. "/uzmanlar/melek-yildiz.jpg". */
-  image: string;
-  /** Kısa biyografi metni. */
-  bio: string;
-  /** Uzmanlık/çalışma alanları. */
-  areas: string[];
-  /** Person.sameAs için profil URL'leri (LinkedIn, Instagram, akademik vb.). */
-  sameAs: string[];
 }
 
 /** Tüm site yapılandırmasının kök tipi. */
@@ -214,71 +201,21 @@ export const site: Site = {
     note: "[DOLDUR] İlk görüşme ücretsizdir; çift/aile seansları farklı ücretlendirilir.",
   },
 
+  // Uzman KİMLİĞİ sabit (slug/ad/unvan); İÇERİK (bio, künye, dereceler, vb.)
+  // panelden (Profilim) girilir ve `expert_profiles` tablosunda tutulur.
+  // Kamu sayfaları içeriği `@/lib/ekip` `birlesikProfil` ile birleştirir.
   experts: [
     {
       slug: "melek-yildiz",
       name: "Melek Yıldız",
       title: "Psikolojik Danışman",
       shortTitle: "Psk. Dan.",
-      // TODO: GERÇEK VERİ -- tek satır künye (ör. "Psk. Dan. Melek Yıldız — Bireysel ve çift danışmanlığı")
-      credentialsLine: "[DOLDUR] Psk. Dan. Melek Yıldız — Bireysel ve çift danışmanlığı",
-      degrees: [
-        // TODO: GERÇEK VERİ -- diploma/dereceler (ör. "Psikolojik Danışmanlık ve Rehberlik, Lisans")
-        "[DOLDUR] Psikolojik Danışmanlık ve Rehberlik, Lisans",
-      ],
-      // TODO: GERÇEK VERİ -- mezun olunan üniversite (ör. "Boğaziçi Üniversitesi")
-      university: "[DOLDUR] Boğaziçi Üniversitesi",
-      certifications: [
-        // TODO: GERÇEK VERİ -- sertifikalar (ör. "Bilişsel Davranışçı Terapi (BDT) Sertifikası")
-        "[DOLDUR] Bilişsel Davranışçı Terapi (BDT) Sertifikası",
-      ],
-      // TODO: GERÇEK VERİ -- üyelik (ör. "Türk Psikolojik Danışma ve Rehberlik Derneği üyesi")
-      membership: "[DOLDUR] Türk Psikolojik Danışma ve Rehberlik Derneği üyesi",
-      image: "/uzmanlar/melek-yildiz.jpg",
-      // TODO: GERÇEK VERİ -- kısa biyografi (ör. "Melek Yıldız, ergen ve yetişkinlerle bireysel danışmanlık yürütür...")
-      bio: "[DOLDUR] Melek Yıldız, ergen ve yetişkinlerle bireysel danışmanlık alanında çalışmaktadır.",
-      areas: [
-        // TODO: GERÇEK VERİ -- çalışma alanları (ör. "Kaygı bozuklukları", "İlişki sorunları")
-        "[DOLDUR] Kaygı bozuklukları",
-        "[DOLDUR] İlişki sorunları",
-      ],
-      sameAs: [
-        // TODO: GERÇEK VERİ -- profil URL'leri (ör. "https://www.instagram.com/melekyildizpsk")
-        "[DOLDUR] https://www.instagram.com/melekyildizpsk",
-      ],
     },
     {
       slug: "sacide-sahin",
       name: "Sacide Şahin",
       title: "Klinik Psikolog",
       shortTitle: "Kl. Psk.",
-      // TODO: GERÇEK VERİ -- tek satır künye (ör. "Kl. Psk. Sacide Şahin — Yetişkin psikoterapisi")
-      credentialsLine: "[DOLDUR] Kl. Psk. Sacide Şahin — Yetişkin psikoterapisi",
-      degrees: [
-        // TODO: GERÇEK VERİ -- diploma/dereceler (ör. "Psikoloji, Lisans", "Klinik Psikoloji, Yüksek Lisans")
-        "[DOLDUR] Psikoloji, Lisans",
-        "[DOLDUR] Klinik Psikoloji, Yüksek Lisans",
-      ],
-      // TODO: GERÇEK VERİ -- mezun olunan üniversite (ör. "İstanbul Üniversitesi")
-      university: "[DOLDUR] İstanbul Üniversitesi",
-      certifications: [
-        // TODO: GERÇEK VERİ -- sertifikalar (ör. "EMDR Terapi Sertifikası")
-        "[DOLDUR] EMDR Terapi Sertifikası",
-      ],
-      // TODO: GERÇEK VERİ -- üyelik (ör. "Türk Psikologlar Derneği üyesi")
-      membership: "[DOLDUR] Türk Psikologlar Derneği üyesi",
-      image: "/uzmanlar/sacide-sahin.jpg",
-      // TODO: GERÇEK VERİ -- kısa biyografi (ör. "Sacide Şahin, travma ve kayıp konularında yetişkinlerle çalışmaktadır...")
-      bio: "[DOLDUR] Sacide Şahin, travma ve kayıp konularında yetişkinlerle psikoterapi yürütmektedir.",
-      areas: [
-        // TODO: GERÇEK VERİ -- çalışma alanları (ör. "Travma", "Depresyon")
-        "[DOLDUR] Travma",
-        "[DOLDUR] Depresyon",
-      ],
-      sameAs: [
-        // TODO: GERÇEK VERİ -- profil URL'leri (ör. "https://www.linkedin.com/in/sacidesahin")
-        "[DOLDUR] https://www.linkedin.com/in/sacidesahin",
-      ],
     },
   ],
 };

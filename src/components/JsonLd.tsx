@@ -1,3 +1,6 @@
+import { birlesikProfil } from "@/lib/ekip";
+import { jsonLdSerialize } from "@/lib/json-ld";
+import { getTumProfiller } from "@/lib/profil-db";
 import { absoluteUrl, site } from "@/lib/site";
 
 /**
@@ -14,9 +17,13 @@ import { absoluteUrl, site } from "@/lib/site";
  *    Not: schema.org'da net bir "Psychologist" işletme tipi yoktur; bu yüzden
  *    MedicalClinic + medicalSpecialty: "Psychiatric" kullanılır.
  *  - Her uzman için bir Person düğümü (worksFor ile klinikle ilişkilendirilir).
+ *    Person içeriği (bio, üniversite, üyelik, alanlar, sameAs, görsel) panelden
+ *    girilir (`expert_profiles`); `birlesikProfil` ile birleştirilir. Girilmemiş
+ *    (null) alanlar düğümden atlanır (eski isReady-atla davranışıyla aynı).
  */
-export default function JsonLd() {
-  // Gerçek veri doğrulanmadan yapısal veri yayımlama.
+export default async function JsonLd() {
+  // Gerçek veri doğrulanmadan yapısal veri yayımlama. (DB'ye erişmeden önce
+  // döner: dataReady=false iken profil sorgusu hiç çalışmaz.)
   if (!site.dataReady) {
     return null;
   }
@@ -68,36 +75,48 @@ export default function JsonLd() {
     ...(clinicSameAs.length > 0 ? { sameAs: clinicSameAs } : {}),
   };
 
+  // Kimlik site.experts'ten, içerik panelden (expert_profiles) — tek sorgu.
+  const profiller = await getTumProfiller();
+
   const people = site.experts.map((expert) => {
+    const profil = birlesikProfil(expert, profiller.get(expert.slug) ?? null);
+
     // hasCredential: diploma/dereceler + sertifikalar tek listede.
-    const credentials = [...expert.degrees, ...expert.certifications].map(
-      (credential) => ({
-        "@type": "EducationalOccupationalCredential",
-        name: credential,
-      }),
-    );
+    const credentials = [
+      ...(profil.degrees ?? []),
+      ...(profil.certifications ?? []),
+    ].map((credential) => ({
+      "@type": "EducationalOccupationalCredential",
+      name: credential,
+    }));
 
-    // sameAs: yalnızca dolu (boş olmayan) profil URL'leri.
-    const personSameAs = expert.sameAs.filter((url) => url.trim().length > 0);
+    const personSameAs = profil.sameAs ?? [];
+    const knowsAbout = profil.areas ?? [];
 
+    // Görsel yolu mutlaklaştırılır; zaten mutlaksa (Blob URL) olduğu gibi kalır.
+    const imageUrl = profil.imageUrl
+      ? profil.imageUrl.startsWith("http")
+        ? profil.imageUrl
+        : absoluteUrl(profil.imageUrl)
+      : null;
+
+    // Girilmemiş (null/boş) alanlar düğümden atlanır (eski isReady-atla).
     return {
       "@type": "Person",
       "@id": `${site.url}#${expert.slug}`,
       name: expert.name,
       jobTitle: expert.title,
-      description: expert.bio,
-      image: absoluteUrl(expert.image),
-      knowsAbout: expert.areas,
       worksFor: { "@id": clinicId },
-      alumniOf: {
-        "@type": "CollegeOrUniversity",
-        name: expert.university,
-      },
+      ...(profil.bio ? { description: profil.bio } : {}),
+      ...(imageUrl ? { image: imageUrl } : {}),
+      ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
+      ...(profil.university
+        ? { alumniOf: { "@type": "CollegeOrUniversity", name: profil.university } }
+        : {}),
       ...(credentials.length > 0 ? { hasCredential: credentials } : {}),
-      memberOf: {
-        "@type": "Organization",
-        name: expert.membership,
-      },
+      ...(profil.membership
+        ? { memberOf: { "@type": "Organization", name: profil.membership } }
+        : {}),
       ...(personSameAs.length > 0 ? { sameAs: personSameAs } : {}),
     };
   });
@@ -110,9 +129,10 @@ export default function JsonLd() {
   return (
     <script
       type="application/ld+json"
-      // JSON.stringify çıktısı güvenli (HTML enjeksiyonu için </script> dizisi
-      // üretmez); yine de site config'ten gelen sabit veriden oluşur.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      // Person içeriği panelden (expert_profiles) gelir; jsonLdSerialize "<"
+      // karakterini kaçırarak "</script>" ile script bağlamından kaçışı
+      // (stored XSS) engeller.
+      dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
     />
   );
 }

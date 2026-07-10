@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAllPosts, formatDateTR } from "@/lib/blog";
 
@@ -51,19 +52,30 @@ export default async function BlogIndexPage() {
                 className="group flex h-full flex-col overflow-hidden rounded-2xl bg-warm-white transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-sage/10"
               >
                 <div className="relative h-44 overflow-hidden bg-sage/10">
-                  <div className="flex h-full items-center justify-center">
-                    <svg
-                      className="h-12 w-12 text-sage-light transition-transform duration-500 group-hover:scale-110"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                    </svg>
-                  </div>
+                  {post.coverImageUrl ? (
+                    <Image
+                      src={post.coverImageUrl}
+                      alt=""
+                      width={600}
+                      height={315}
+                      unoptimized
+                      className="aspect-[1200/630] h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <svg
+                        className="h-12 w-12 text-sage-light transition-transform duration-500 group-hover:scale-110"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                      </svg>
+                    </div>
+                  )}
                   <span className="absolute left-4 top-4 rounded-full bg-forest/90 px-3 py-1 text-[10px] font-semibold tracking-wider text-cream uppercase">
                     {post.category}
                   </span>

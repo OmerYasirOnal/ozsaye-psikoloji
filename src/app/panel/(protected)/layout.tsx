@@ -71,6 +71,13 @@ export default async function PanelLayout({
             <ServiceIcon name="document" className="h-4 w-4 text-sage" />
             Blog
           </Link>
+          <Link
+            href="/panel/profil"
+            className="flex items-center gap-1.5 text-forest-muted hover:text-forest"
+          >
+            <ServiceIcon name="user" className="h-4 w-4 text-sage" />
+            {staff?.role === "admin" ? "Profiller" : "Profilim"}
+          </Link>
         </nav>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-10">{children}</main>
