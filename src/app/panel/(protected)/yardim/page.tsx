@@ -73,9 +73,10 @@ export default function YardimSayfasi() {
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li>
-              Talep detayında tek dokunuşla &quot;Arandı olarak işaretle&quot;
-              ve &quot;İptal et&quot; düğmeleri vardır; &quot;Planlandı&quot;
-              için Yönet bölümünden tarih seçmeniz gerekir.
+              Talep detayında tek dokunuşla &quot;Arandı olarak işaretle&quot;,
+              (randevu planlandıysa) &quot;Tamamlandı olarak işaretle&quot; ve
+              &quot;İptal et&quot; düğmeleri vardır; &quot;Planlandı&quot; için
+              Yönet bölümünden tarih seçmeniz gerekir.
             </li>
             <li>
               <strong>Önemli:</strong> Planlanan tarihi kaydettiğinizde hastaya
