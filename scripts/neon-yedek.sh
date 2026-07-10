@@ -11,7 +11,8 @@
 #      GÜVENLE okur (dosyayı source ETMEZ, URL'i asla ekrana/log'a basmaz).
 #   2. Docker `postgres:17-alpine` imajıyla `pg_dump -Fc` (custom format) alır.
 #      Yerel pg_dump gerektirmez; sürüm >= sunucu (PG17) garanti.
-#      URL host komut-satırında GÖRÜNMEZ (`-e PGURL` isim-geçişi) → `ps` sızmaz.
+#      URL host komut-satırında GÖRÜNMEZ (`-e PGURL` isim-geçişi) → host `ps`
+#      sızmaz (container-içi kısa `docker top` penceresi: bilinçli kabul, bkz. run_dump).
 #   3. Bütünlük doğrular: boyut > 1 KB + aynı imajla `pg_restore --list`.
 #   4. En yeni 8 yedeği tutar (rotasyon), gerisini siler.
 #   5. Tek satır özet basar (tarih, dosya, boyut, kalan) — PII/URL YOK.
@@ -39,6 +40,10 @@
 # ---------------------------------------------------------------------------
 
 set -euo pipefail
+
+# Savunma derinliği: üst dizin (~/Yedekler) ve .partial dosyası, chmod'lar
+# uygulanana kadarki pencerede bile grup/diğer erişimine hiç açılmasın.
+umask 077
 
 # launchd altında PATH minimaldir; docker CLI /usr/local/bin'de.
 PATH="/usr/local/bin:/opt/homebrew/bin:${PATH}"
@@ -75,6 +80,12 @@ read_database_url() {
   [[ -n "$line" ]] || die "DATABASE_URL satırı bulunamadı: $env_file"
   # "export " ön ekini ve anahtar+eşittir kısmını at
   line="${line#*DATABASE_URL=}"
+  # CRLF/boşluk artıklarını ÖNCE soy: satır sonu \r taşırsa kapanış tırnağı
+  # "son karakter" olmaz, aşağıdaki soyma sessizce atlanır ve bozuk URL ile
+  # haftalık yedek SESSİZCE kesilirdi (review bulgusu, hex-dump ile kanıtlı).
+  line="${line%$'\r'}"
+  line="${line#"${line%%[![:space:]]*}"}"
+  line="${line%"${line##*[![:space:]]}"}"
   # olası çevreleyen tırnakları soy
   line="${line%\"}"; line="${line#\"}"
   line="${line%\'}"; line="${line#\'}"
@@ -82,7 +93,13 @@ read_database_url() {
   printf '%s' "$line"
 }
 
-# Tek dump denemesi. URL'i -e PGURL (isim-geçişi) ile verir → host ps'te sızmaz.
+# Tek dump denemesi. URL'i -e PGURL (isim-geçişi) ile verir → HOST ps'te sızmaz.
+# Bilinçli sınır: container İÇİNDE sh genişlemesi URL'i pg_dump argv'sine koyar;
+# dump süren birkaç saniyelik pencerede `docker top` erişimi olan yerel bir
+# kullanıcı görebilir — kabul edilen risk (docker soketine erişimi olan biri
+# env dosyasını da okuyabilir; PGDATABASE-URI denendi, libpq env yolunda URI
+# genişletmediği ampirik görüldü, bileşen-ayrıştırma ise sessiz-kesinti riski
+# taşıyan kırılganlık eklerdi).
 # $1 = bağlantı url'i, $2 = çıktı dosyası
 run_dump() {
   local url="$1" out="$2"
@@ -107,11 +124,11 @@ EOF
 restore_help() {
   cat <<'EOF'
 # Geri yükleme (örnek) — DİKKAT: hedef veritabanının içeriğini değiştirir.
-# URL'i ekrana basmadan env dosyasından oku ve dışa aktar, sonra pg_restore çalıştır:
+# 1) URL'i .env.neon-prod.local dosyasından ELLE KOPYALAYIP dışa aktarın
+#    (ekrana/geçmişe basmamak için satırın başına boşluk koyun; çoğu kabukta
+#    boşlukla başlayan komut history'ye yazılmaz):
 
-  export PGURL="$(grep -E '^DATABASE_URL=' \
-      /Users/omeryasironal/Projects/özsaye_psikoloji/.env.neon-prod.local \
-      | sed -E 's/^DATABASE_URL=//; s/^"//; s/"$//')"
+   export PGURL='postgresql://…'   # ← dosyadaki DATABASE_URL değerini yapıştırın
 
   # (a) Tabloları temizleyip aynı DB'ye geri yükle (mevcut şemayı korur):
   docker run --rm -i -e PGURL \
