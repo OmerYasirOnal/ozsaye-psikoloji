@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { isReady, site } from "@/lib/site";
+import { birlesikProfil } from "@/lib/ekip";
+import { getProfilIcerik } from "@/lib/profil-db";
+import { site } from "@/lib/site";
 
-// Uzman detay sayfası. Kaynak: site.experts (slug ile bulunur).
+// Uzman detay sayfası. Kimlik: site.experts (slug ile bulunur); içerik (bio,
+// künye, dereceler vb.) panelden girilir ve `expert_profiles`'tan gelir.
+// Birleştirme: birlesikProfil — içerik yoksa (null) tüm alanlar null = kamuda
+// gizli (eski placeholder-gizle davranışının DB karşılığı).
 // robots: kök layout dataReady durumuna göre noindex/index yönetir; burada
 // ayarlanmaz (miras alınır).
-// isReady (placeholder filtresi) @/lib/site tek kaynağından gelir.
 
 export function generateStaticParams() {
   return site.experts.map((expert) => ({ slug: expert.slug }));
@@ -44,6 +49,10 @@ export default async function ExpertDetailPage({
     notFound();
   }
 
+  // Kimlik + panel içeriği birleştirilir. İçerik satırı yoksa tüm içerik
+  // alanları null döner (kamuda gizli — eski placeholder-gizle davranışı).
+  const profil = birlesikProfil(expert, await getProfilIcerik(slug));
+
   // Monogram: ad kelimelerinin baş harfleri (en fazla 2, büyük harf). Foto
   // yer tutucusu için. Ör. "Melek Yıldız" -> "MY", "Sacide Şahin" -> "SŞ".
   const monogram = expert.name
@@ -53,21 +62,19 @@ export default async function ExpertDetailPage({
     .map((word) => word.charAt(0).toLocaleUpperCase("tr-TR"))
     .join("");
 
-  // Placeholder uzman alanları yalnızca gerçek veri girildiğinde gösterilir;
-  // [DOLDUR] iken hiç render edilmez (sahte künye/beyan görünmesin).
-  const bio = isReady(expert.bio) ? expert.bio : null;
-  const university = isReady(expert.university) ? expert.university : null;
-  const membership = isReady(expert.membership) ? expert.membership : null;
-  const credentialsLine = isReady(expert.credentialsLine)
-    ? expert.credentialsLine
-    : null;
-  const degrees = expert.degrees.filter(isReady);
-  const certifications = expert.certifications.filter(isReady);
-  const areas = expert.areas.filter(isReady);
+  // İçerik alanları yalnızca panelden girildiğinde (null değilken) gösterilir;
+  // içerik yoksa hiç render edilmez (sahte künye/beyan görünmesin).
+  const bio = profil.bio;
+  const university = profil.university;
+  const membership = profil.membership;
+  const credentialsLine = profil.credentialsLine;
+  const degrees = profil.degrees ?? [];
+  const certifications = profil.certifications ?? [];
+  const areas = profil.areas ?? [];
 
-  // JSON-LD yalnızca gerçek veri hazır olduğunda (dataReady) üretilir; künye
-  // placeholder olduğu sürece yapısal veri yayılmaz.
-  const sameAs = expert.sameAs.filter(isReady);
+  // JSON-LD yalnızca gerçek veri hazır olduğunda (dataReady) üretilir; içerik
+  // girilmediği sürece null alanlar düğümden atlanır.
+  const sameAs = profil.sameAs ?? [];
   const knowsAbout = areas;
 
   const personJsonLd = site.dataReady
@@ -129,33 +136,27 @@ export default async function ExpertDetailPage({
         </nav>
 
         <div className="mt-14 grid gap-12 lg:grid-cols-[18rem_1fr] lg:gap-16">
-          {/* Foto yuvası */}
+          {/* Foto yuvası: panelden görsel girildiyse portre, yoksa monogram. */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            {/*
-              FOTOĞRAF: gerçek portre görseli henüz yok; aşağıdaki monogram
-              (uzmanın ad baş harfleri) geçici yer tutucudur. Görsel hazır
-              olduğunda (public yolu expert.image, ör.
-              "/uzmanlar/melek-yildiz.jpg") bu yuvayı next/image ile değiştirin.
-              Örnek:
-
-                import Image from "next/image";
-
-                <Image
-                  src={expert.image}
-                  alt={expert.name + " portresi"}
-                  width={288}
-                  height={360}
-                  className="aspect-[4/5] w-full rounded-2xl border border-sage/15 object-cover"
-                />
-            */}
-            <div
-              aria-hidden="true"
-              className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-sage/15 bg-sage/10"
-            >
-              <span className="font-display text-6xl font-light tracking-wide text-sage lg:text-7xl">
-                {monogram}
-              </span>
-            </div>
+            {profil.imageUrl ? (
+              <Image
+                src={profil.imageUrl}
+                alt={expert.name + " portresi"}
+                width={288}
+                height={360}
+                unoptimized
+                className="aspect-[4/5] w-full rounded-2xl border border-sage/15 object-cover"
+              />
+            ) : (
+              <div
+                aria-hidden="true"
+                className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-sage/15 bg-sage/10"
+              >
+                <span className="font-display text-6xl font-light tracking-wide text-sage lg:text-7xl">
+                  {monogram}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Künye + içerik */}
