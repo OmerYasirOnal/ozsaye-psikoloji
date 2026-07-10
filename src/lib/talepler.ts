@@ -23,6 +23,20 @@ export type RandevuDurum = keyof typeof DURUM_ETIKETLERI;
 // İzin verilen durum değerleri (zod/enum + gösterge sırası) — tek yerden.
 export const DURUM_DEGERLERI = Object.keys(DURUM_ETIKETLERI) as RandevuDurum[];
 
+/**
+ * Kart sol-kenar aksanı — `DurumRozeti.tsx`'in (bağımsız review'dan geçmiş,
+ * PR #27) 3-katmanlı renk sınıflandırmasının kart-aksanı biçimi. YENİ BİR RENK
+ * ŞEMASI İCAT EDİLMEZ: açık/takip gerektiren durumlar (yeni, arandı,
+ * planlandı) forest; kapanmış durumlar (tamam, iptal) stone.
+ */
+export const RANDEVU_AKSAN_SINIFI: Record<RandevuDurum, string> = {
+  new: "border-l-forest",
+  contacted: "border-l-forest",
+  scheduled: "border-l-forest",
+  done: "border-l-stone",
+  cancelled: "border-l-stone",
+};
+
 /** expertSlug -> uzman görünen adı; null ("farketmez") → "Farketmez". */
 export function uzmanEtiketi(slug: string | null): string {
   if (!slug) return "Farketmez";
