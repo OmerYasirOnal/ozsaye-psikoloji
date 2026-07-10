@@ -55,12 +55,18 @@ export async function talebiGuncelle(
   }
 
   // 3) KAPSAM-korumalı güncelleme (IDOR: başka uzmanın talebi güncellenemez —
-  //    yetki WHERE'de; kapsam dışıysa updateTalep null döner).
-  const guncel = await updateTalep(id, staff.expertSlug, {
-    status: durum,
-    scheduledAt,
-    internalNote: icNot || null,
-  });
+  //    yetki WHERE'de; kapsam dışıysa updateTalep null döner). Admin istisnası
+  //    kapsamKosulu içinde ele alınır.
+  const guncel = await updateTalep(
+    id,
+    staff.expertSlug,
+    staff.role === "admin",
+    {
+      status: durum,
+      scheduledAt,
+      internalNote: icNot || null,
+    },
+  );
   if (!guncel) {
     return { hata: "Bu talep bulunamadı veya erişim yetkiniz yok." };
   }
