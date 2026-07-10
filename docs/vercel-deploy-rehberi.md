@@ -175,3 +175,15 @@ kaydı tekrar Vercel'e çevrilir.
   Argüman verilmezse varsayılan 365 gündür; alternatif olarak
   `PURGE_OLD_REQUESTS_DAYS=365 npm run db:purge` kullanılabilir.
 - Gerçek NAP/uzman verileri girilmeden `site.dataReady=true` yapılmaz.
+- **Haftalık yerel Neon yedeği (KVKK):** Neon free-tier PITR penceresi yalnızca
+  ~6 saat olduğundan `scripts/neon-yedek.sh` her Cumartesi 04:00'te (launchd:
+  `scripts/launchd/com.ozsaye.neon-yedek.plist`) Docker `postgres:17-alpine` ile
+  `pg_dump -Fc` alır. Kurulum ve elle çalıştırma adımları script başındaki
+  yorumda; kurulum: `plist`'i `~/Library/LaunchAgents/`'a kopyalayıp
+  `launchctl load` et (tetiklenme anında Docker Desktop açık olmalı).
+  - **Konum:** `~/Yedekler/ozsaye/ozsaye-YYYY-AA-GG-SSDD.dump`, en yeni 8 tutulur.
+  - **Geri yükleme:** `bash scripts/neon-yedek.sh --geri-yukle-nasil` örnek
+    `pg_restore` komutunu basar (URL'i ekrana basmadan env dosyasından okur).
+  - **Güvenlik:** dump dosyaları **şifresiz**; koruma katmanı klasör izni `700`
+    (dosyalar `600`) **+ diskin FileVault ile şifreli olması**. FileVault kapalıysa
+    açılması önerilir. Bağlantı URL'i (`.env.neon-prod.local`) asla loglanmaz/basılmaz.
