@@ -2,17 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
-import { listPlanliTakvim, listTalepler } from "@/lib/talepler-db";
+import {
+  listPlanliTakvim,
+  listTalepler,
+  talepSayilari,
+} from "@/lib/talepler-db";
 import {
   DURUM_DEGERLERI,
   DURUM_ETIKETLERI,
   RANDEVU_AKSAN_SINIFI,
+  goreliZaman,
   maskeliTelefon,
+  tercihEdilenTarih,
   uzmanEtiketi,
   type RandevuDurum,
 } from "@/lib/talepler";
 import { ayAraligi, ayParametresi } from "@/lib/takvim";
-import { formatDateTR } from "@/lib/blog";
 import { ServiceIcon } from "@/components/ServiceIcon";
 import DurumRozeti from "./DurumRozeti";
 import TakvimGorunumu from "./TakvimGorunumu";
@@ -36,17 +41,22 @@ export default async function TaleplerListe({
   // Takvim: ?ay= varsa açık; geçersiz değer içinde bulunulan aya düşer.
   const ay = ayParametresi(ayHam);
   const { baslangic, bitis } = ayAraligi(ay);
-  const [talepler, planliRandevular] = await Promise.all([
+  const [talepler, planliRandevular, sayilar] = await Promise.all([
     listTalepler(slug, isAdmin, aktifDurum),
     listPlanliTakvim(slug, isAdmin, baslangic, bitis),
+    talepSayilari(slug, isAdmin),
   ]);
+  const toplam = DURUM_DEGERLERI.reduce((t, d) => t + sayilar[d], 0);
 
-  // Filtre çipi bağlantısı (aktif çip forest dolu, diğerleri çizgili).
-  const cip = (etiket: string, hedefDurum?: RandevuDurum) => {
+  // Filtre çipi bağlantısı (aktif çip forest dolu, diğerleri çizgili). Takvim
+  // açıkken (?ay=) tıklandığında ayı korur — aksi halde çip takvimi kapatırdı.
+  const cip = (etiket: string, sayi: number, hedefDurum?: RandevuDurum) => {
     const aktif = aktifDurum === hedefDurum;
-    const href = hedefDurum
-      ? `/panel/talepler?durum=${hedefDurum}`
-      : "/panel/talepler";
+    const params = new URLSearchParams();
+    if (hedefDurum) params.set("durum", hedefDurum);
+    if (ayHam !== undefined) params.set("ay", ayHam);
+    const qs = params.toString();
+    const href = qs ? `/panel/talepler?${qs}` : "/panel/talepler";
     return (
       <Link
         key={etiket}
@@ -57,7 +67,7 @@ export default async function TaleplerListe({
             : "border border-stone text-forest-muted"
         }`}
       >
-        {etiket}
+        {etiket} ({sayi})
       </Link>
     );
   };
@@ -83,8 +93,8 @@ export default async function TaleplerListe({
       )}
 
       <div className="mb-8 flex flex-wrap gap-2">
-        {cip("Tümü", undefined)}
-        {DURUM_DEGERLERI.map((d) => cip(DURUM_ETIKETLERI[d], d))}
+        {cip("Tümü", toplam, undefined)}
+        {DURUM_DEGERLERI.map((d) => cip(DURUM_ETIKETLERI[d], sayilar[d], d))}
       </div>
 
       {talepler.length === 0 ? (
@@ -114,8 +124,13 @@ export default async function TaleplerListe({
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-4">
+                  {tercihEdilenTarih(t.preferredNote) && (
+                    <span className="rounded-full border border-stone px-2.5 py-0.5 text-xs text-forest-muted">
+                      Tercih: {tercihEdilenTarih(t.preferredNote)}
+                    </span>
+                  )}
                   <span className="text-forest-muted text-sm">
-                    {formatDateTR(t.createdAt.toISOString())}
+                    {goreliZaman(t.createdAt)}
                   </span>
                   <DurumRozeti durum={t.status} />
                 </div>

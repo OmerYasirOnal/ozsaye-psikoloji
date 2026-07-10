@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { verifySession } from "@/lib/auth/dal";
+import { getStaffByEmail } from "@/lib/auth/staff";
+import { talepSayilari } from "@/lib/talepler-db";
 import { ServiceIcon } from "@/components/ServiceIcon";
 import { logout } from "./actions";
 
@@ -15,6 +17,12 @@ export default async function PanelLayout({
   children: React.ReactNode;
 }) {
   const session = await verifySession(); // oturumsuzsa /panel/giris'e redirect
+  const staff = await getStaffByEmail(session.email);
+  const sayilar = await talepSayilari(
+    staff?.expertSlug ?? null,
+    staff?.role === "admin",
+  );
+  const yeniSayisi = sayilar.new;
 
   return (
     <div className="min-h-screen bg-cream">
@@ -47,6 +55,14 @@ export default async function PanelLayout({
           >
             <ServiceIcon name="user" className="h-4 w-4 text-sage" />
             Talepler
+            {yeniSayisi > 0 && (
+              <span
+                aria-label={`${yeniSayisi} yeni talep`}
+                className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-forest px-1.5 text-xs text-warm-white"
+              >
+                {yeniSayisi}
+              </span>
+            )}
           </Link>
           <Link
             href="/panel/blog"
