@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Öz & Saye — Neon Postgres HAFTALIK yedek (launchd LaunchAgent)
+  Program: scripts/neon-yedek.sh (Docker postgres:17-alpine ile pg_dump -Fc).
+  Çalışma: her Cumartesi 04:00 (Weekday 6, Hour 4). RunAtLoad = false.
+
+  Kurulum:
+    mkdir -p /Users/omeryasironal/Projects/özsaye_psikoloji/loglar
+    cp scripts/launchd/com.ozsaye.neon-yedek.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.ozsaye.neon-yedek.plist
+  Kaldırma:
+    launchctl unload ~/Library/LaunchAgents/com.ozsaye.neon-yedek.plist
+  Elle test:
+    launchctl start com.ozsaye.neon-yedek
+
+  NOT: Tetiklenme anında Docker Desktop açık olmalı (daemon). Mac uykudaysa
+  launchd, uyanışta kaçırılan işi bir kez çalıştırır.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ozsaye.neon-yedek</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/omeryasironal/Projects/özsaye_psikoloji/scripts/neon-yedek.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>6</integer>
+        <key>Hour</key>
+        <integer>4</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/neon-yedek.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/neon-yedek.log</string>
+</dict>
+</plist>
