@@ -15,6 +15,13 @@
       "when": 1783508740209,
       "tag": "0001_curvy_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783706288502,
+      "tag": "0002_military_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }

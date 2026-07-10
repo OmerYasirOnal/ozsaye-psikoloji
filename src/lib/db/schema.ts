@@ -52,6 +52,21 @@ export const blogPosts = pgTable("blog_posts", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const expertProfiles = pgTable("expert_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  expertSlug: text("expert_slug").notNull().unique(),
+  bio: text("bio"),
+  credentialsLine: text("credentials_line"),
+  university: text("university"),
+  membership: text("membership"),
+  degrees: text("degrees").array(),
+  certifications: text("certifications").array(),
+  areas: text("areas").array(),
+  sameAs: text("same_as").array(),
+  imageUrl: text("image_url"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const magicTokens = pgTable("magic_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull(),
