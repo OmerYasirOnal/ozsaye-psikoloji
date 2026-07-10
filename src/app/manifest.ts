@@ -24,8 +24,11 @@ export default function manifest(): MetadataRoute.Manifest {
     dir: "ltr",
     // Final logo ikonları (beyaz zeminli, brand/logo/final → site_icon). Logoda
     // wordmark olduğu için purpose "any" (maskable kırpması wordmark'ı kesebilir).
+    // Not: favicon.ico burada LİSTELENMEZ — gerçek boyutları `sizes: "any"`
+    // beyanıyla uyuşmadığı için Chrome konsolda "resource size is not correct"
+    // uyarısı üretiyordu; PWA gereksinimlerini 192/512 PNG'ler karşılar,
+    // favicon'u tarayıcılar zaten kök konvansiyonuyla bulur.
     icons: [
-      { src: "/favicon.ico", sizes: "any", type: "image/x-icon" },
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
     ],
