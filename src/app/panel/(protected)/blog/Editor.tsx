@@ -236,7 +236,9 @@ export default function Editor({ initialMarkdown, onChange }: Props) {
       <EditorContent editor={editor} />
 
       {uploadError && (
-        <p className="mt-2 text-sm font-semibold text-forest">{uploadError}</p>
+        <p className="px-4 pb-3 text-sm font-semibold text-forest">
+          {uploadError}
+        </p>
       )}
     </div>
   );
