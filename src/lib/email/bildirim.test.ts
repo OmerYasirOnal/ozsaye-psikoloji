@@ -1,5 +1,10 @@
 import { expect, test } from "vitest";
-import { KLINIK_KUTU, bildirimAlicilari, hastaOnayiMetni } from "./bildirim";
+import {
+  KLINIK_KUTU,
+  bildirimAlicilari,
+  hastaOnayiMetni,
+  hastaPlanlandiMetni,
+} from "./bildirim";
 
 // --- bildirimAlicilari (saf; server-only/IO YOK, düz Vitest'te koşar) ---
 
@@ -53,6 +58,40 @@ test("hastaOnayiMetni: placeholder ([DOLDUR]) ya da telefon/adres SIZDIRMAZ", ()
 
 test("hastaOnayiMetni: ad boş/boşluk ise isim yankılamadan nazik selam", () => {
   const { text } = hastaOnayiMetni("   ");
+  expect(text).toContain("Merhaba,");
+  // Boş ad "Merhaba ," (fazladan boşluk) üretmemeli.
+  expect(text).not.toContain("Merhaba ,");
+});
+
+// --- hastaPlanlandiMetni (saf) ---
+
+test("hastaPlanlandiMetni: konu + sakin gövde; ilk ad + verilen tarih geçer", () => {
+  const { subject, text } = hastaPlanlandiMetni(
+    "Ayşe Yılmaz",
+    "15 Temmuz 2026 14:30",
+  );
+  expect(subject).toBe("Randevunuz planlandı — Öz & Saye Psikoloji");
+  expect(text).toContain("Merhaba Ayşe,");
+  // Soyadı (fazladan hasta verisi) yankılanmaz — yalnız ilk ad.
+  expect(text).not.toContain("Yılmaz");
+  // Çağıranın verdiği tarih-saat string'i gövdede AYNEN geçer.
+  expect(text).toContain("15 Temmuz 2026 14:30");
+  // Değişiklik için "yanıtla" yönlendirmesi + marka imzası.
+  expect(text).toContain("yanıtlayarak");
+  expect(text).toContain("Öz & Saye Psikoloji");
+});
+
+test("hastaPlanlandiMetni: placeholder ([DOLDUR]) / uzman adı / adres SIZDIRMAZ", () => {
+  const { subject, text } = hastaPlanlandiMetni("Mehmet", "1 Nisan 2026 09:00");
+  expect(subject).not.toContain("[DOLDUR]");
+  expect(text).not.toContain("[DOLDUR]");
+  // Uzman adları/soyadları bildirimde yankılanmaz (yalnız hasta ilk adı + tarih).
+  expect(text).not.toContain("Melek");
+  expect(text).not.toContain("Sacide");
+});
+
+test("hastaPlanlandiMetni: ad boş/boşluk ise isim yankılamadan nazik selam", () => {
+  const { text } = hastaPlanlandiMetni("   ", "1 Nisan 2026 09:00");
   expect(text).toContain("Merhaba,");
   // Boş ad "Merhaba ," (fazladan boşluk) üretmemeli.
   expect(text).not.toContain("Merhaba ,");

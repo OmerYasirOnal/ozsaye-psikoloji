@@ -85,6 +85,20 @@ export function istanbulInputDegeri(d: Date): string {
 }
 
 /**
+ * Mutlak an → Türkçe okunur tarih-saat (ör. "15 Temmuz 2026 14:30", İstanbul
+ * yereli). Panel talep detay sayfasının damgaları (oluşturma/planlanan/güncelleme)
+ * ile hastaya giden "randevunuz planlandı" bildiriminin tarih metni AYNI
+ * biçimlendirmeyi paylaşsın diye buradadır — tek kaynak, iki taraf.
+ */
+export function istanbulTarihSaat(d: Date): string {
+  return new Intl.DateTimeFormat("tr-TR", {
+    timeZone: "Europe/Istanbul",
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(d);
+}
+
+/**
  * `datetime-local` ("YYYY-MM-DDTHH:mm", İstanbul yereli kabul edilir — UTC+3,
  * DST yok) → mutlak an. Sunucu saat diliminden bağımsız olması için offset
  * açıkça eklenir. Boş → null (temizle). Biçim bozuksa "gecersiz".
