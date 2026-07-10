@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
 import { listPostsAdmin } from "@/lib/blog-admin";
 import { formatDateTR } from "@/lib/blog";
+
+export const metadata: Metadata = { title: "Blog Yazıları" };
 
 export default async function PanelBlogListesi() {
   await verifySession(); // DAL cache'li — layout zaten çağırdı, bedava

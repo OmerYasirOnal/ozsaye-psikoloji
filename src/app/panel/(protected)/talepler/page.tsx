@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
 import { getStaffByEmail } from "@/lib/auth/staff";
@@ -11,6 +12,8 @@ import {
 } from "@/lib/talepler";
 import { formatDateTR } from "@/lib/blog";
 import DurumRozeti from "./DurumRozeti";
+
+export const metadata: Metadata = { title: "Randevu Talepleri" };
 
 export default async function TaleplerListe({
   searchParams,

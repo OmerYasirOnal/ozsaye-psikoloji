@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -12,6 +13,8 @@ import {
 } from "@/lib/talepler";
 import DurumRozeti from "../DurumRozeti";
 import TalepDuzenleForm from "./TalepDuzenleForm";
+
+export const metadata: Metadata = { title: "Talep Detayı" };
 
 export default async function TalepDetay({
   params,

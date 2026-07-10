@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { verifySession } from "@/lib/auth/dal";
+
+export const metadata: Metadata = { title: "Gösterge" };
+
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { talepSayilari } from "@/lib/talepler-db";
 import { DURUM_DEGERLERI, DURUM_ETIKETLERI } from "@/lib/talepler";
