@@ -31,7 +31,7 @@ import { revalidatePath } from "next/cache";
 import { getStaffByEmail } from "@/lib/auth/staff";
 import { getProfilIcerik, upsertProfilIcerik } from "@/lib/profil-db";
 import type { ProfilIcerik } from "@/lib/ekip";
-import { profilKaydet } from "./actions";
+import { profilKaydet, profilFotoAyarla } from "./actions";
 
 const staff = vi.mocked(getStaffByEmail);
 const oku = vi.mocked(getProfilIcerik);
@@ -189,4 +189,82 @@ test("(5) geçersiz slug: zod hatası döner (Türkçe), upsert ve revalidate YO
   expect(sonuc.ok).toBeUndefined();
   expect(kaydet).not.toHaveBeenCalled();
   expect(tazele).not.toHaveBeenCalled();
+});
+
+/**
+ * profilFotoAyarla AKIŞ testleri — yalnız `imageUrl`'i yöneten dar action.
+ * Ana içerik alanlarına DOKUNMAZ: mevcut satır olduğu gibi taşınır, sadece
+ * imageUrl değişir. Odak: yetki, url ayarlama (diğer alanlar korunur), kaldırma
+ * (boş url → null) ve 3 kamu yüzeyinin tazelenmesi.
+ */
+
+// Foto formu: yalnız slug + url okunur.
+function fdFoto(slug: string, url: string): FormData {
+  const f = new FormData();
+  f.set("slug", slug);
+  f.set("url", url);
+  return f;
+}
+
+test("(6) foto — yetki reddi: therapist başka uzmanın fotosunu ayarlayamaz", async () => {
+  staff.mockResolvedValue(MELEK); // expertSlug: melek-yildiz
+
+  const sonuc = await profilFotoAyarla(
+    {},
+    fdFoto("sacide-sahin", "/uploads/blog/x.png"),
+  );
+
+  expect(sonuc).toEqual({ hata: "Bu profili düzenleme yetkiniz yok." });
+  expect(kaydet).not.toHaveBeenCalled();
+  expect(tazele).not.toHaveBeenCalled();
+});
+
+test("(7) foto ayarla: imageUrl yazılır, diğer alanlar korunur, 3 revalidate", async () => {
+  // Mevcut satırda bio var — foto ayarlanınca DEĞİŞMEDEN taşınmalı.
+  oku.mockResolvedValue(bosIcerik({ bio: "Mevcut biyografi" }));
+
+  const sonuc = await profilFotoAyarla(
+    {},
+    fdFoto("melek-yildiz", "/uploads/blog/portre.png"),
+  );
+
+  expect(sonuc).toEqual({ ok: true });
+  expect(kaydet).toHaveBeenCalledTimes(1);
+  expect(kaydet).toHaveBeenCalledWith("melek-yildiz", {
+    bio: "Mevcut biyografi",
+    credentialsLine: null,
+    university: null,
+    membership: null,
+    degrees: null,
+    certifications: null,
+    areas: null,
+    sameAs: null,
+    imageUrl: "/uploads/blog/portre.png",
+  });
+  expect(tazele).toHaveBeenCalledTimes(3);
+  expect(tazele).toHaveBeenNthCalledWith(1, "/ekip");
+  expect(tazele).toHaveBeenNthCalledWith(2, "/ekip/melek-yildiz");
+  expect(tazele).toHaveBeenNthCalledWith(3, "/");
+});
+
+test("(8) foto kaldır: boş url → imageUrl null, diğer alanlar korunur", async () => {
+  oku.mockResolvedValue(
+    bosIcerik({ bio: "Mevcut biyografi", imageUrl: "/uploads/blog/eski.png" }),
+  );
+
+  const sonuc = await profilFotoAyarla({}, fdFoto("melek-yildiz", ""));
+
+  expect(sonuc).toEqual({ ok: true });
+  expect(kaydet).toHaveBeenCalledWith("melek-yildiz", {
+    bio: "Mevcut biyografi",
+    credentialsLine: null,
+    university: null,
+    membership: null,
+    degrees: null,
+    certifications: null,
+    areas: null,
+    sameAs: null,
+    imageUrl: null,
+  });
+  expect(tazele).toHaveBeenCalledTimes(3);
 });

@@ -1,7 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
-import { profilKaydet, type ProfilFormState } from "../actions";
+import { useActionState, useRef, useState, type ChangeEvent } from "react";
+import Image from "next/image";
+import {
+  profilKaydet,
+  profilFotoAyarla,
+  type ProfilFormState,
+} from "../actions";
 
 type ProfilInitial = {
   bio: string;
@@ -16,16 +21,149 @@ type ProfilInitial = {
 
 type Props = {
   slug: string;
+  imageUrl: string | null;
   initial: ProfilInitial;
 };
 
 const bos: ProfilFormState = {};
 
-export default function ProfilForm({ slug, initial }: Props) {
+// Profil fotoğrafı bölümü — kendi action'ıyla (profilFotoAyarla), ana içerik
+// formundan (profilKaydet) AYRI iki form. Görsel önce endpoint'e yüklenir,
+// dönen url gizli input'a yazılıp form programatik submit edilir; "Kaldır"
+// butonu boş url'li ikinci formu gönderir. HizliAksiyonlar'ın çok-formlu
+// (tek useActionState) desenini yansıtır.
+function FotoBolumu({
+  slug,
+  imageUrl,
+}: {
+  slug: string;
+  imageUrl: string | null;
+}) {
+  const [state, fotoAction] = useActionState(profilFotoAyarla, bos);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const ayarlaFormRef = useRef<HTMLFormElement>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleImageSelected(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // aynı dosyanın tekrar seçilebilmesi için sıfırla
+    if (!file) return;
+
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("dosya", file); // endpoint alan adı: "dosya"
+      // trailingSlash:true — sonu "/" olan URL'e POST (308 yönlendirmesi olmadan).
+      const res = await fetch("/panel/profil/gorsel/", {
+        method: "POST",
+        body: formData,
+      });
+      const data: { url?: string; hata?: string } | null = await res
+        .json()
+        .catch(() => null);
+      if (!res.ok || !data?.url) {
+        setUploadError(data?.hata ?? "Görsel yüklenemedi. Lütfen tekrar deneyin.");
+        return;
+      }
+      // Dönen url'i gizli input'a yaz ve ayarla formunu programatik gönder.
+      if (urlInputRef.current) urlInputRef.current.value = data.url;
+      ayarlaFormRef.current?.requestSubmit();
+    } catch {
+      setUploadError("Görsel yüklenemedi. Lütfen tekrar deneyin.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-4 rounded-lg border border-stone bg-cream p-5">
+      <h2 className="text-forest font-medium">Profil fotoğrafı</h2>
+
+      <div className="flex items-start gap-5">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt="Mevcut profil fotoğrafı"
+            width={96}
+            height={120}
+            unoptimized
+            className="rounded-md border border-stone object-cover"
+          />
+        ) : (
+          <div className="flex h-[120px] w-24 items-center justify-center rounded-md border border-stone bg-warm-white text-center text-sm text-forest-muted">
+            Fotoğraf yok
+          </div>
+        )}
+
+        <div className="space-y-3">
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-md border border-stone px-4 py-2 text-sm text-forest disabled:opacity-60"
+          >
+            {uploading ? "Yükleniyor…" : "Fotoğraf yükle"}
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={handleImageSelected}
+          />
+
+          {/* Ayarla formu: url gizli input'a yüklemeden sonra yazılır. */}
+          <form ref={ayarlaFormRef} action={fotoAction} className="hidden">
+            <input type="hidden" name="slug" value={slug} />
+            <input ref={urlInputRef} type="hidden" name="url" defaultValue="" />
+          </form>
+
+          {/* Kaldır formu: boş url ile aynı action'a submit (→ imageUrl null). */}
+          {imageUrl && (
+            <form action={fotoAction}>
+              <input type="hidden" name="slug" value={slug} />
+              <input type="hidden" name="url" value="" />
+              <button
+                type="submit"
+                className="rounded-md border border-stone px-4 py-2 text-sm text-forest-muted"
+              >
+                Fotoğrafı kaldır
+              </button>
+            </form>
+          )}
+
+          <p className="text-forest-muted text-sm">
+            PNG, JPEG veya WebP · en fazla 4 MB.
+          </p>
+        </div>
+      </div>
+
+      {uploadError && (
+        <p role="alert" className="text-sm font-semibold text-forest">
+          {uploadError}
+        </p>
+      )}
+      {state.hata && (
+        <p role="alert" className="text-sm font-semibold text-forest">
+          {state.hata}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function ProfilForm({ slug, imageUrl, initial }: Props) {
   const [state, formAction, pending] = useActionState(profilKaydet, bos);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <div className="space-y-6">
+      <FotoBolumu slug={slug} imageUrl={imageUrl} />
+
+      <form action={formAction} className="space-y-6">
       {state.hata && (
         <p className="font-semibold text-forest" role="alert">
           {state.hata}
@@ -162,6 +300,7 @@ export default function ProfilForm({ slug, initial }: Props) {
       >
         {pending ? "Kaydediliyor…" : "Profili kaydet"}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }

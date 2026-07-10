@@ -57,7 +57,11 @@ export default async function ProfilDuzenle({
         </p>
       </div>
 
-      <ProfilForm slug={slug} initial={initial} />
+      <ProfilForm
+        slug={slug}
+        imageUrl={icerik?.imageUrl ?? null}
+        initial={initial}
+      />
     </section>
   );
 }
