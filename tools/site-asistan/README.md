@@ -35,7 +35,14 @@ Mimari ve tasarım kararları: `docs/superpowers/specs/2026-07-11-site-ai-asista
    - `AI_ASISTAN_URL` = 4. adımdaki `https://....ts.net` adresi
    - `AI_ASISTAN_SECRET` = 2. adımda ürettiğiniz secret
 
-6. **Sürekli çalışır durumda tut** (Mac yeniden başlarsa otomatik ayağa kalksın):
+6. **Değişikliğin canlıya yansıması için yeniden deploy edin** (env değişikliği yalnız
+   YENİ bir deploy'da etkinleşir — mevcut production deployment eski env'i kullanmaya
+   devam eder):
+   ```bash
+   vercel redeploy <mevcut-production-url> --target production
+   ```
+
+7. **Sürekli çalışır durumda tut** (Mac yeniden başlarsa otomatik ayağa kalksın):
    `tools/icerik-uretici/launchd/` deseniyle bir `launchd` `.plist` dosyası ekleyin
    (`KeepAlive: true`, `ProgramArguments: ["node", ".../server.cjs"]`).
 
@@ -53,4 +60,4 @@ Beklenen: `{"cevap": "..."}` şeklinde bir JSON.
 
 Her konuşma, `tools/site-asistan/gunluk.tsv` dosyasına **anonim** bir satır
 olarak yazılır (yalnız zaman damgası + kaba kategori — kişisel veri/mesaj
-metni yok). Bu dosya `.gitignore`'a eklenmelidir.
+metni yok). Bu dosya `.gitignore`'dadır (repoya commit'lenmez).

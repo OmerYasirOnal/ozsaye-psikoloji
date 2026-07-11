@@ -16,7 +16,7 @@ const mesajSchema = z.object({
     .array(
       z.object({
         rol: z.enum(["kullanici", "asistan"]),
-        icerik: z.string().max(500),
+        icerik: z.string().max(4000),
       }),
     )
     .max(6)
