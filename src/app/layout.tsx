@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCta from "@/components/StickyCta";
 import SiteChrome from "@/components/SiteChrome";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -107,6 +108,7 @@ export default function RootLayout({
           header={<Header />}
           footer={<Footer />}
           stickyCta={<StickyCta />}
+          chatWidget={<ChatWidget />}
         >
           {children}
         </SiteChrome>

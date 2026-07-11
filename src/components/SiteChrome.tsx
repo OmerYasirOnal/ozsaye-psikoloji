@@ -13,11 +13,13 @@ export default function SiteChrome({
   header,
   footer,
   stickyCta,
+  chatWidget,
   children,
 }: {
   header: React.ReactNode;
   footer: React.ReactNode;
   stickyCta: React.ReactNode;
+  chatWidget: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -33,6 +35,7 @@ export default function SiteChrome({
       {children}
       {footer}
       {stickyCta}
+      {chatWidget}
     </>
   );
 }
