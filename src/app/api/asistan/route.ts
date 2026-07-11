@@ -51,9 +51,10 @@ async function macAsistanindanCevapAl(
   const secret = process.env.AI_ASISTAN_SECRET;
   if (!url || !secret) return null;
 
+  const controller = new AbortController();
+  const zamanAsimi = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const controller = new AbortController();
-    const zamanAsimi = setTimeout(() => controller.abort(), 5000);
     const yanit = await fetch(`${url}/sohbet`, {
       method: "POST",
       headers: {
@@ -63,12 +64,13 @@ async function macAsistanindanCevapAl(
       body: JSON.stringify({ mesaj, gecmis, siteIcerigi: asistanIcerigi() }),
       signal: controller.signal,
     });
-    clearTimeout(zamanAsimi);
     if (!yanit.ok) return null;
     const veri = await yanit.json();
     return typeof veri.cevap === "string" ? veri.cevap : null;
   } catch {
     return null;
+  } finally {
+    clearTimeout(zamanAsimi);
   }
 }
 
