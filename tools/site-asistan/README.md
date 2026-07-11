@@ -1,0 +1,56 @@
+# Site AI Asistanı (Mac tarafı)
+
+`ozsaye.com`'daki sohbet widget'ının arkasındaki yerel Ollama sarmalayıcısı.
+Mimari ve tasarım kararları: `docs/superpowers/specs/2026-07-11-site-ai-asistani-design.md`.
+
+## Kurulum
+
+1. **Ollama'yı kur ve modeli indir** (bir kere):
+   ```bash
+   brew install ollama
+   ollama pull qwen2.5:7b
+   ```
+
+2. **Ortam değişkenlerini ayarla:**
+   ```bash
+   cp tools/site-asistan/.env.local.example tools/site-asistan/.env.local
+   # ASISTAN_SECRET için: openssl rand -base64 32
+   # çıkan değeri hem bu dosyaya hem de Vercel Production env'e
+   # (AI_ASISTAN_SECRET adıyla) yazın.
+   ```
+
+3. **Sunucuyu başlat:**
+   ```bash
+   node tools/site-asistan/server.cjs
+   ```
+   `http://localhost:8787` üzerinde dinlemeye başlar.
+
+4. **Tailscale Funnel ile dışa aç** (bir kere kurulum, `tailscale.com/download`):
+   ```bash
+   tailscale funnel 8787
+   ```
+   Çıktıda verilen `https://<makine-adı>.<tailnet>.ts.net` adresini kopyalayın.
+
+5. **Vercel Production env'e ekleyin** (`vercel env add`, ya da Vercel Dashboard'dan):
+   - `AI_ASISTAN_URL` = 4. adımdaki `https://....ts.net` adresi
+   - `AI_ASISTAN_SECRET` = 2. adımda ürettiğiniz secret
+
+6. **Sürekli çalışır durumda tut** (Mac yeniden başlarsa otomatik ayağa kalksın):
+   `tools/icerik-uretici/launchd/` deseniyle bir `launchd` `.plist` dosyası ekleyin
+   (`KeepAlive: true`, `ProgramArguments: ["node", ".../server.cjs"]`).
+
+## Doğrulama
+
+```bash
+curl -X POST http://localhost:8787/sohbet \
+  -H "Content-Type: application/json" \
+  -H "X-Asistan-Secret: <ASISTAN_SECRET değeriniz>" \
+  -d '{"mesaj":"Randevu nasıl alırım?","gecmis":[],"siteIcerigi":"Test klinik bilgisi."}'
+```
+Beklenen: `{"cevap": "..."}` şeklinde bir JSON.
+
+## Loglar
+
+Her konuşma, `tools/site-asistan/gunluk.tsv` dosyasına **anonim** bir satır
+olarak yazılır (yalnız zaman damgası + kaba kategori — kişisel veri/mesaj
+metni yok). Bu dosya `.gitignore`'a eklenmelidir.

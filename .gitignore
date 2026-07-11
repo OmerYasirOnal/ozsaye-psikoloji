@@ -67,3 +67,6 @@ review-rapor.md.log
 
 # Claude Code oturum artefaktları (subagent worktree'leri vb.)
 /.claude/
+
+# Site AI Asistanı — anonim konuşma günlüğü (yerel, kişisel veri yok ama commit'lenmez)
+tools/site-asistan/gunluk.tsv
