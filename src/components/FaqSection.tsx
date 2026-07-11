@@ -21,7 +21,7 @@ import { site, isReady } from "@/lib/site";
  * beyanının yapısal veriye sızmaması için).
  */
 
-interface Faq {
+export interface Faq {
   question: string;
   /** İnsan okuru için JSX cevap (vurgu, satır vb. içerebilir). */
   answer: React.ReactNode;
@@ -39,7 +39,7 @@ const seansSuresi = isReady(site.pricing.duration)
   ? site.pricing.duration
   : "yaklaşık 45-50 dakika";
 
-const faqs: Faq[] = [
+export const faqs: Faq[] = [
   {
     question: "Terapi nedir ve kimler için uygundur?",
     answer: (
