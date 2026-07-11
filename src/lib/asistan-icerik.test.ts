@@ -23,4 +23,9 @@ describe("asistanIcerigi", () => {
     const metin = asistanIcerigi();
     expect(metin).toContain("Öz & Saye");
   });
+
+  test("placeholder ([DOLDUR]) alanı sızdırmaz", () => {
+    const metin = asistanIcerigi();
+    expect(metin).not.toContain("[DOLDUR]");
+  });
 });

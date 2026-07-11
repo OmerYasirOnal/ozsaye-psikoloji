@@ -20,7 +20,11 @@ export function asistanIcerigi(): string {
   bolumler.push(`Uzman kadrosu:\n${uzmanlar}`);
 
   if (isReady(site.pricing.sessionFee)) {
-    bolumler.push(`Seans ücreti: ${site.pricing.sessionFee} (${site.pricing.duration})`);
+    // Seans süresi placeholder iken genel/standart bir ifadeye düşülür (sızıntı önlenir).
+    const seansSuresi = isReady(site.pricing.duration)
+      ? site.pricing.duration
+      : "yaklaşık 45-50 dakika";
+    bolumler.push(`Seans ücreti: ${site.pricing.sessionFee} (${seansSuresi})`);
   }
 
   const sss = faqs.map((f) => `S: ${f.question}\nC: ${f.answerText}`).join("\n\n");
