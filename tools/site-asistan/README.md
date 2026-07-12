@@ -1,4 +1,9 @@
-# Site AI Asistanı (Mac tarafı)
+# Site AI Asistanı (Mac tarafı — YEDEK yol)
+
+> **Not (2026-07-12):** Asistanın birincil cevap yolu artık **Groq bulut
+> API'sidir** (`src/lib/asistan-bulut.ts`, Vercel env `GROQ_API_KEY`) — Mac'e
+> bağımlılık yok. Buradaki Mac kurulumu, Groq'a ulaşılamadığında devreye giren
+> **yedek** yoldur; kurulu değilse de site sabit fallback cevaplarla çalışır.
 
 `ozsaye.com`'daki sohbet widget'ının arkasındaki yerel Ollama sarmalayıcısı.
 Mimari ve tasarım kararları: `docs/superpowers/specs/2026-07-11-site-ai-asistani-design.md`.

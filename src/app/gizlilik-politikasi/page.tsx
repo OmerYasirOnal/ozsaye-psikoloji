@@ -135,6 +135,21 @@ export default function GizlilikPolitikasiPage() {
             </p>
           </Section>
 
+          <Section id="ai-asistan" title="Sitedeki Sohbet Asistanı">
+            <p>
+              Sitemizin köşesindeki sohbet asistanı; hizmetlerimiz, randevu
+              süreci ve ücretler gibi site içeriğine dayalı sorulara otomatik
+              cevap veren bir yapay zekâ aracıdır. Terapi, tanı veya psikolojik
+              tavsiye vermez. Yazdığınız mesajlar cevabın üretilebilmesi için
+              yapay zekâ altyapı sağlayıcımıza iletilir; ne bizim
+              sistemlerimizde ne de sağlayıcıda kayıt altına alınır ve yapay
+              zekâ modellerinin eğitiminde kullanılmaz. Yine de asistana ad,
+              telefon, sağlık bilgisi gibi kişisel verilerinizi yazmamanızı,
+              bu bilgileri yalnızca randevu formu üzerinden iletmenizi rica
+              ederiz.
+            </p>
+          </Section>
+
           <Section id="cerezler" title="Çerezler ve Analitik">
             <p>
               {/* TODO: GERÇEK VERİ -- analitik aracı (ör. Vercel Analytics / Google Analytics) entegre edilince bu paragrafı güncelleyin; entegre edilmezse bu bölümü sadeleştirin */}

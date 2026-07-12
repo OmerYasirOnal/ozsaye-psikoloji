@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { asistanIcerigi } from "@/lib/asistan-icerik";
+import { bulutCevapAl, type GecmisMesaj } from "@/lib/asistan-bulut";
 import { fallbackCevap } from "@/lib/asistan-fallback";
 
 /**
@@ -42,8 +43,6 @@ function hizSiniriAsildiMi(ip: string): boolean {
   istekGecmisi.set(ip, zamanlar);
   return zamanlar.length > RATE_LIMIT_MAKS_ISTEK;
 }
-
-type GecmisMesaj = { rol: "kullanici" | "asistan"; icerik: string };
 
 async function macAsistanindanCevapAl(
   mesaj: string,
@@ -98,6 +97,10 @@ export async function POST(request: Request) {
     });
   }
 
-  const macCevabi = await macAsistanindanCevapAl(mesaj, gecmis);
-  return Response.json({ cevap: macCevabi ?? fallbackCevap(mesaj) });
+  // Kademeli cevap: bulut (Groq, birincil) → Mac köprüsü (yedek) → sabit fallback.
+  const cevap =
+    (await bulutCevapAl(mesaj, gecmis)) ??
+    (await macAsistanindanCevapAl(mesaj, gecmis)) ??
+    fallbackCevap(mesaj);
+  return Response.json({ cevap });
 }
