@@ -48,7 +48,6 @@ export default function ExpertAvatar({
         alt={`${name} portresi`}
         width={boxDim}
         height={boxDimH}
-        unoptimized
         className={`${box} rounded-2xl object-cover ${className}`}
       />
     );

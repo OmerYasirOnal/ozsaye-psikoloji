@@ -16,7 +16,6 @@ export default function About() {
                   src={site.aboutImageUrl}
                   alt="Öz & Saye Psikoloji danışmanlık ofisinden bir görünüm"
                   fill
-                  unoptimized
                   sizes="(min-width: 1024px) 480px, 100vw"
                   className="object-cover"
                 />
