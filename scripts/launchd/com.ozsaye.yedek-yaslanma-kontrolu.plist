@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Öz & Saye — Neon yedeği yaşlanma kontrolü (launchd LaunchAgent)
+  Program: scripts/yedek-yaslanma-kontrolu.sh. Her gün 10:00'da en yeni Neon
+  yedeğinin yaşına bakar; 9 günü aşmışsa (veya hiç yedek yoksa) Telegram'a
+  uyarı gönderir. neon-yedek.sh'nin kendi hata alarmından BAĞIMSIZDIR: Mac
+  Cumartesi 04:00'te kapalıysa iş hiç tetiklenmez ve hata da oluşmaz — bu
+  kontrol o sessiz-boşluğu yakalar.
+
+  Kurulum:
+    mkdir -p /Users/omeryasironal/Projects/özsaye_psikoloji/loglar
+    cp scripts/launchd/com.ozsaye.yedek-yaslanma-kontrolu.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.ozsaye.yedek-yaslanma-kontrolu.plist
+  Kaldırma:
+    launchctl unload ~/Library/LaunchAgents/com.ozsaye.yedek-yaslanma-kontrolu.plist
+  Elle test:
+    launchctl start com.ozsaye.yedek-yaslanma-kontrolu
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ozsaye.yedek-yaslanma-kontrolu</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/omeryasironal/Projects/özsaye_psikoloji/scripts/yedek-yaslanma-kontrolu.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>10</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/yedek-yaslanma-kontrolu.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/yedek-yaslanma-kontrolu.log</string>
+</dict>
+</plist>

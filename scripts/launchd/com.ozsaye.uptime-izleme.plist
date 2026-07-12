@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Öz & Saye — ozsaye.com uptime izleyici (launchd LaunchAgent)
+  Program: tools/uptime-izleme/kontrol-et.cjs. Her 5 dakikada bir çalışır;
+  durum DEĞİŞTİYSE (düştü/geri geldi) Telegram'a haber verir, aksi halde
+  sessiz kalır (spam yok). Art arda 2 başarısız kontrolden sonra "düşük" ilan
+  eder (bkz. script içi FAIL_ESIGI).
+
+  Kurulum:
+    mkdir -p /Users/omeryasironal/Projects/özsaye_psikoloji/loglar
+    cp scripts/launchd/com.ozsaye.uptime-izleme.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.ozsaye.uptime-izleme.plist
+  Kaldırma:
+    launchctl unload ~/Library/LaunchAgents/com.ozsaye.uptime-izleme.plist
+  Elle test:
+    launchctl start com.ozsaye.uptime-izleme
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ozsaye.uptime-izleme</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/node</string>
+        <string>/Users/omeryasironal/Projects/özsaye_psikoloji/tools/uptime-izleme/kontrol-et.cjs</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/uptime-izleme.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/uptime-izleme.log</string>
+</dict>
+</plist>

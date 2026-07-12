@@ -54,8 +54,36 @@ readonly KEEP=8
 
 # --- yardımcılar -----------------------------------------------------------
 
+# tools/icerik-uretici/.env.local'den bir anahtarın değerini güvenle oku (yok/boş → "").
+env_degeri_oku() {
+  local dosya="$1" anahtar="$2" satir
+  [[ -f "$dosya" ]] || { printf ''; return; }
+  satir="$(grep -E "^[[:space:]]*${anahtar}=" "$dosya" | head -n1 || true)"
+  [[ -n "$satir" ]] || { printf ''; return; }
+  satir="${satir#*${anahtar}=}"
+  satir="${satir%$'\r'}"
+  printf '%s' "$satir"
+}
+
+# Yedek başarısız olursa Telegram'a haber ver (yoksa Mac kapalıyken/hata
+# sessizce geçerse bir sonraki başarılı yedeğe kadar fark edilmeyebilir).
+# Aynı Telegram botunu tools/icerik-uretici ile paylaşır. Best-effort: bu
+# fonksiyon başarısız olsa bile asıl hata (die) akışını bloklamaz.
+uyar_telegram() {
+  local mesaj="$1" repo env_file token chat_id
+  repo="$(repo_root)"
+  env_file="${repo%/}/tools/icerik-uretici/.env.local"
+  token="$(env_degeri_oku "$env_file" TG_BOT_TOKEN)"
+  chat_id="$(env_degeri_oku "$env_file" TG_CHAT_ID)"
+  [[ -n "$token" && -n "$chat_id" ]] || return 0
+  curl -s -m 10 "https://api.telegram.org/bot${token}/sendMessage" \
+    --data-urlencode "chat_id=${chat_id}" \
+    --data-urlencode "text=🔴 ozsaye Neon yedeği BAŞARISIZ: ${mesaj}" >/dev/null 2>&1 || true
+}
+
 die() {
   echo "HATA: $*" >&2
+  uyar_telegram "$*"
   exit 1
 }
 
