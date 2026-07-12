@@ -63,7 +63,12 @@ export async function bulutCevapAl(
       }),
       signal: controller.signal,
     });
-    if (!yanit.ok) return null;
+    if (!yanit.ok) {
+      // Yalnız durum kodu loglanır (kişisel veri yok): yanlış anahtar (401)
+      // veya kota aşımı (429) sessizce Mac/fallback'e düşünce görünmez olurdu.
+      console.error(`[asistan-bulut] Groq hata: ${yanit.status}`);
+      return null;
+    }
     const veri = await yanit.json();
     const icerik = veri?.choices?.[0]?.message?.content;
     return typeof icerik === "string" && icerik.trim() ? icerik.trim() : null;

@@ -10,8 +10,9 @@ import { fallbackCevap } from "@/lib/asistan-fallback";
  * bir Türkçe cevapla 200 döner.
  */
 export const dynamic = "force-dynamic";
-// Mac'e giden istek 25 sn'ye kadar bekleyebilir; fonksiyon süresi buna sığmalı.
-export const maxDuration = 30;
+// En kötü durum sıralı kademeler: Groq 10 sn + Mac köprüsü 25 sn = 35 sn;
+// fonksiyon süresi buna sığmalı ki ziyaretçi ham zaman-aşımı hatası görmesin.
+export const maxDuration = 40;
 
 const mesajSchema = z.object({
   mesaj: z.string().trim().min(1).max(500),
