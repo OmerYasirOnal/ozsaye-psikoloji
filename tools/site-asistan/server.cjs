@@ -70,7 +70,13 @@ async function ollamaCevapla(mesaj, gecmis, siteIcerigi) {
   const yanit = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: OLLAMA_MODEL, messages: mesajlar, stream: false }),
+    body: JSON.stringify({
+      model: OLLAMA_MODEL,
+      messages: mesajlar,
+      stream: false,
+      // Modeli bellekte tut — soğuk yeniden yükleme ilk cevabı geciktiriyor.
+      keep_alive: "2h",
+    }),
   });
   if (!yanit.ok) throw new Error(`Ollama hata: ${yanit.status}`);
   const veri = await yanit.json();

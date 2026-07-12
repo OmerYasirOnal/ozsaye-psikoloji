@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Öz & Saye — site AI asistanı sunucusu (server.cjs, localhost:8787).
+  Ortam değişkenleri tools/site-asistan/.env.local'den okunur (lib/env.cjs).
+  Kurulum/kaldırma: tools/site-asistan/README.md → "launchd".
+  Yollar bu makinedeki checkout'a ve Homebrew node'una göredir — farklıysa düzenleyin.
+  Log dizini önceden var olmalı:  mkdir -p loglar   (loglar/ .gitignore'dadır)
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ozsaye.site-asistan</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/node</string>
+    <string>/Users/omeryasironal/Projects/özsaye_psikoloji/tools/site-asistan/server.cjs</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/site-asistan.log</string>
+  <key>StandardErrorPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/site-asistan.log</string>
+</dict>
+</plist>

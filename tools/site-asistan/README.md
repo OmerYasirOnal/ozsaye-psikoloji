@@ -42,9 +42,22 @@ Mimari ve tasarım kararları: `docs/superpowers/specs/2026-07-11-site-ai-asista
    vercel redeploy <mevcut-production-url> --target production
    ```
 
-7. **Sürekli çalışır durumda tut** (Mac yeniden başlarsa otomatik ayağa kalksın):
-   `tools/icerik-uretici/launchd/` deseniyle bir `launchd` `.plist` dosyası ekleyin
-   (`KeepAlive: true`, `ProgramArguments: ["node", ".../server.cjs"]`).
+7. **Sürekli çalışır durumda tut** (Mac yeniden başlarsa otomatik ayağa kalksın) —
+   hazır plist'ler `launchd/` altında (biri `tailscaled` userspace daemon'u, biri
+   bu sunucu; Funnel yapılandırması daemon durumunda saklıdır, daemon kalkınca
+   kendiliğinden geri gelir):
+   ```bash
+   mkdir -p loglar
+   cp tools/site-asistan/launchd/*.plist ~/Library/LaunchAgents/
+   launchctl load ~/Library/LaunchAgents/com.ozsaye.tailscaled.plist
+   launchctl load ~/Library/LaunchAgents/com.ozsaye.site-asistan.plist
+   ```
+
+> **Not (bu makinedeki kurulum):** Tailscale, GUI uygulaması yerine Homebrew
+> formülüyle (`brew install tailscale`) ve **userspace** modda kuruludur — sudo
+> gerektirmez, Funnel bu modda da çalışır. Durum/soket dizini:
+> `~/.tailscale-asistan/`. CLI kullanırken soketi belirtin:
+> `tailscale --socket ~/.tailscale-asistan/tailscaled.sock <komut>`.
 
 ## Doğrulama
 

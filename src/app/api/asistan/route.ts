@@ -9,6 +9,8 @@ import { fallbackCevap } from "@/lib/asistan-fallback";
  * bir Türkçe cevapla 200 döner.
  */
 export const dynamic = "force-dynamic";
+// Mac'e giden istek 25 sn'ye kadar bekleyebilir; fonksiyon süresi buna sığmalı.
+export const maxDuration = 30;
 
 const mesajSchema = z.object({
   mesaj: z.string().trim().min(1).max(500),
@@ -52,7 +54,9 @@ async function macAsistanindanCevapAl(
   if (!url || !secret) return null;
 
   const controller = new AbortController();
-  const zamanAsimi = setTimeout(() => controller.abort(), 5000);
+  // 7B model + uzun site özeti: önbelleksiz ilk istek 5 sn'yi aşabiliyor
+  // (canlıda ölçüldü) — ziyaretçiyi fallback'e düşürmemek için geniş tutulur.
+  const zamanAsimi = setTimeout(() => controller.abort(), 25_000);
 
   try {
     const yanit = await fetch(`${url}/sohbet`, {

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Öz & Saye — site AI asistanının Tailscale daemon'u (userspace modu, sudo'suz).
+  Funnel yapılandırması daemon durumunda saklıdır; daemon ayağa kalkınca
+  https://ozsaye-asistan.<tailnet>.ts.net → localhost:8787 funnel'ı kendiliğinden
+  yeniden kurulur. Kurulum/kaldırma: tools/site-asistan/README.md → "launchd".
+  Yollar bu makinedeki checkout'a ve Homebrew'a göredir — farklıysa düzenleyin.
+  Log dizini önceden var olmalı:  mkdir -p loglar   (loglar/ .gitignore'dadır)
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ozsaye.tailscaled</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/opt/tailscale/bin/tailscaled</string>
+    <string>--tun=userspace-networking</string>
+    <string>--statedir=/Users/omeryasironal/.tailscale-asistan/state</string>
+    <string>--socket=/Users/omeryasironal/.tailscale-asistan/tailscaled.sock</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/tailscaled.log</string>
+  <key>StandardErrorPath</key><string>/Users/omeryasironal/Projects/özsaye_psikoloji/loglar/tailscaled.log</string>
+</dict>
+</plist>
