@@ -58,7 +58,6 @@ export default async function BlogIndexPage() {
                       alt=""
                       width={600}
                       height={315}
-                      unoptimized
                       className="aspect-[1200/630] h-full w-full object-cover"
                     />
                   ) : (

@@ -112,6 +112,12 @@ export interface Site {
   };
   /** Uzman kadrosu. */
   experts: Expert[];
+  /**
+   * Anasayfa "Hakkımızda" bölümündeki genel ofis/tanıtım görseli (opsiyonel).
+   * Boşsa (klinikten fotoğraf gelene kadar) About.tsx zarifçe bir yer
+   * tutucu gösterir — kırık görsel veya boş alan olmaz.
+   */
+  aboutImageUrl?: string;
 }
 
 export const site: Site = {

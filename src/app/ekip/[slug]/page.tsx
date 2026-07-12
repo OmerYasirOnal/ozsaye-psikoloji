@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Cta from "@/components/Cta";
+import ExpertAvatar from "@/components/ExpertAvatar";
 import { birlesikProfil } from "@/lib/ekip";
 import { jsonLdSerialize } from "@/lib/json-ld";
 import { getProfilIcerik } from "@/lib/profil-db";
@@ -53,15 +54,6 @@ export default async function ExpertDetailPage({
   // Kimlik + panel içeriği birleştirilir. İçerik satırı yoksa tüm içerik
   // alanları null döner (kamuda gizli — eski placeholder-gizle davranışı).
   const profil = birlesikProfil(expert, await getProfilIcerik(slug));
-
-  // Monogram: ad kelimelerinin baş harfleri (en fazla 2, büyük harf). Foto
-  // yer tutucusu için. Ör. "Melek Yıldız" -> "MY", "Sacide Şahin" -> "SŞ".
-  const monogram = expert.name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toLocaleUpperCase("tr-TR"))
-    .join("");
 
   // İçerik alanları yalnızca panelden girildiğinde (null değilken) gösterilir;
   // içerik yoksa hiç render edilmez (sahte künye/beyan görünmesin).
@@ -139,25 +131,7 @@ export default async function ExpertDetailPage({
         <div className="mt-14 grid gap-12 lg:grid-cols-[18rem_1fr] lg:gap-16">
           {/* Foto yuvası: panelden görsel girildiyse portre, yoksa monogram. */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            {profil.imageUrl ? (
-              <Image
-                src={profil.imageUrl}
-                alt={expert.name + " portresi"}
-                width={288}
-                height={360}
-                unoptimized
-                className="aspect-[4/5] w-full rounded-2xl border border-sage/15 object-cover"
-              />
-            ) : (
-              <div
-                aria-hidden="true"
-                className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-sage/15 bg-sage/10"
-              >
-                <span className="font-display text-6xl font-light tracking-wide text-sage lg:text-7xl">
-                  {monogram}
-                </span>
-              </div>
-            )}
+            <ExpertAvatar name={expert.name} imageUrl={profil.imageUrl} size="lg" />
           </div>
 
           {/* Künye + içerik */}
@@ -271,18 +245,7 @@ export default async function ExpertDetailPage({
                 randevu talebi oluşturabilirsiniz.
               </p>
               <div className="mt-8">
-                <Link
-                  href="/#randevu"
-                  className="group inline-flex items-center gap-2 rounded-full bg-forest px-8 py-3.5 font-body text-sm font-semibold tracking-wide text-cream transition-colors duration-300 hover:bg-forest-dark motion-reduce:transition-none"
-                >
-                  Randevu oluştur
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                  >
-                    →
-                  </span>
-                </Link>
+                <Cta href="/#randevu">Randevu oluştur</Cta>
               </div>
             </div>
 

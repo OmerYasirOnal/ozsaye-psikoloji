@@ -1,42 +1,47 @@
+import Image from "next/image";
+
 import ScrollReveal from "./ScrollReveal";
+import { site } from "@/lib/site";
 
 export default function About() {
   return (
     <section id="hakkimizda" className="bg-cream py-28 lg:py-40">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
-          {/* Image side */}
+          {/* Image side: gerçek görsel geldiyse portre, yoksa zarif yer tutucu. */}
           <ScrollReveal variant="fade">
-            {/* next/image örneği (genel ofis görseli için):
-             *
-             * import Image from "next/image";
-             *
-             * <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-sage/15">
-             *   <Image
-             *     src="/ofis/ozsaye-ofis.jpg"
-             *     alt="Özsaye Psikoloji danışmanlık ofisinden bir görünüm"
-             *     fill
-             *     sizes="(min-width: 1024px) 480px, 100vw"
-             *     className="object-cover"
-             *   />
-             * </div>
-             */}
-            <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl border border-sage/15 bg-sage/10 bg-[radial-gradient(circle,rgba(167,191,167,0.18),transparent_70%)]">
-              <svg
-                aria-hidden="true"
-                className="h-16 w-16 text-sage"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 22V10" />
-                <path d="M12 12c-3.3 0-6-2.7-6-6 3.3 0 6 2.7 6 6Z" />
-                <path d="M12 10.5c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" />
-              </svg>
-            </div>
+            {site.aboutImageUrl ? (
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-sage/15">
+                <Image
+                  src={site.aboutImageUrl}
+                  alt="Öz & Saye Psikoloji danışmanlık ofisinden bir görünüm"
+                  fill
+                  unoptimized
+                  sizes="(min-width: 1024px) 480px, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex aspect-[4/5] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-sage/15 bg-sage/10">
+                <svg
+                  aria-hidden="true"
+                  className="h-16 w-16 text-sage"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22V10" />
+                  <path d="M12 12c-3.3 0-6-2.7-6-6 3.3 0 6 2.7 6 6Z" />
+                  <path d="M12 10.5c0-2.8 2.2-5 5-5 0 2.8-2.2 5-5 5Z" />
+                </svg>
+                <p className="font-body text-xs font-medium tracking-[0.2em] text-forest-muted uppercase">
+                  Fotoğraflar yakında
+                </p>
+              </div>
+            )}
           </ScrollReveal>
 
           {/* Text side */}

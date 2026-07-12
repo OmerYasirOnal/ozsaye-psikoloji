@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Cta from "@/components/Cta";
 import { ServiceIcon } from "@/components/ServiceIcon";
+import { jsonLdSerialize } from "@/lib/json-ld";
 import { getService, getServiceSlugs } from "@/lib/services";
-import { site } from "@/lib/site";
+import { absoluteUrl, site } from "@/lib/site";
 
 /**
  * Hizmet (çalışma alanı) detay sayfası — /hizmetler/[slug].
@@ -89,15 +91,41 @@ export default async function HizmetDetayPage({
     })),
   };
 
+  // Breadcrumb JSON-LD — sayfadaki görsel breadcrumb'ı (Ana sayfa / Çalışma
+  // Alanları / hizmet) birebir yansıtır.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana sayfa", item: site.url },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Çalışma Alanları",
+        item: absoluteUrl("/hizmetler"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.title,
+        item: absoluteUrl(`/hizmetler/${service.slug}`),
+      },
+    ],
+  };
+
   return (
     <main id="icerik" className="bg-warm-white">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(serviceJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(breadcrumbJsonLd) }}
       />
 
       <article className="mx-auto max-w-3xl px-6 py-28 lg:px-8 lg:py-36">
@@ -233,18 +261,7 @@ export default async function HizmetDetayPage({
             ilk adımı birlikte atabiliriz.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6">
-            <Link
-              href="/#randevu"
-              className="group inline-flex items-center gap-2 rounded-full bg-forest px-8 py-3.5 font-body text-sm font-semibold tracking-wide text-cream transition-all duration-300 hover:bg-forest-dark motion-reduce:transition-none"
-            >
-              Randevu Al
-              <span
-                aria-hidden="true"
-                className="transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
-              >
-                →
-              </span>
-            </Link>
+            <Cta href="/#randevu">Randevu Al</Cta>
             <Link
               href="/hizmetler"
               className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-forest underline decoration-sage/50 underline-offset-[5px] transition-colors duration-300 hover:decoration-forest"

@@ -59,6 +59,14 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const url = `${siteUrl}/blog/${post.slug}`;
+
+  // Yazar E-E-A-T: gerçek uzmana eşleşirse Person (profil linkiyle), yoksa
+  // savunmacı Organization fallback (beklenmeyen bir yazar adı gelirse).
+  const yazarUzman = site.experts.find((e) => e.name === post.author);
+  const author = yazarUzman
+    ? { "@type": "Person", name: yazarUzman.name, url: absoluteUrl(`/ekip/${yazarUzman.slug}`) }
+    : { "@type": "Organization", name: post.author, url: siteUrl };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -74,13 +82,25 @@ export default async function BlogPostPage({
         ? absoluteUrl(post.coverImageUrl)
         : post.coverImageUrl
       : `${siteUrl}/og.png`,
-    author: { "@type": "Organization", name: post.author, url: siteUrl },
+    author,
     publisher: {
       "@type": "Organization",
       name: "Öz & Saye Psikoloji",
       logo: { "@type": "ImageObject", url: `${siteUrl}/icon-512.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
+  };
+
+  // Breadcrumb JSON-LD — sayfadaki görsel breadcrumb'ı (Anasayfa / Yazılar) +
+  // güncel yazı ile birebir yansıtır.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Anasayfa", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Yazılar", item: absoluteUrl("/blog") },
+      { "@type": "ListItem", position: 3, name: post.title, item: url },
+    ],
   };
 
   return (
@@ -118,10 +138,9 @@ export default async function BlogPostPage({
           {post.coverImageUrl && (
             <Image
               src={post.coverImageUrl}
-              alt=""
+              alt={post.title}
               width={1200}
               height={630}
-              unoptimized
               className="mt-8 aspect-[1200/630] w-full rounded-2xl object-cover"
             />
           )}
@@ -169,6 +188,10 @@ export default async function BlogPostPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(breadcrumbJsonLd) }}
       />
     </>
   );

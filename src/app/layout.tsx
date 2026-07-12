@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Montserrat } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import Header from "@/components/Header";
@@ -113,6 +115,8 @@ export default function RootLayout({
           {children}
         </SiteChrome>
         <JsonLd />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

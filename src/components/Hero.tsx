@@ -1,3 +1,4 @@
+import Cta from "./Cta";
 import Parallax from "./Parallax";
 
 export default function Hero() {
@@ -50,28 +51,10 @@ export default function Hero() {
 
         {/* CTA — tek birincil eylem + sessiz ikincil bağlantı */}
         <div className="hero-animate hero-animate-delay-3 mt-10 flex flex-col items-center justify-center gap-x-8 gap-y-5 sm:flex-row">
-          <a
-            href="#randevu"
-            className="group inline-flex items-center gap-2 rounded-full bg-forest px-8 py-3.5 font-body text-sm font-semibold tracking-wide text-cream transition-colors duration-300 hover:bg-forest-dark"
-          >
-            Online Randevu Al
-            <svg
-              aria-hidden="true"
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </a>
-          <a
-            href="#hakkimizda"
-            className="font-body text-sm font-semibold tracking-wide text-forest underline decoration-sage/50 underline-offset-[6px] transition-colors duration-300 hover:decoration-forest"
-          >
+          <Cta href="#randevu">Online Randevu Al</Cta>
+          <Cta href="#hakkimizda" variant="ghost" icon={false}>
             Bizi tanıyın
-          </a>
+          </Cta>
         </div>
       </div>
     </section>

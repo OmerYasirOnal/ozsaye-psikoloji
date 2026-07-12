@@ -6,34 +6,56 @@ import { absoluteUrl, site } from "@/lib/site";
 /**
  * Özsaye Psikoloji — schema.org yapısal verisi (JSON-LD).
  *
- * Server Component. `site.dataReady` `false` olduğu sürece (NAP/kimlik gerçek
- * verisi henüz girilip doğrulanmadığı için) hiçbir yapısal veri üretmez ve
- * `null` döner — placeholder verinin arama motorlarına/AI sistemlerine sızmasını
- * önlemek için.
- *
- * `true` olduğunda tek bir <script type="application/ld+json"> içinde bir
- * `@graph` dizisi üretilir:
- *  - MedicalClinic (klinik kimliği, NAP, çalışma saatleri, konum).
- *    Not: schema.org'da net bir "Psychologist" işletme tipi yoktur; bu yüzden
- *    MedicalClinic + medicalSpecialty: "Psychiatric" kullanılır.
- *  - Her uzman için bir Person düğümü (worksFor ile klinikle ilişkilendirilir).
- *    Person içeriği (bio, üniversite, üyelik, alanlar, sameAs, görsel) panelden
- *    girilir (`expert_profiles`); `birlesikProfil` ile birleştirilir. Girilmemiş
- *    (null) alanlar düğümden atlanır (eski isReady-atla davranışıyla aynı).
+ * Server Component. Tek bir <script type="application/ld+json"> içinde bir
+ * `@graph` dizisi üretilir. Graph iki kademeli:
+ *  - **Her zaman** (NAP verisinden bağımsız): `WebSite` + `Organization`
+ *    (yalnız site adı/URL + doğrulanmış sosyal profiller — bunlar zaten
+ *    gerçek ve NAP'e ihtiyaç duymaz).
+ *  - **Yalnız `site.dataReady=true` iken** eklenir (NAP/kimlik gerçek verisi
+ *    girilip doğrulanana kadar placeholder'ın arama motorlarına/AI
+ *    sistemlerine sızmasını önlemek için): MedicalClinic (NAP, çalışma
+ *    saatleri, konum — schema.org'da net bir "Psychologist" işletme tipi
+ *    yoktur, bu yüzden MedicalClinic + medicalSpecialty: "Psychiatric"
+ *    kullanılır) + her uzman için bir Person düğümü (worksFor ile klinikle
+ *    ilişkilendirilir; içerik panelden girilir, `birlesikProfil` ile
+ *    birleştirilir; girilmemiş alanlar düğümden atlanır).
  */
 export default async function JsonLd() {
-  // Gerçek veri doğrulanmadan yapısal veri yayımlama. (DB'ye erişmeden önce
-  // döner: dataReady=false iken profil sorgusu hiç çalışmaz.)
-  if (!site.dataReady) {
-    return null;
-  }
-
-  const clinicId = `${site.url}#klinik`;
-
-  // Klinik için sameAs: yalnızca tanımlı sosyal profiller.
   const clinicSameAs = [site.social.instagram, site.social.linkedin].filter(
     (url): url is string => Boolean(url),
   );
+
+  const graph: object[] = [
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}#website`,
+      name: site.shortName,
+      url: site.url,
+      inLanguage: "tr-TR",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${site.url}#organization`,
+      name: site.shortName,
+      url: site.url,
+      ...(clinicSameAs.length > 0 ? { sameAs: clinicSameAs } : {}),
+    },
+  ];
+
+  // NAP/kimlik gerçek veri doğrulanmadan MedicalClinic/Person yayımlama.
+  // (DB'ye erişmeden önce döner: dataReady=false iken profil sorgusu hiç çalışmaz.)
+  if (!site.dataReady) {
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdSerialize({ "@context": "https://schema.org", "@graph": graph }),
+        }}
+      />
+    );
+  }
+
+  const clinicId = `${site.url}#klinik`;
 
   const clinic = {
     "@type": ["MedicalClinic", "MedicalBusiness"],
@@ -123,7 +145,7 @@ export default async function JsonLd() {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@graph": [clinic, ...people],
+    "@graph": [...graph, clinic, ...people],
   };
 
   return (

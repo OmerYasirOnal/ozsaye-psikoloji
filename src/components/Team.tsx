@@ -1,24 +1,9 @@
-import Image from "next/image";
-import Link from "next/link";
-
+import Cta from "./Cta";
+import ExpertAvatar from "./ExpertAvatar";
 import ScrollReveal from "./ScrollReveal";
 import { birlesikProfil } from "@/lib/ekip";
 import { getTumProfiller } from "@/lib/profil-db";
 import { site } from "@/lib/site";
-
-/**
- * Uzman adının kelimelerinin baş harflerinden (en fazla 2) büyük harf monogram
- * üretir. Ör. "Melek Yıldız" -> "MY", "Sacide Şahin" -> "SŞ".
- */
-function monogram(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toLocaleUpperCase("tr"))
-    .join("");
-}
 
 export default async function Team() {
   // Kimlik site.experts'ten, içerik panelden (expert_profiles). Tek sorguyla
@@ -56,26 +41,12 @@ export default async function Team() {
             return (
               <ScrollReveal key={expert.slug} delay={idx + 2}>
                 <div className="group rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(31,59,46,0.15)] motion-reduce:transition-none lg:p-10">
-                  {/* Foto: panelden görsel girildiyse portre, yoksa monogram. */}
-                  {profil.imageUrl ? (
-                    <Image
-                      src={profil.imageUrl}
-                      alt={expert.name + " portresi"}
-                      width={112}
-                      height={112}
-                      unoptimized
-                      className="mx-auto mb-7 h-28 w-28 rounded-2xl object-cover"
-                    />
-                  ) : (
-                    <div
-                      aria-hidden="true"
-                      className="mx-auto mb-7 flex h-28 w-28 items-center justify-center rounded-2xl bg-sage/10"
-                    >
-                      <span className="font-display text-3xl font-light text-sage">
-                        {monogram(expert.name)}
-                      </span>
-                    </div>
-                  )}
+                  <ExpertAvatar
+                    name={expert.name}
+                    imageUrl={profil.imageUrl}
+                    size="md"
+                    className="mx-auto mb-7"
+                  />
 
                   {/* Info */}
                   <div className="text-center">
@@ -92,18 +63,9 @@ export default async function Team() {
                     )}
 
                     {/* Profil bağlantısı */}
-                    <Link
-                      href={`/ekip/${expert.slug}`}
-                      className="mt-8 inline-flex items-center gap-1.5 font-body text-sm font-medium text-forest underline decoration-sage/50 underline-offset-[5px] transition-colors duration-300 hover:decoration-forest motion-reduce:transition-none"
-                    >
+                    <Cta href={`/ekip/${expert.slug}`} variant="ghost" className="mt-8">
                       {expert.name} profilini görüntüle
-                      <span
-                        aria-hidden="true"
-                        className="no-underline transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                      >
-                        →
-                      </span>
-                    </Link>
+                    </Cta>
                   </div>
                 </div>
               </ScrollReveal>

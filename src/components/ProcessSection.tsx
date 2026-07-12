@@ -66,7 +66,10 @@ export default function ProcessSection() {
           {steps.map((step, idx) => (
             <ScrollReveal key={step.title} delay={Math.min(idx + 1, 5)}>
               <li className="h-full rounded-2xl border border-sage/15 bg-warm-white p-8 transition-colors duration-300 hover:border-sage/30 lg:p-10">
-                <span className="font-display text-5xl font-light leading-none text-forest">
+                <span
+                  aria-hidden="true"
+                  className="flex h-14 w-14 items-center justify-center rounded-full border border-sage/30 font-display text-2xl font-light text-forest"
+                >
                   {idx + 1}
                 </span>
                 <h3 className="mt-6 font-display text-xl font-light text-forest">

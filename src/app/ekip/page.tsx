@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
+import ExpertAvatar from "@/components/ExpertAvatar";
 import { birlesikProfil } from "@/lib/ekip";
 import { getTumProfiller } from "@/lib/profil-db";
 import { site } from "@/lib/site";
-
-/** Adın ilk en fazla 2 kelimesinin baş harflerinden büyük harfli monogram üretir. */
-function monogram(name: string): string {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word.charAt(0))
-    .join("")
-    .toLocaleUpperCase("tr-TR");
-}
 
 export const metadata: Metadata = {
   title: "Ekibimiz",
@@ -82,26 +71,12 @@ export default async function EkipPage() {
                 href={`/ekip/${expert.slug}`}
                 className="group flex flex-col rounded-2xl border border-sage/15 bg-warm-white p-8 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_10px_30px_-12px_rgba(31,59,46,0.15)] lg:p-10"
               >
-                {/* Foto: panelden görsel girildiyse portre, yoksa monogram. */}
-                {profil.imageUrl ? (
-                  <Image
-                    src={profil.imageUrl}
-                    alt={expert.name + " portresi"}
-                    width={96}
-                    height={96}
-                    unoptimized
-                    className="mb-7 h-24 w-24 rounded-2xl object-cover"
-                  />
-                ) : (
-                  <div
-                    aria-hidden="true"
-                    className="mb-7 flex h-24 w-24 items-center justify-center rounded-2xl bg-sage/10"
-                  >
-                    <span className="font-display text-3xl font-light text-sage">
-                      {monogram(expert.name)}
-                    </span>
-                  </div>
-                )}
+                <ExpertAvatar
+                  name={expert.name}
+                  imageUrl={profil.imageUrl}
+                  size="sm"
+                  className="mb-7"
+                />
 
                 <h2 className="font-display text-2xl font-light text-forest">
                   {expert.name}

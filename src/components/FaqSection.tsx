@@ -1,4 +1,5 @@
 import ScrollReveal from "./ScrollReveal";
+import { jsonLdSerialize } from "@/lib/json-ld";
 import { site, isReady } from "@/lib/site";
 
 /**
@@ -182,7 +183,7 @@ export default function FaqSection() {
       {/* FAQPage yapısal verisi — içerik gerçek/doğru olduğundan her zaman yayınlanır. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSerialize(faqJsonLd) }}
       />
 
       <div className="mx-auto max-w-3xl px-6 lg:px-8">

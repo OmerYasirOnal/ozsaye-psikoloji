@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Cta from "./Cta";
 import ScrollReveal from "./ScrollReveal";
 import { getAllPosts, formatDateTR } from "@/lib/blog";
 
@@ -26,22 +27,9 @@ export default async function Articles() {
             </ScrollReveal>
           </div>
           <ScrollReveal delay={2}>
-            <Link
-              href="/blog"
-              className="group inline-flex items-center gap-2 rounded-full border-2 border-forest/20 px-6 py-3 text-sm font-semibold text-forest transition-all duration-300 hover:border-forest hover:bg-forest hover:text-cream"
-            >
+            <Cta href="/blog" variant="secondary">
               Tüm Yazılar
-              <svg
-                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
+            </Cta>
           </ScrollReveal>
         </div>
 
@@ -61,7 +49,6 @@ export default async function Articles() {
                       alt=""
                       width={600}
                       height={315}
-                      unoptimized
                       className="aspect-[1200/630] h-full w-full object-cover"
                     />
                   ) : (
