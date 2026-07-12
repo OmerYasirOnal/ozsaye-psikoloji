@@ -76,6 +76,12 @@ async function ollamaCevapla(mesaj, gecmis, siteIcerigi) {
       stream: false,
       // Modeli bellekte tut — soğuk yeniden yükleme ilk cevabı geciktiriyor.
       keep_alive: "2h",
+      // Düşünen modellerde (qwen3+) düşünme kapalı: cevabı geciktirir;
+      // düşünmeyen modeller (qwen2.5) bu alanı sorunsuz yok sayar.
+      think: false,
+      // Düşük sıcaklık: küçük modellerin Türkçe dil sürçmelerini azaltır;
+      // SSS-botu için yaratıcılık gerekmez.
+      options: { temperature: 0.3 },
     }),
   });
   if (!yanit.ok) throw new Error(`Ollama hata: ${yanit.status}`);
