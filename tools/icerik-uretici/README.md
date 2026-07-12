@@ -46,11 +46,18 @@ verilebilir — bkz. "Telegram onay botu".
    (sudo'suz: `BRAND_FONT_DIR=./.fonts bash scripts/setup-fonts.sh` ve çalıştırırken
    aynı `BRAND_FONT_DIR`'i ayarla.)
 3. **ffmpeg** (Reels için): `brew install ffmpeg` (yoksa reels adımı zarifçe atlanır).
-4. **Ollama** (yerel LLM, opsiyonel): <https://ollama.com> → `ollama pull llama3.1`
-   (yoksa `--no-llm` ile şablon tabanlı metin üretilir).
+4. **Ollama** (yerel LLM, opsiyonel): <https://ollama.com> — makinede kurulu bir
+   modeli `OLLAMA_MODEL` ile gösterin (bu Mac'te: `qwen3.5:9b`; env boşsa kod
+   varsayılanı `llama3.1`'dir ve o model kurulu DEĞİLSE metin şablona düşer;
+   Ollama hiç yoksa `--no-llm` ile şablon tabanlı üretim).
 5. **Ortam değişkenleri**: `cp tools/icerik-uretici/.env.local.example tools/icerik-uretici/.env.local`
    ve doldur. `DATABASE_URL` / `BLOB_READ_WRITE_TOKEN` proje kökü `.env.local`'de
    zaten varsa burada tekrar gerekmez (öncelik: process.env > araç-yerel > kök).
+   **DİKKAT — `DATABASE_URL` kanonik veriye bakmalı:** blog'un kanonik kaynağı
+   prod DB'dir (panel düzenlemeleri oraya gider). Kök `.env.local`'deki yerel
+   Docker adresi kullanılırsa araç, Docker kapalıyken düşer ve panelden
+   yayınlanan yeni yazıları hiç göremez — bu yüzden araç-yerel `.env.local`'de
+   prod (salt-okunur kullanım) adresi tanımlıdır (2026-07-12).
 
 ## Kullanım
 

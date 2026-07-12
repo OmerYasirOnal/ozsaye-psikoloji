@@ -123,6 +123,9 @@ async function generateWithOllama(post) {
       model: OLLAMA_MODEL,
       stream: false,
       format: "json",
+      // Düşünen modellerde (qwen3+) düşünme kapalı: format:"json" ile daha
+      // öngörülebilir; düşünmeyen modeller bu alanı sorunsuz yok sayar.
+      think: false,
       options: { temperature: 0.7 },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
@@ -412,8 +415,16 @@ async function main() {
   if (FLAGS.watch) {
     const interval = Math.max(5, Number(opt("interval") || 60)) * 1000;
     console.log(`\n👀 İzleme modu açık — her ${interval / 1000}s'de yeni yazı kontrol edilir. Durdurmak için Ctrl+C.`);
-    setInterval(() => { runOnce().catch((e) => console.error(e.message)); }, interval);
+    setInterval(() => { runOnce().catch((e) => console.error((e && (e.stack || e.message)) || e)); }, interval);
   }
 }
 
-main().catch((e) => { console.error("Hata:", e.message); process.exit(1); });
+main().catch((e) => {
+  // e.message tek başına yetmez: pg'nin AggregateError'ı (ör. ECONNREFUSED)
+  // boş message taşır ve log yalnız "Hata: " kalırdı — tam hata + alt hatalar basılır.
+  console.error("Hata:", (e && (e.stack || e.message)) || e);
+  if (e && Array.isArray(e.errors)) {
+    for (const alt of e.errors) console.error("  ↳", (alt && alt.message) || alt);
+  }
+  process.exit(1);
+});
